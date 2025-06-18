@@ -3,28 +3,23 @@ import './App.css';
 
 function App() {
   const [coins, setCoins] = useState(0);
+  const [isClicked, setIsClicked] = useState(false);
 
   const handleClick = () => {
-    if (coins < 100) {
-      setCoins(coins + 1);
-      const robot = document.getElementById('robot');
-      robot.classList.add('shake');
-      setTimeout(() => robot.classList.remove('shake'), 300);
-    }
+    setCoins(coins + 1);
+    setIsClicked(true);
+    setTimeout(() => setIsClicked(false), 150);
   };
 
   return (
-    <div className="app">
-      <h1>VPN Empire 🚀</h1>
-      <p>Добро пожаловать в мини-приложение!</p>
+    <div className="container">
+      <div className="counter">{coins} $RICH</div>
       <img
-        id="robot"
         src="/robot.png"
-        alt="Робот"
-        className="robot"
+        alt="robot"
+        className={`robot ${isClicked ? 'clicked' : ''}`}
         onClick={handleClick}
       />
-      <p className="counter">{coins}/100 монет</p>
     </div>
   );
 }
