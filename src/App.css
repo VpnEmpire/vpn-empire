@@ -29,3 +29,9 @@ button {
   cursor: pointer;
   margin-top: 1rem;
 } 
+button {
+  transition: transform 0.1s ease;
+}
+button:active {
+  transform: scale(0.95);
+} 
