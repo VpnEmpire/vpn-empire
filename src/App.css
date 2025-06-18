@@ -65,3 +65,26 @@ button:active {
   font-weight: bold;
   margin-top: 1rem;
 }
+.robot {
+  width: 150px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.shake {
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(7deg); }
+  50% { transform: rotate(-7deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.counter {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  font-weight: bold;
+} 
