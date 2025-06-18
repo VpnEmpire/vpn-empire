@@ -28,13 +28,13 @@ button {
   font-weight: bold;
   cursor: pointer;
   margin-top: 1rem;
-} 
-button {
   transition: transform 0.1s ease;
 }
+
 button:active {
   transform: scale(0.95);
-} 
+}
+
 .clickable-robot {
   width: 200px;
   cursor: pointer;
@@ -45,26 +45,6 @@ button:active {
   transform: scale(0.95);
 }
 
-.counter {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-top: 1rem;
-} 
-.clickable-robot {
-  width: 200px;
-  cursor: pointer;
-  transition: transform 0.1s ease;
-}
-
-.clickable-robot:active {
-  transform: scale(0.95);
-}
-
-.counter {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-top: 1rem;
-}
 .robot {
   width: 150px;
   cursor: pointer;
@@ -84,7 +64,7 @@ button:active {
 }
 
 .counter {
-  font-size: 1.2rem;
-  margin-top: 1rem;
+  font-size: 1.5rem;
   font-weight: bold;
-} 
+  margin-top: 1rem;
+}
