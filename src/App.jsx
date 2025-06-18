@@ -15,7 +15,14 @@ function App() {
   };
 
   return (
-    <div className="app">
+     <div className="app">
+    <img
+      src="/robot.png"
+      alt="Robot"
+      className={`robot ${isShaking ? 'shake' : ''}`}
+      onClick={handleClick}
+    />
+    <p className="counter">{count} монет</p>
       <div className="main-screen">
         <h1>Кликай и зарабатывай $RICH</h1>
         <img
