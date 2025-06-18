@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 function App() {
   const [coins, setCoins] = useState(0);
   const [dailyLimit, setDailyLimit] = useState(100);
   const [isShaking, setIsShaking] = useState(false);
+  const containerRef = useRef(null); // 🎯 Для позиционирования вспышек
 
   useEffect(() => {
     const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
@@ -22,14 +23,24 @@ function App() {
     }
   }, []);
 
-  const handleClick = () => {
+  const handleClick = (e) => {
     if (coins < 100) {
       const newCoins = coins + 1;
       setCoins(newCoins);
       setDailyLimit(100 - newCoins);
       localStorage.setItem('coins', newCoins.toString());
+
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 300);
+
+      // 🌟 Создаём вспышку
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      const rect = containerRef.current.getBoundingClientRect();
+      sparkle.style.left = `${e.clientX - rect.left - 12}px`;
+      sparkle.style.top = `${e.clientY - rect.top - 12}px`;
+      containerRef.current.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 600);
     }
   };
 
@@ -37,17 +48,19 @@ function App() {
     <div className="app">
       <h1>👾 VPN Empire</h1>
       <p>Кликай на робота и зарабатывай монеты!</p>
-      <img
-        src="/robot.png"
-        alt="Робот"
-        className={`robot ${isShaking ? 'shake' : ''}`}
-        onClick={handleClick}
-      />
-      <div className="counter">
-        {coins}/100 монет
+      <div className="main-screen" ref={containerRef}>
+        <img
+          src="/robot.png"
+          alt="Робот"
+          className={`robot ${isShaking ? 'shake' : ''}`}
+          onClick={handleClick}
+        />
+        <div className="counter">
+          {coins}/100 монет
+        </div>
       </div>
     </div>
   );
 }
 
-export default App; 
+export default App;
