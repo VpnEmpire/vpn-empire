@@ -50,3 +50,18 @@ button:active {
   font-weight: bold;
   margin-top: 1rem;
 } 
+.clickable-robot {
+  width: 200px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.clickable-robot:active {
+  transform: scale(0.95);
+}
+
+.counter {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 1rem;
+}
