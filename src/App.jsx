@@ -5,19 +5,25 @@ function App() {
   const [coins, setCoins] = useState(0);
 
   const handleClick = () => {
-    setCoins(coins + 1); // Можно заменить на +10 или +100
+    setCoins(coins + 1);
   };
 
   return (
     <div className="app">
-      <div className="start-screen main-screen">
-        <h1>VPN Empire 🚀</h1>
-        <p>Монеты: <strong>{coins} $RICH</strong></p>
-        <button onClick={handleClick}>Кликни, чтобы заработать</button>
+      <h1>VPN Empire 🚀</h1>
+      <p>Добро пожаловать в мини-приложение!</p>
+      <div className="main-screen">
+        <img
+          src="/robot.png"
+          alt="Робот"
+          style={{ width: '100%', cursor: 'pointer' }}
+          onClick={handleClick}
+        />
+        <h2>{coins} $RICH</h2>
+        <p>Кликай по роботу, чтобы зарабатывать!</p>
       </div>
     </div>
   );
 }
 
-export default App;
-
+export default App; 
