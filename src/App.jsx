@@ -1,40 +1,49 @@
 import { useState } from 'react';
 import './App.css';
-import robotImg from '/robot.png';
 
 function App() {
+  const [started, setStarted] = useState(false);
   const [coins, setCoins] = useState(0);
-  const [shake, setShake] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
+
+  const maxDailyCoins = 100;
+
+  const handleStart = () => {
+    setStarted(true);
+  };
 
   const handleClick = () => {
-    if (coins < 100) {
-      setCoins(coins + 1);
-      setShake(true);
-      setTimeout(() => setShake(false), 300);
+    if (coins < maxDailyCoins) {
+      setCoins(prev => prev + 1);
+    } else {
+      setLimitReached(true);
     }
   };
 
   return (
-     <div className="app">
-    <img
-      src="/robot.png"
-      alt="Robot"
-      className={`robot ${isShaking ? 'shake' : ''}`}
-      onClick={handleClick}
-    />
-    <p className="counter">{count} монет</p>
-      <div className="main-screen">
-        <h1>Кликай и зарабатывай $RICH</h1>
-        <img
-          src={robotImg}
-          alt="Robot"
-          className={`robot ${shake ? 'shake' : ''}`}
-          onClick={handleClick}
-        />
-        <div className="counter">{coins}/100 монет</div>
-      </div>
+    <div className="app">
+      {!started ? (
+        <div className="start-screen">
+          <h1>VPN Empire</h1>
+          <p>Нажимай на робота и получай $RICH</p>
+          <button onClick={handleStart}>Начать</button>
+        </div>
+      ) : (
+        <div className="main-screen">
+          <img
+            src="/robot.png"
+            alt="Robot"
+            className="robot"
+            onClick={handleClick}
+          />
+          <div className="counter">
+            {coins}/{maxDailyCoins} монет
+            {limitReached && <p>На сегодня лимит!</p>}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export default App;
+export default App; 
