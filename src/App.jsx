@@ -5,20 +5,25 @@ function App() {
   const [coins, setCoins] = useState(0);
 
   const handleClick = () => {
-    setCoins(coins + 1);
+    if (coins < 100) {
+      setCoins(coins + 1);
+    }
   };
 
   return (
     <div className="app">
       <h1>VPN Empire 🚀</h1>
       <p>Добро пожаловать в мини-приложение!</p>
-      <img
-        src="/robot.png"
-        alt="robot"
-        className="clickable-robot"
-        onClick={handleClick}
-      />
-      <p className="counter">{coins} $RICH</p>
+      <div className="main-screen">
+        <img
+          src="/robot.png"
+          alt="robot"
+          width={150}
+          onClick={handleClick}
+          style={{ cursor: 'pointer' }}
+        />
+        <h2>{coins}/100 монет</h2>
+      </div>
     </div>
   );
 }
