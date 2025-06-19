@@ -5,7 +5,7 @@ function App() {
   const [coins, setCoins] = useState(0);
   const [dailyLimit, setDailyLimit] = useState(100);
   const [isShaking, setIsShaking] = useState(false);
-  const containerRef = useRef(null); // 🎯 Для позиционирования вспышек
+  const clickSoundRef = useRef(null); // <— ссылка на звук
 
   useEffect(() => {
     const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
@@ -23,42 +23,35 @@ function App() {
     }
   }, []);
 
-  const handleClick = (e) => {
+  const handleClick = () => {
     if (coins < 100) {
       const newCoins = coins + 1;
       setCoins(newCoins);
       setDailyLimit(100 - newCoins);
       localStorage.setItem('coins', newCoins.toString());
 
+      if (clickSoundRef.current) {
+        clickSoundRef.current.currentTime = 0;
+        clickSoundRef.current.play();
+      }
+
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 300);
-
-      // 🌟 Создаём вспышку
-      const sparkle = document.createElement('div');
-      sparkle.className = 'sparkle';
-      const rect = containerRef.current.getBoundingClientRect();
-      sparkle.style.left = `${e.clientX - rect.left - 12}px`;
-      sparkle.style.top = `${e.clientY - rect.top - 12}px`;
-      containerRef.current.appendChild(sparkle);
-      setTimeout(() => sparkle.remove(), 600);
     }
   };
 
   return (
     <div className="app">
-      <h1>👾 VPN Empire</h1>
-      <p>Кликай на робота и зарабатывай монеты!</p>
-      <div className="main-screen" ref={containerRef}>
-        <img
-          src="/robot.png"
-          alt="Робот"
-          className={`robot ${isShaking ? 'shake' : ''}`}
-          onClick={handleClick}
-        />
-        <div className="counter">
-          {coins}/100 монет
-        </div>
-      </div>
+      <h1>👾 VPN Empire 🚀</h1>
+      <p>Монеты: {coins} $RICH</p>
+      <img
+        src="/robot.png"
+        alt="Робот"
+        className={`robot ${isShaking ? 'shake' : ''}`}
+        onClick={handleClick}
+      />
+      <div className="counter">{dailyLimit > 0 ? 'Кликай, чтобы заработать' : 'Лимит на сегодня исчерпан'}</div>
+      <audio ref={clickSoundRef} src="/click.mp3" preload="auto" />
     </div>
   );
 }
