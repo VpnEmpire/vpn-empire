@@ -57,10 +57,12 @@ function App() {
       setCoins(newCoins);
       setDailyLimit(100 - newCoins);
       localStorage.setItem('coins', newCoins.toString());
+
       if (clickSoundRef.current) {
         clickSoundRef.current.currentTime = 0;
         clickSoundRef.current.play();
       }
+
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 300);
     }
