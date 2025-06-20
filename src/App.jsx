@@ -106,7 +106,11 @@ function App() {
 
   return (
     <div className="app">
-      <h1>👾 VPN Empire 🚀</h1>
+      <h1>👾 VPN Empire 🚀</h1> <div className="stats">
+  <p><strong>Монет:</strong> {coins} $RICH</p>
+  <p><strong>Звание:</strong> {getRank()}</p>
+  <p><strong>Выполнено заданий:</strong> {tasks.filter(t => t.completed).length} / {tasks.length}</p>
+</div>
       <p>Твое звание: <strong>{getRank()}</strong></p>
       <img
         src="/robot.png"
