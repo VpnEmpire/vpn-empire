@@ -31,14 +31,15 @@ function App() {
   const [isShaking, setIsShaking] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [canSpin, setCanSpin] = useState(true);
+  const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
   const clickSoundRef = useRef(null);
 
   useEffect(() => {
     const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
     const storedDate = localStorage.getItem('lastClickDate');
-    const storedSpinDate = localStorage.getItem('lastSpinDate');
     const today = new Date().toDateString();
+    const lastSpinDate = localStorage.getItem('lastSpinDate');
 
     if (storedDate !== today) {
       setCoins(0);
@@ -53,11 +54,7 @@ function App() {
       setTasks(savedTasks);
     }
 
-    if (storedSpinDate === today) {
-      setCanSpin(false);
-    } else {
-      setCanSpin(true);
-    }
+    if (lastSpinDate === today) setCanSpin(false);
   }, []);
 
   const handleClick = () => {
@@ -116,14 +113,20 @@ function App() {
 
   const spinWheel = () => {
     if (!canSpin) return;
+
+    setIsSpinning(true);
     const rewardOptions = [50, 100, 150, 200, 250, 300];
     const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
-    const newCoins = coins + reward;
-    setCoins(newCoins);
-    localStorage.setItem('coins', newCoins.toString());
-    setSpinResult(reward);
-    setCanSpin(false);
-    localStorage.setItem('lastSpinDate', new Date().toDateString());
+
+    setTimeout(() => {
+      const newCoins = coins + reward;
+      setCoins(newCoins);
+      setSpinResult(reward);
+      setCanSpin(false);
+      setIsSpinning(false);
+      localStorage.setItem('coins', newCoins.toString());
+      localStorage.setItem('lastSpinDate', new Date().toDateString());
+    }, 2000);
   };
 
   return (
@@ -145,7 +148,6 @@ function App() {
       <div className="counter">
         {coins}/100 монет {dailyLimit <= 0 && '(лимит на сегодня)'}
       </div>
-
       <div className="helper">
         <p>{getHelperMessage()}</p>
       </div>
@@ -167,15 +169,10 @@ function App() {
       ))}
 
       <div className="roulette">
-        <h2>🎰 Рулетка</h2>
-        <button
-          className="spin-button"
-          onClick={spinWheel}
-          disabled={!canSpin}
-        >
-          {canSpin ? 'Крутить рулетку' : 'Завтра снова можно крутить'}
+        <button className="spin-button" onClick={spinWheel} disabled={!canSpin || isSpinning}>
+          {isSpinning ? 'Крутится...' : '🎰 Крутить рулетку'}
         </button>
-        {spinResult && (
+        {spinResult !== null && !isSpinning && (
           <div className="spin-result">+{spinResult} монет!</div>
         )}
       </div>
@@ -186,3 +183,4 @@ function App() {
 }
 
 export default App;
+
