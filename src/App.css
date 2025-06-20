@@ -109,3 +109,28 @@ button:active {
     transform: scale(2) translateY(-50px);
   }
 } 
+.click-area {
+  position: relative;
+  display: inline-block;
+}
+
+.sparkle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  animation: sparkle-fade 0.5s ease-out;
+  pointer-events: none;
+}
+
+@keyframes sparkle-fade {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -20px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -40px) scale(0.8);
+  }
+}
