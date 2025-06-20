@@ -7,8 +7,6 @@ body, html {
 
 .app {
   padding: 2rem;
-  max-width: 500px;
-  margin: auto;
 }
 
 .start-screen, .main-screen {
@@ -18,15 +16,6 @@ body, html {
   max-width: 360px;
   margin: auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-p {
-  margin: 0.5rem 0;
 }
 
 button {
@@ -46,15 +35,20 @@ button:active {
   transform: scale(0.95);
 }
 
-.robot, .clickable-robot {
+.clickable-robot {
+  width: 200px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.clickable-robot:active {
+  transform: scale(0.95);
+}
+
+.robot {
   width: 150px;
   cursor: pointer;
   transition: transform 0.2s ease;
-}
-
-.robot:active,
-.clickable-robot:active {
-  transform: scale(0.95);
 }
 
 .shake {
@@ -75,7 +69,6 @@ button:active {
   margin-top: 1rem;
 }
 
-/* 🎇 Вспышки и звёздочки */
 .flash {
   position: absolute;
   width: 40px;
@@ -102,12 +95,9 @@ button:active {
   position: absolute;
   top: 0;
   left: 50%;
-  width: 30px;
-  height: 30px;
-  background: radial-gradient(circle, #ffff66, #ffcc00);
-  border-radius: 50%;
-  animation: sparkle-fade 0.5s ease-out;
   transform: translateX(-50%);
+  font-size: 2rem;
+  animation: sparkle-fade 0.5s ease-out;
   pointer-events: none;
 }
 
@@ -127,43 +117,35 @@ button:active {
   display: inline-block;
 }
 
-/* 📋 Список заданий */
-.task-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
+/* 💠 Стили для карточек заданий */
 .task-card {
-  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9f9f9;
+  border: 2px solid #00bfa6;
   border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  text-align: left;
-  position: relative;
-}
-
-.task-card.done {
-  opacity: 0.5;
-}
-
-.task-card p {
-  margin: 0.5rem 0;
+  padding: 10px 16px;
+  margin: 10px auto;
+  max-width: 360px;
+  font-size: 1rem;
 }
 
 .task-card button {
-  padding: 10px 16px;
-  font-size: 1rem;
-  background-color: #00bfa6;
+  background: #00bfa6;
   color: #fff;
-  border: none;
-  border-radius: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
   cursor: pointer;
-  margin-top: 0.5rem;
-  transition: transform 0.1s ease;
 }
 
-.task-card button:active {
-  transform: scale(0.95);
+.task-card button:hover {
+  background: #009e8b;
+}
+
+.task-card .done {
+  color: #28a745;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
