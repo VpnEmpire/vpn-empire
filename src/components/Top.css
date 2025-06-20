@@ -1,1 +1,73 @@
+.top-container {
+  text-align: center;
+  padding: 1rem;
+  color: #fff;
+  background: linear-gradient(to bottom, #0d1b2a, #1b263b);
+  min-height: 100vh;
+}
 
+.top-container h2 {
+  font-size: 1.8rem;
+  color: #ffd700;
+  margin-bottom: 1rem;
+}
+
+.robot-image img {
+  width: 120px;
+  margin-bottom: 1rem;
+}
+
+.leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.player-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 280px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: #162c49;
+  font-size: 1rem;
+  color: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.rank-1 {
+  border: 2px solid gold;
+  background: rgba(255, 215, 0, 0.15);
+}
+.rank-2 {
+  border: 2px solid #00bfff;
+  background: rgba(0, 191, 255, 0.15);
+}
+.rank-3 {
+  border: 2px solid #a020f0;
+  background: rgba(160, 32, 240, 0.15);
+}
+
+.rank-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 12px;
+}
+
+.player-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.player-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.player-coins {
+  font-size: 1rem;
+  color: #ffd700;
+}
