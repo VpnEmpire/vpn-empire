@@ -66,12 +66,10 @@ function App() {
       setCoins(newCoins);
       setDailyLimit(100 - newCoins);
       localStorage.setItem('coins', newCoins.toString());
-
       if (clickSoundRef.current) {
         clickSoundRef.current.currentTime = 0;
         clickSoundRef.current.play();
       }
-
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 300);
     }
@@ -118,11 +116,9 @@ function App() {
 
   const spinWheel = () => {
     if (!canSpin) return;
-
     const rewardOptions = [50, 100, 150, 200, 250, 300];
     const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
     const newCoins = coins + reward;
-
     setCoins(newCoins);
     localStorage.setItem('coins', newCoins.toString());
     setSpinResult(reward);
@@ -133,13 +129,13 @@ function App() {
   return (
     <div className="app">
       <h1>👾 VPN Empire 🚀</h1>
-
       <div className="stats">
         <p><strong>Монет:</strong> {coins} $RICH</p>
         <p><strong>Звание:</strong> {getRank()}</p>
         <p><strong>Выполнено заданий:</strong> {tasks.filter(t => t.completed).length} / {tasks.length}</p>
       </div>
 
+      <p>Твое звание: <strong>{getRank()}</strong></p>
       <img
         src="/robot.png"
         alt="Робот"
@@ -170,13 +166,19 @@ function App() {
         </div>
       ))}
 
-      <h2>🎰 Рулетка</h2>
-      {canSpin ? (
-        <button onClick={spinWheel}>Крутить рулетку</button>
-      ) : (
-        <p>⏳ Рулетка уже крутилась сегодня</p>
-      )}
-      {spinResult && <p>🎉 Ты получил: {spinResult} монет!</p>}
+      <div className="roulette">
+        <h2>🎰 Рулетка</h2>
+        <button
+          className="spin-button"
+          onClick={spinWheel}
+          disabled={!canSpin}
+        >
+          {canSpin ? 'Крутить рулетку' : 'Завтра снова можно крутить'}
+        </button>
+        {spinResult && (
+          <div className="spin-result">+{spinResult} монет!</div>
+        )}
+      </div>
 
       <audio ref={clickSoundRef} src="/click.mp3" preload="auto" />
     </div>
@@ -184,4 +186,3 @@ function App() {
 }
 
 export default App;
-
