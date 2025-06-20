@@ -5,7 +5,8 @@ function App() {
   const [coins, setCoins] = useState(0);
   const [dailyLimit, setDailyLimit] = useState(100);
   const [isShaking, setIsShaking] = useState(false);
-  const clickSoundRef = useRef(null); // <— ссылка на звук
+  const [showSparkle, setShowSparkle] = useState(false); // <— новое
+  const clickSoundRef = useRef(null);
 
   useEffect(() => {
     const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
@@ -36,7 +37,11 @@ function App() {
       }
 
       setIsShaking(true);
-      setTimeout(() => setIsShaking(false), 300);
+      setShowSparkle(true); // показываем вспышку
+      setTimeout(() => {
+        setIsShaking(false);
+        setShowSparkle(false);
+      }, 300);
     }
   };
 
@@ -44,12 +49,15 @@ function App() {
     <div className="app">
       <h1>👾 VPN Empire 🚀</h1>
       <p>Монеты: {coins} $RICH</p>
-      <img
-        src="/robot.png"
-        alt="Робот"
-        className={`robot ${isShaking ? 'shake' : ''}`}
-        onClick={handleClick}
-      />
+      <div className="click-area">
+        <img
+          src="/robot.png"
+          alt="Робот"
+          className={`robot ${isShaking ? 'shake' : ''}`}
+          onClick={handleClick}
+        />
+        {showSparkle && <div className="sparkle">✨</div>}
+      </div>
       <div className="counter">{dailyLimit > 0 ? 'Кликай, чтобы заработать' : 'Лимит на сегодня исчерпан'}</div>
       <audio ref={clickSoundRef} src="/click.mp3" preload="auto" />
     </div>
