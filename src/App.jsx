@@ -51,7 +51,7 @@ function App() {
       <p>Монеты: {coins} $RICH</p>
       <div className="click-area">
         <img
-          src="/robot.png"
+          src="/robot.PNG"
           alt="Робот"
           className={`robot ${isShaking ? 'shake' : ''}`}
           onClick={handleClick}
