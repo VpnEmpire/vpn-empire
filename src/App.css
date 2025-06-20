@@ -18,12 +18,26 @@ body, html {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
+.stats {
+  background: #f0f4ff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 16px auto;
+  max-width: 360px;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: left;
+}
+.stats p {
+  margin: 6px 0;
+}
+
 button {
   padding: 12px 24px;
   font-size: 1rem;
   border-radius: 8px;
   border: none;
-  background: #00bfa6;
+  background: #ff9800;
   color: white;
   font-weight: bold;
   cursor: pointer;
@@ -139,16 +153,19 @@ button:active {
   font-size: 0.9rem;
   cursor: pointer;
 }
-
 .task-card button:hover {
   background: #009e8b;
 }
-
+.task-card a {
+  color: white;
+  text-decoration: none;
+}
 .task-card .done {
   color: #28a745;
   font-size: 1.2rem;
   font-weight: bold;
 }
+
 .helper {
   background: #fff9e6;
   border-left: 5px solid #ffcc00;
@@ -159,32 +176,28 @@ button:active {
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
-.stats {
-  background: #f0f4ff;
-  border-radius: 12px;
-  padding: 12px 16px;
-  margin: 16px auto;
-  max-width: 360px;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  text-align: left;
+
+/* 🎰 Рулетка */
+.roulette {
+  margin-top: 2rem;
 }
-.stats p {
-  margin: 6px 0;
-}
-button {
-  padding: 12px 24px;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-  background: #ff9800;
+.spin-button {
+  background-color: #ff9800;
   color: white;
   font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
   cursor: pointer;
-  margin-top: 1rem;
-  transition: transform 0.1s ease;
+  font-size: 1rem;
 }
-
-button:active {
-  transform: scale(0.95);
+.spin-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.spin-result {
+  margin-top: 10px;
+  font-size: 1.2rem;
+  color: #4caf50;
+  font-weight: bold;
 }
