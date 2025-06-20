@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import './App.css';
+import Home from './components/Home';
+import Tasks from './components/Tasks';
+import Roulette from './components/Roulette';
+import Top from './components/Top';
+import BottomNav from './components/BottomNav';
 
 const RANKS = [
   { title: 'Новичок', threshold: 0 },
@@ -26,11 +31,12 @@ const TASKS_TEMPLATE = [
 ];
 
 function App() {
+  const [currentTab, setCurrentTab] = useState('home');
   const [coins, setCoins] = useState(0);
-  const [dailyLimit, setDailyLimit] = useState(100);
-  const [isShaking, setIsShaking] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [canSpin, setCanSpin] = useState(true);
+  const [dailyLimit, setDailyLimit] = useState(100);
+  const [isShaking, setIsShaking] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
   const clickSoundRef = useRef(null);
@@ -57,34 +63,6 @@ function App() {
     if (lastSpinDate === today) setCanSpin(false);
   }, []);
 
-  const handleClick = () => {
-    if (coins < 100) {
-      const newCoins = coins + 1;
-      setCoins(newCoins);
-      setDailyLimit(100 - newCoins);
-      localStorage.setItem('coins', newCoins.toString());
-      if (clickSoundRef.current) {
-        clickSoundRef.current.currentTime = 0;
-        clickSoundRef.current.play();
-      }
-      setIsShaking(true);
-      setTimeout(() => setIsShaking(false), 300);
-    }
-  };
-
-  const getRank = () => {
-    return RANKS.slice().reverse().find(rank => coins >= rank.threshold)?.title || 'Новичок';
-  };
-
-  const getHelperMessage = () => {
-    if (coins >= 1500) return '🎉 Ты — Легенда VPN! Мир свободы открыт для тебя.';
-    if (coins >= 1000) return '🧠 Ты стал Экспертом! Осталось немного до легенды.';
-    if (coins >= 600) return '🚀 Отличная работа, Профи! Продолжай в том же духе.';
-    if (coins >= 300) return '🕵️ Ты уже Агент! Поделись VPN с друзьями.';
-    if (coins > 0) return '🔥 Хорошее начало! Продолжай клики и выполняй задания.';
-    return '👋 Я твой помощник! Кликай на робота и зарабатывай монеты.';
-  };
-
   const resetTasks = () => {
     const reset = TASKS_TEMPLATE.map(task => {
       const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -98,89 +76,59 @@ function App() {
     setTasks(reset);
   };
 
-  const completeTask = (taskId) => {
-    const updatedTasks = tasks.map(task =>
-      task.id === taskId ? { ...task, completed: true } : task
-    );
-    setTasks(updatedTasks);
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    const task = TASKS_TEMPLATE.find(t => t.id === taskId);
-    const reward = task?.reward || 0;
-    const newCoins = coins + reward;
+  const updateCoins = (newCoins) => {
     setCoins(newCoins);
     localStorage.setItem('coins', newCoins.toString());
   };
 
-  const spinWheel = () => {
-    if (!canSpin) return;
+  const updateTasks = (newTasks) => {
+    setTasks(newTasks);
+    localStorage.setItem('tasks', JSON.stringify(newTasks));
+  };
 
-    setIsSpinning(true);
-    const rewardOptions = [50, 100, 150, 200, 250, 300];
-    const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
+  const renderTab = () => {
+    const commonProps = {
+      coins,
+      setCoins: updateCoins,
+      tasks,
+      setTasks: updateTasks,
+      dailyLimit,
+      setDailyLimit,
+      isShaking,
+      setIsShaking,
+      canSpin,
+      setCanSpin,
+      isSpinning,
+      setIsSpinning,
+      spinResult,
+      setSpinResult,
+      clickSoundRef,
+      resetTasks,
+      RANKS,
+      TASKS_TEMPLATE
+    };
 
-    setTimeout(() => {
-      const newCoins = coins + reward;
-      setCoins(newCoins);
-      setSpinResult(reward);
-      setCanSpin(false);
-      setIsSpinning(false);
-      localStorage.setItem('coins', newCoins.toString());
-      localStorage.setItem('lastSpinDate', new Date().toDateString());
-    }, 2000);
+    switch (currentTab) {
+      case 'home':
+        return <Home {...commonProps} />;
+      case 'tasks':
+        return <Tasks {...commonProps} />;
+      case 'roulette':
+        return <Roulette {...commonProps} />;
+      case 'top':
+        return <Top />;
+      default:
+        return <Home {...commonProps} />;
+    }
   };
 
   return (
     <div className="app">
-      <h1>👾 VPN Empire 🚀</h1>
-      <div className="stats">
-        <p><strong>Монет:</strong> {coins} $RICH</p>
-        <p><strong>Звание:</strong> {getRank()}</p>
-        <p><strong>Выполнено заданий:</strong> {tasks.filter(t => t.completed).length} / {tasks.length}</p>
-      </div>
-
-      <p>Твое звание: <strong>{getRank()}</strong></p>
-      <img
-        src="/robot.png"
-        alt="Робот"
-        className={`robot ${isShaking ? 'shake' : ''}`}
-        onClick={handleClick}
-      />
-      <div className="counter">
-        {coins}/100 монет {dailyLimit <= 0 && '(лимит на сегодня)'}
-      </div>
-      <div className="helper">
-        <p>{getHelperMessage()}</p>
-      </div>
-
-      <h2>🎯 Задания</h2>
-      {tasks.map(task => (
-        <div key={task.id} className="task-card">
-          <span>{task.title}</span>
-          {task.completed ? (
-            <span className="done">✅</span>
-          ) : (
-            <button onClick={() => completeTask(task.id)}>
-              {task.link ? (
-                <a href={task.link} target="_blank" rel="noreferrer">Выполнить</a>
-              ) : 'Выполнить'}
-            </button>
-          )}
-        </div>
-      ))}
-
-      <div className="roulette">
-        <button className="spin-button" onClick={spinWheel} disabled={!canSpin || isSpinning}>
-          {isSpinning ? 'Крутится...' : '🎰 Крутить рулетку'}
-        </button>
-        {spinResult !== null && !isSpinning && (
-          <div className="spin-result">+{spinResult} монет!</div>
-        )}
-      </div>
-
+      {renderTab()}
+      <BottomNav currentTab={currentTab} setCurrentTab={setCurrentTab} />
       <audio ref={clickSoundRef} src="/click.mp3" preload="auto" />
     </div>
   );
 }
 
 export default App;
-
