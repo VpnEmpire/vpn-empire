@@ -30,6 +30,8 @@ function App() {
   const [dailyLimit, setDailyLimit] = useState(100);
   const [isShaking, setIsShaking] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const [canSpin, setCanSpin] = useState(true);
+  const [spinResult, setSpinResult] = useState(null);
   const clickSoundRef = useRef(null);
 
   useEffect(() => {
@@ -43,11 +45,23 @@ function App() {
       localStorage.setItem('lastClickDate', today);
       localStorage.setItem('coins', '0');
       resetTasks();
+      setCanSpin(true);
+      setSpinResult(null);
+      localStorage.removeItem('spinResult');
     } else {
       setCoins(storedCoins);
       setDailyLimit(100 - storedCoins);
       const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
       setTasks(savedTasks);
+
+      const lastSpin = localStorage.getItem('lastSpinDate');
+      if (lastSpin !== today) {
+        setCanSpin(true);
+        setSpinResult(null);
+      } else {
+        setCanSpin(false);
+        setSpinResult(parseInt(localStorage.getItem('spinResult')) || null);
+      }
     }
   }, []);
 
@@ -66,15 +80,29 @@ function App() {
     }
   };
 
-  const getRank = () => { 
-    const getHelperMessage = () => {
-  if (coins >= 1500) return '🎉 Ты — Легенда VPN! Мир свободы открыт для тебя.';
-  if (coins >= 1000) return '🧠 Ты стал Экспертом! Осталось немного до легенды.';
-  if (coins >= 600) return '🚀 Отличная работа, Профи! Продолжай в том же духе.';
-  if (coins >= 300) return '🕵️ Ты уже Агент! Поделись VPN с друзьями.';
-  if (coins > 0) return '🔥 Хорошее начало! Продолжай клики и выполняй задания.';
-  return '👋 Я твой помощник! Кликай на робота и зарабатывай монеты.';
-};
+  const spinWheel = () => {
+    if (!canSpin) return;
+    const rewardOptions = [50, 100, 150, 200, 250, 300];
+    const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
+    const newCoins = coins + reward;
+    setCoins(newCoins);
+    localStorage.setItem('coins', newCoins.toString());
+    setSpinResult(reward);
+    setCanSpin(false);
+    localStorage.setItem('lastSpinDate', new Date().toDateString());
+    localStorage.setItem('spinResult', reward.toString());
+  };
+
+  const getHelperMessage = () => {
+    if (coins >= 1500) return '🎉 Ты — Легенда VPN! Мир свободы открыт для тебя.';
+    if (coins >= 1000) return '🧠 Ты стал Экспертом! Осталось немного до легенды.';
+    if (coins >= 600) return '🚀 Отличная работа, Профи! Продолжай в том же духе.';
+    if (coins >= 300) return '🕵️ Ты уже Агент! Поделись VPN с друзьями.';
+    if (coins > 0) return '🔥 Хорошее начало! Продолжай клики и выполняй задания.';
+    return '👋 Я твой помощник! Кликай на робота и зарабатывай монеты.';
+  };
+
+  const getRank = () => {
     return RANKS.slice().reverse().find(rank => coins >= rank.threshold)?.title || 'Новичок';
   };
 
@@ -106,24 +134,22 @@ function App() {
 
   return (
     <div className="app">
-      <h1>👾 VPN Empire 🚀</h1> <div className="stats">
-  <p><strong>Монет:</strong> {coins} $RICH</p>
-  <p><strong>Звание:</strong> {getRank()}</p>
-  <p><strong>Выполнено заданий:</strong> {tasks.filter(t => t.completed).length} / {tasks.length}</p>
-</div>
-      <p>Твое звание: <strong>{getRank()}</strong></p>
+      <h1>👾 VPN Empire 🚀</h1>
+      <div className="stats">
+        <p><strong>Монет:</strong> {coins} $RICH</p>
+        <p><strong>Звание:</strong> {getRank()}</p>
+        <p><strong>Выполнено заданий:</strong> {tasks.filter(t => t.completed).length} / {tasks.length}</p>
+      </div>
+
       <img
         src="/robot.png"
         alt="Робот"
         className={`robot ${isShaking ? 'shake' : ''}`}
         onClick={handleClick}
       />
-      <div className="counter">
-        {coins}/100 монет {dailyLimit <= 0 && '(лимит на сегодня)'}
-      </div>
-<div className="helper">
-  <p>{getHelperMessage()}</p>
-</div>
+      <div className="counter">{coins}/100 монет {dailyLimit <= 0 && '(лимит на сегодня)'}</div>
+      <div className="helper"><p>{getHelperMessage()}</p></div>
+
       <h2>🎯 Задания</h2>
       {tasks.map(task => (
         <div key={task.id} className="task-card">
@@ -139,6 +165,13 @@ function App() {
           )}
         </div>
       ))}
+
+      <h2>🎰 Ежедневная рулетка</h2>
+      {canSpin ? (
+        <button onClick={spinWheel}>Крутить рулетку</button>
+      ) : (
+        <p>Вы уже крутили рулетку сегодня {spinResult ? `и получили ${spinResult} монет 🎉` : ''}</p>
+      )}
 
       <audio ref={clickSoundRef} src="/click.mp3" preload="auto" />
     </div>
