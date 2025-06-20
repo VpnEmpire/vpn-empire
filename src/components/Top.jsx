@@ -1,35 +1,30 @@
-// src/components/Top.jsx
 import React from 'react';
 import './Top.css';
 
 const mockTopPlayers = [
-  { name: 'Player1', coins: 1500 },
-  { name: 'Player2', coins: 1200 },
-  { name: 'Player4', coins: 800 }
+  { name: 'Player1', coins: 1500, color: 'gold' },
+  { name: 'Player2', coins: 1200, color: 'blue' },
+  { name: 'Player4', coins: 800, color: 'purple' }
 ];
 
-const Top = () => {
+function Top() {
   return (
     <div className="top-container">
-      <h2>🏆 ТОП ИГРОКОВ</h2>
-      <div className="robot-image">
-        <img src="/robot.png" alt="Робот" />
-      </div>
-
-      <div className="leaderboard">
+      <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2>
+      <img src="/robot.png" alt="Робот" className="top-robot" />
+      <div className="top-list">
         {mockTopPlayers.map((player, index) => (
-          <div key={index} className={`player-card rank-${index + 1}`}>
+          <div key={index} className={`top-player ${player.color}`}>
             <div className="rank-number">{index + 1}</div>
-            <div className="player-info">
-              <span className="player-name">{player.name}</span>
-              <span className="player-coins">🏆 {player.coins}</span>
+            <div className="player-name">{player.name}</div>
+            <div className="player-coins">
+              <img src="/trophy.png" alt="Кубок" className="trophy-icon" /> {player.coins}
             </div>
           </div>
         ))}
       </div>
     </div>
   );
-};
+}
 
 export default Top;
-
