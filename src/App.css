@@ -159,3 +159,16 @@ button:active {
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
+.stats {
+  background: #f0f4ff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 16px auto;
+  max-width: 360px;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: left;
+}
+.stats p {
+  margin: 6px 0;
+}
