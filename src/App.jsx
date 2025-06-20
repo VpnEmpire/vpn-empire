@@ -37,6 +37,7 @@ function App() {
   useEffect(() => {
     const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
     const storedDate = localStorage.getItem('lastClickDate');
+    const storedSpinDate = localStorage.getItem('lastSpinDate');
     const today = new Date().toDateString();
 
     if (storedDate !== today) {
@@ -45,23 +46,17 @@ function App() {
       localStorage.setItem('lastClickDate', today);
       localStorage.setItem('coins', '0');
       resetTasks();
-      setCanSpin(true);
-      setSpinResult(null);
-      localStorage.removeItem('spinResult');
     } else {
       setCoins(storedCoins);
       setDailyLimit(100 - storedCoins);
       const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
       setTasks(savedTasks);
+    }
 
-      const lastSpin = localStorage.getItem('lastSpinDate');
-      if (lastSpin !== today) {
-        setCanSpin(true);
-        setSpinResult(null);
-      } else {
-        setCanSpin(false);
-        setSpinResult(parseInt(localStorage.getItem('spinResult')) || null);
-      }
+    if (storedSpinDate === today) {
+      setCanSpin(false);
+    } else {
+      setCanSpin(true);
     }
   }, []);
 
@@ -71,26 +66,19 @@ function App() {
       setCoins(newCoins);
       setDailyLimit(100 - newCoins);
       localStorage.setItem('coins', newCoins.toString());
+
       if (clickSoundRef.current) {
         clickSoundRef.current.currentTime = 0;
         clickSoundRef.current.play();
       }
+
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 300);
     }
   };
 
-  const spinWheel = () => {
-    if (!canSpin) return;
-    const rewardOptions = [50, 100, 150, 200, 250, 300];
-    const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
-    const newCoins = coins + reward;
-    setCoins(newCoins);
-    localStorage.setItem('coins', newCoins.toString());
-    setSpinResult(reward);
-    setCanSpin(false);
-    localStorage.setItem('lastSpinDate', new Date().toDateString());
-    localStorage.setItem('spinResult', reward.toString());
+  const getRank = () => {
+    return RANKS.slice().reverse().find(rank => coins >= rank.threshold)?.title || 'Новичок';
   };
 
   const getHelperMessage = () => {
@@ -100,10 +88,6 @@ function App() {
     if (coins >= 300) return '🕵️ Ты уже Агент! Поделись VPN с друзьями.';
     if (coins > 0) return '🔥 Хорошее начало! Продолжай клики и выполняй задания.';
     return '👋 Я твой помощник! Кликай на робота и зарабатывай монеты.';
-  };
-
-  const getRank = () => {
-    return RANKS.slice().reverse().find(rank => coins >= rank.threshold)?.title || 'Новичок';
   };
 
   const resetTasks = () => {
@@ -132,9 +116,24 @@ function App() {
     localStorage.setItem('coins', newCoins.toString());
   };
 
+  const spinWheel = () => {
+    if (!canSpin) return;
+
+    const rewardOptions = [50, 100, 150, 200, 250, 300];
+    const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
+    const newCoins = coins + reward;
+
+    setCoins(newCoins);
+    localStorage.setItem('coins', newCoins.toString());
+    setSpinResult(reward);
+    setCanSpin(false);
+    localStorage.setItem('lastSpinDate', new Date().toDateString());
+  };
+
   return (
     <div className="app">
       <h1>👾 VPN Empire 🚀</h1>
+
       <div className="stats">
         <p><strong>Монет:</strong> {coins} $RICH</p>
         <p><strong>Звание:</strong> {getRank()}</p>
@@ -147,8 +146,13 @@ function App() {
         className={`robot ${isShaking ? 'shake' : ''}`}
         onClick={handleClick}
       />
-      <div className="counter">{coins}/100 монет {dailyLimit <= 0 && '(лимит на сегодня)'}</div>
-      <div className="helper"><p>{getHelperMessage()}</p></div>
+      <div className="counter">
+        {coins}/100 монет {dailyLimit <= 0 && '(лимит на сегодня)'}
+      </div>
+
+      <div className="helper">
+        <p>{getHelperMessage()}</p>
+      </div>
 
       <h2>🎯 Задания</h2>
       {tasks.map(task => (
@@ -166,12 +170,13 @@ function App() {
         </div>
       ))}
 
-      <h2>🎰 Ежедневная рулетка</h2>
+      <h2>🎰 Рулетка</h2>
       {canSpin ? (
         <button onClick={spinWheel}>Крутить рулетку</button>
       ) : (
-        <p>Вы уже крутили рулетку сегодня {spinResult ? `и получили ${spinResult} монет 🎉` : ''}</p>
+        <p>⏳ Рулетка уже крутилась сегодня</p>
       )}
+      {spinResult && <p>🎉 Ты получил: {spinResult} монет!</p>}
 
       <audio ref={clickSoundRef} src="/click.mp3" preload="auto" />
     </div>
@@ -179,3 +184,4 @@ function App() {
 }
 
 export default App;
+
