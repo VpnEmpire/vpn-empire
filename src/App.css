@@ -149,3 +149,13 @@ button:active {
   font-size: 1.2rem;
   font-weight: bold;
 }
+.helper {
+  background: #fff9e6;
+  border-left: 5px solid #ffcc00;
+  padding: 12px 16px;
+  margin: 20px auto;
+  max-width: 360px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
