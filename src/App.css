@@ -7,6 +7,8 @@ body, html {
 
 .app {
   padding: 2rem;
+  max-width: 500px;
+  margin: auto;
 }
 
 .start-screen, .main-screen {
@@ -16,6 +18,15 @@ body, html {
   max-width: 360px;
   margin: auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  margin: 0.5rem 0;
 }
 
 button {
@@ -35,20 +46,15 @@ button:active {
   transform: scale(0.95);
 }
 
-.clickable-robot {
-  width: 200px;
-  cursor: pointer;
-  transition: transform 0.1s ease;
-}
-
-.clickable-robot:active {
-  transform: scale(0.95);
-}
-
-.robot {
+.robot, .clickable-robot {
   width: 150px;
   cursor: pointer;
   transition: transform 0.2s ease;
+}
+
+.robot:active,
+.clickable-robot:active {
+  transform: scale(0.95);
 }
 
 .shake {
@@ -68,6 +74,8 @@ button:active {
   font-weight: bold;
   margin-top: 1rem;
 }
+
+/* 🎇 Вспышки и звёздочки */
 .flash {
   position: absolute;
   width: 40px;
@@ -88,39 +96,18 @@ button:active {
     opacity: 0;
     transform: scale(2);
   }
-} 
-.sparkle {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  background: radial-gradient(circle, #ffff66, #ffcc00);
-  border-radius: 50%;
-  animation: sparkle 0.6s ease-out forwards;
-  pointer-events: none;
-}
-
-@keyframes sparkle {
-  0% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2) translateY(-50px);
-  }
-} 
-.click-area {
-  position: relative;
-  display: inline-block;
 }
 
 .sparkle {
   position: absolute;
   top: 0;
   left: 50%;
-  transform: translateX(-50%);
-  font-size: 2rem;
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle, #ffff66, #ffcc00);
+  border-radius: 50%;
   animation: sparkle-fade 0.5s ease-out;
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
@@ -133,4 +120,50 @@ button:active {
     opacity: 0;
     transform: translate(-50%, -40px) scale(0.8);
   }
+}
+
+.click-area {
+  position: relative;
+  display: inline-block;
+}
+
+/* 📋 Список заданий */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.task-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  position: relative;
+}
+
+.task-card.done {
+  opacity: 0.5;
+}
+
+.task-card p {
+  margin: 0.5rem 0;
+}
+
+.task-card button {
+  padding: 10px 16px;
+  font-size: 1rem;
+  background-color: #00bfa6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: transform 0.1s ease;
+}
+
+.task-card button:active {
+  transform: scale(0.95);
 }
