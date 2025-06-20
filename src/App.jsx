@@ -22,7 +22,7 @@ const TASKS_TEMPLATE = [
   { id: 'share', title: 'Рассказать о нас в соцсетях', reward: 100 },
   { id: 'comment', title: 'Оставить комментарий под постом', reward: 50 },
   { id: 'react', title: 'Поставить реакцию на запись', reward: 50 },
-  { id: 'daily', title: 'Заходить в VPN каждый день', reward: 100 }
+  { id: 'daily', title: 'Заходить в VPN каждый день', reward: 100, repeatable: true }
 ];
 
 function App() {
@@ -57,12 +57,10 @@ function App() {
       setCoins(newCoins);
       setDailyLimit(100 - newCoins);
       localStorage.setItem('coins', newCoins.toString());
-
       if (clickSoundRef.current) {
         clickSoundRef.current.currentTime = 0;
         clickSoundRef.current.play();
       }
-
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 300);
     }
@@ -73,7 +71,14 @@ function App() {
   };
 
   const resetTasks = () => {
-    const reset = TASKS_TEMPLATE.map(task => ({ ...task, completed: false }));
+    const reset = TASKS_TEMPLATE.map(task => {
+      const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      const old = storedTasks.find(t => t.id === task.id);
+      return {
+        ...task,
+        completed: task.repeatable ? false : old?.completed || false
+      };
+    });
     localStorage.setItem('tasks', JSON.stringify(reset));
     setTasks(reset);
   };
@@ -113,7 +118,9 @@ function App() {
             <span className="done">✅</span>
           ) : (
             <button onClick={() => completeTask(task.id)}>
-              {task.link ? <a href={task.link} target="_blank" rel="noreferrer">Выполнить</a> : 'Выполнить'}
+              {task.link ? (
+                <a href={task.link} target="_blank" rel="noreferrer">Выполнить</a>
+              ) : 'Выполнить'}
             </button>
           )}
         </div>
