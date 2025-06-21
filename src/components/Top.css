@@ -1,42 +1,14 @@
-import React from 'react';
-import './Top.css';
-
-const mockTopPlayers = [
-  { name: 'Player1', coins: 1500, color: 'gold' },
-  { name: 'Player2', coins: 1200, color: 'blue' },
-  { name: 'Player4', coins: 800, color: 'purple' }
-];
-
-function Top() {
-  return (
-    <div className="top-container">
-      <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2>
-      <img src="/robot.png" alt="Робот" className="top-robot" />
-      <div className="top-list">
-        {mockTopPlayers.map((player, index) => (
-          <div key={index} className={`top-player ${player.color}`}>
-            <div className="rank-number">{index + 1}</div>
-            <div className="player-name">{player.name}</div>
-            <div className="player-coins">
-              <img src="/trophy.png" alt="Кубок" className="trophy-icon" /> {player.coins}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export default Top;
 .top-container {
   text-align: center;
-  padding: 20px;
+  padding: 2rem 1rem;
+  max-width: 400px;
+  margin: auto;
 }
 
 .top-title {
   font-size: 1.8rem;
+  margin-bottom: 1rem;
   color: #ffd700;
-  margin-bottom: 10px;
 }
 
 .top-robot {
@@ -55,34 +27,16 @@ export default Top;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 300px;
+  width: 320px;
   padding: 10px 20px;
   border-radius: 12px;
+  font-size: 1rem;
   font-weight: bold;
   color: white;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
 }
 
-.top-player .rank-number {
-  font-size: 1.4rem;
-}
-
-.top-player .player-name {
-  flex-grow: 1;
-  text-align: left;
-  margin-left: 10px;
-}
-
-.top-player .player-coins {
-  display: flex;
-  align-items: center;
-}
-
-.trophy-icon {
-  width: 20px;
-  margin-right: 5px;
-}
-
-/* Цветовые стили */
+/* Цветовые стили игроков */
 .top-player.gold {
   background: linear-gradient(to right, #ffd700, #ffecb3);
   color: #333;
@@ -98,7 +52,39 @@ export default Top;
   color: #fff;
 }
 
+.top-player.cyan {
+  background: linear-gradient(to right, #00bcd4, #b2ebf2);
+  color: #003f4e;
+}
+
 .top-player.silver {
   background: linear-gradient(to right, #9e9e9e, #eeeeee);
   color: #333;
+}
+
+.rank-number {
+  font-size: 1.4rem;
+  margin-right: 10px;
+  width: 30px;
+  text-align: center;
+}
+
+.player-name {
+  flex-grow: 1;
+  text-align: left;
+  margin-left: 10px;
+}
+
+.player-coins {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  color: #4caf50;
+}
+
+.trophy-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
 }
