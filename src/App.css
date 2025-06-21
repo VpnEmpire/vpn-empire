@@ -4,11 +4,9 @@ body, html {
   background: linear-gradient(to bottom, #f0f8ff, #ffffff);
   text-align: center;
 }
-
 .app {
   padding: 2rem;
 }
-
 .start-screen, .main-screen {
   background: white;
   border-radius: 16px;
@@ -17,7 +15,6 @@ body, html {
   margin: auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-
 .stats {
   background: #f0f4ff;
   border-radius: 12px;
@@ -31,7 +28,6 @@ body, html {
 .stats p {
   margin: 6px 0;
 }
-
 button {
   padding: 12px 24px;
   font-size: 1rem;
@@ -44,31 +40,25 @@ button {
   margin-top: 1rem;
   transition: transform 0.1s ease;
 }
-
 button:active {
   transform: scale(0.95);
 }
-
 .clickable-robot {
   width: 200px;
   cursor: pointer;
   transition: transform 0.1s ease;
 }
-
 .clickable-robot:active {
   transform: scale(0.95);
 }
-
 .robot {
   width: 150px;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
-
 .shake {
   animation: shake 0.3s;
 }
-
 @keyframes shake {
   0% { transform: rotate(0deg); }
   25% { transform: rotate(7deg); }
@@ -76,13 +66,11 @@ button:active {
   75% { transform: rotate(5deg); }
   100% { transform: rotate(0deg); }
 }
-
 .counter {
   font-size: 1.5rem;
   font-weight: bold;
   margin-top: 1rem;
 }
-
 .flash {
   position: absolute;
   width: 40px;
@@ -93,7 +81,6 @@ button:active {
   animation: fadeOut 0.6s forwards;
   z-index: 10;
 }
-
 @keyframes fadeOut {
   0% {
     opacity: 1;
@@ -104,7 +91,6 @@ button:active {
     transform: scale(2);
   }
 }
-
 .sparkle {
   position: absolute;
   top: 0;
@@ -114,7 +100,6 @@ button:active {
   animation: sparkle-fade 0.5s ease-out;
   pointer-events: none;
 }
-
 @keyframes sparkle-fade {
   0% {
     opacity: 1;
@@ -125,12 +110,10 @@ button:active {
     transform: translate(-50%, -40px) scale(0.8);
   }
 }
-
 .click-area {
   position: relative;
   display: inline-block;
 }
-
 /* 💠 Стили для карточек заданий */
 .task-card {
   display: flex;
@@ -144,7 +127,6 @@ button:active {
   max-width: 360px;
   font-size: 1rem;
 }
-
 .task-card button {
   background: #00bfa6;
   color: #fff;
@@ -165,7 +147,6 @@ button:active {
   font-size: 1.2rem;
   font-weight: bold;
 }
-
 .helper {
   background: #fff9e6;
   border-left: 5px solid #ffcc00;
@@ -176,7 +157,6 @@ button:active {
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
-
 /* 🎰 Рулетка */
 .roulette {
   margin-top: 2rem;
