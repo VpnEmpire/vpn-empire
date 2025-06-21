@@ -1,38 +1,34 @@
-// BottomNav.jsx
-import React from 'react';
-import './BottomNav.css';
-
-const BottomNav = ({ currentTab, setCurrentTab }) => {
-  return (
-    <div className="bottom-nav">
-      <button className={currentTab === 'main' ? 'active' : ''} onClick={() => setCurrentTab('main')}>🏠 Главная</button>
-      <button className={currentTab === 'tasks' ? 'active' : ''} onClick={() => setCurrentTab('tasks')}>🎯 Задания</button>
-      <button className={currentTab === 'roulette' ? 'active' : ''} onClick={() => setCurrentTab('roulette')}>🎰 Рулетка</button>
-      <button className={currentTab === 'top' ? 'active' : ''} onClick={() => setCurrentTab('top')}>🏆 Топ</button>
-    </div>
-  );
-};
-
-export default BottomNav;
 .bottom-nav {
-  display: flex;
-  justify-content: space-around;
-  background-color: orange;
-  padding: 10px 0;
+  display: flex;
+  justify-content: space-around;
+  background-color: orange;
+  padding: 10px 0;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
 }
 
-.bottom-nav button {
-  background: none;
-  border: none;
-  font-weight: bold;
-  color: white;
-  font-size: 14px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.bottom-nav button.active {
-  background-color: #ffcc00;
-  color: black;
+.nav-item .label {
+  font-size: 12px;
+  margin-top: 4px;
 }
+
+.nav-item.active {
+  color: black;
+  background-color: #ffdd57;
+  padding: 6px 12px;
+  border-radius: 10px;
+}
+
