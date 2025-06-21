@@ -69,3 +69,4 @@ const Roulette = ({ coins, setCoins }) => {
 };
 
 export default Roulette;
+
