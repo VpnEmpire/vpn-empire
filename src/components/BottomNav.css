@@ -1,1 +1,37 @@
+/* Стили для нижнего навигационного меню */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  background-color: orange;
+  padding: 10px 0;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+}
 
+/* Стили для каждой кнопки-вкладки */
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* Подпись под иконкой */
+.nav-item .label {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Активная вкладка — выделение */
+.nav-item.active {
+  color: black;
+  background-color: #ffdd57;
+  padding: 6px 12px;
+  border-radius: 10px;
+}
