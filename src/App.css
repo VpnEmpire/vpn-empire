@@ -201,3 +201,9 @@ button:active {
   color: #4caf50;
   font-weight: bold;
 }
+.trophy-icon {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 5px;
+}
