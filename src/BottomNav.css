@@ -1,34 +1,4 @@
-// src/components/BottomNav.jsx
-import React from 'react';
-import './BottomNav.css';
-
-const BottomNav = ({ currentTab, setCurrentTab }) => {
-  return (
-    <div className="bottom-nav">
-      <div className={`nav-item ${currentTab === 'home' ? 'active' : ''}`} onClick={() => setCurrentTab('home')}>
-        🏠<div className="label">Главная</div>
-      </div>
-      <div className={`nav-item ${currentTab === 'tasks' ? 'active' : ''}`} onClick={() => setCurrentTab('tasks')}>
-        📋<div className="label">Задания</div>
-      </div>
-      <div className={`nav-item ${currentTab === 'roulette' ? 'active' : ''}`} onClick={() => setCurrentTab('roulette')}>
-        🎰<div className="label">Рулетка</div>
-      </div>
-      <div className={`nav-item ${currentTab === 'top' ? 'active' : ''}`} onClick={() => setCurrentTab('top')}>
-        🏆<div className="label">Топ</div>
-      </div>
-      <div className={`nav-item ${currentTab === 'profile' ? 'active' : ''}`} onClick={() => setCurrentTab('profile')}>
-        👤<div className="label">Профиль</div>
-      </div>
-    </div>
-  );
-};
-
-export default BottomNav;
-  background-color: #ffdd57;
-  padding: 6px 12px;
-  border-radius: 10px;
-}
+/* Стили для нижнего навигационного меню */
 .bottom-nav {
   display: flex;
   justify-content: space-around;
@@ -40,26 +10,28 @@ export default BottomNav;
   z-index: 10;
 }
 
+/* Стили для каждой кнопки-вкладки */
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-weight: bold;
   color: white;
   font-size: 14px;
-  font-weight: bold;
   cursor: pointer;
   transition: 0.2s;
 }
 
+/* Подпись под иконкой */
 .nav-item .label {
   font-size: 12px;
   margin-top: 4px;
 }
 
+/* Активная вкладка — выделение */
 .nav-item.active {
   color: black;
   background-color: #ffdd57;
   padding: 6px 12px;
   border-radius: 10px;
 }
-
