@@ -132,3 +132,8 @@ function App() {
 }
 
 export default App;
+const [username, setUsername] = useState(localStorage.getItem('username') || 'Ты');
+
+useEffect(() => {
+  localStorage.setItem('username', username);
+}, [username]);
