@@ -38,14 +38,15 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
       </div>
 
       <div
-        className={`nav-item ${currentTab === 'profile' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('profile')}
+        className={`nav-item ${currentTab === 'withdraw' ? 'active' : ''}`}
+        onClick={() => setCurrentTab('withdraw')}
       >
-        <div className="icon">👤</div>
-        <div className="label">Профиль</div>
+        <div className="icon">💸</div>
+        <div className="label">Вывести</div>
       </div>
     </div>
   );
 };
 
 export default BottomNav;
+
