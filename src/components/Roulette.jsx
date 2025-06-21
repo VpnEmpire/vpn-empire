@@ -34,6 +34,8 @@ const Roulette = ({ coins, setCoins }) => {
       <img
         src="/roulette.gif"
         alt="Рулетка"
+        className="roulette-image"
+        />
         style={{ width: '200px', marginBottom: '20px' }}
       />
       <button className="spin-button" onClick={spinWheel} disabled={!canSpin || isSpinning}>
