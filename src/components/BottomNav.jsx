@@ -49,5 +49,3 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
 };
 
 export default BottomNav;
-
- 
