@@ -14,8 +14,9 @@ const Home = ({ coins, setCoins }) => {
   const clickSoundRef = useRef(null);
 
   useEffect(() => {
-    const storedDate = localStorage.getItem('lastClickDate');
-    const today = new Date().toDateString();
+    const storedClickCoins = parseInt(localStorage.getItem('clickCoins')) || 0;
+setCoins(parseInt(localStorage.getItem('coins')) || 0);
+setDailyLimit(100 - storedClickCoins);
 
     if (storedDate !== today) {
       setCoins(0);
