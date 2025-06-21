@@ -1,1 +1,43 @@
+.withdraw-screen {
+  padding: 2rem;
+  max-width: 360px;
+  margin: auto;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  color: #fff;
+}
+
+.coin-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 20px 0;
+}
+
+.coin-icon {
+  font-size: 2rem;
+  margin-right: 10px;
+}
+
+.withdraw-button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background: gray;
+  color: white;
+  font-weight: bold;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.note {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #ccc;
+}
 
