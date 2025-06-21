@@ -14,4 +14,25 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
 };
 
 export default BottomNav;
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  background-color: orange;
+  padding: 10px 0;
+}
 
+.bottom-nav button {
+  background: none;
+  border: none;
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.bottom-nav button.active {
+  background-color: #ffcc00;
+  color: black;
+}
