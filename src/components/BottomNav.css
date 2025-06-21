@@ -31,10 +31,16 @@
   color: #3ea6ff; /* Подсветка при наведении */
 }
 
+/* Иконка */
+.nav-item .icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
 /* Подпись под иконкой */
 .nav-item .label {
   font-size: 12px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 /* Активная вкладка — выделение */
