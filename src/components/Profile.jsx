@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './App.css'; // если нужно, можно заменить на отдельный профиль-стиль
+import '../App.css'; // если нужно, можно заменить на отдельный профиль-стиль
 
 function Profile({ username, setUsername }) {
   const [tempName, setTempName] = useState(username);
