@@ -1,33 +1,60 @@
+/* 🌌 Основной фон */
 body, html {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background: linear-gradient(to bottom, #f0f8ff, #ffffff);
+  color: white;
+  background-image: url('/bg-dark.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
   text-align: center;
 }
+
+.app-wrapper {
+  background-image: url('/bg-dark.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Общая обёртка */
 .app {
   padding: 2rem;
 }
+
+/* Экраны */
 .start-screen, .main-screen {
-  background: white;
+  background: rgba(0, 0, 0, 0.6);
   border-radius: 16px;
   padding: 2rem;
   max-width: 360px;
   margin: auto;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
 }
+
+/* Статистика */
 .stats {
-  background: #f0f4ff;
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 12px 16px;
   margin: 16px auto;
   max-width: 360px;
   font-size: 0.95rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   text-align: left;
+  backdrop-filter: blur(4px);
 }
 .stats p {
   margin: 6px 0;
+  color: white;
 }
+
+/* Кнопки */
 button {
   padding: 12px 24px;
   font-size: 1rem;
@@ -43,6 +70,8 @@ button {
 button:active {
   transform: scale(0.95);
 }
+
+/* Робот */
 .clickable-robot {
   width: 200px;
   cursor: pointer;
@@ -56,6 +85,8 @@ button:active {
   cursor: pointer;
   transition: transform 0.2s ease;
 }
+
+/* Анимации */
 .shake {
   animation: shake 0.3s;
 }
@@ -66,11 +97,14 @@ button:active {
   75% { transform: rotate(5deg); }
   100% { transform: rotate(0deg); }
 }
+
 .counter {
   font-size: 1.5rem;
   font-weight: bold;
   margin-top: 1rem;
 }
+
+/* Эффекты */
 .flash {
   position: absolute;
   width: 40px;
@@ -114,18 +148,21 @@ button:active {
   position: relative;
   display: inline-block;
 }
-/* 💠 Стили для карточек заданий */
+
+/* 💠 Карточки заданий */
 .task-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f9f9f9;
+  background: rgba(255, 255, 255, 0.05);
   border: 2px solid #00bfa6;
   border-radius: 12px;
   padding: 10px 16px;
   margin: 10px auto;
   max-width: 360px;
   font-size: 1rem;
+  color: white;
+  backdrop-filter: blur(4px);
 }
 .task-card button {
   background: #00bfa6;
@@ -147,16 +184,21 @@ button:active {
   font-size: 1.2rem;
   font-weight: bold;
 }
+
+/* Подсказка */
 .helper {
-  background: #fff9e6;
+  background: rgba(255, 255, 255, 0.07);
   border-left: 5px solid #ffcc00;
   padding: 12px 16px;
   margin: 20px auto;
   max-width: 360px;
   font-size: 0.95rem;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  color: white;
+  backdrop-filter: blur(3px);
 }
+
 /* 🎰 Рулетка */
 .roulette {
   margin-top: 2rem;
@@ -181,6 +223,8 @@ button:active {
   color: #4caf50;
   font-weight: bold;
 }
+
+/* 🏆 Иконка трофея */
 .trophy-icon {
   width: 20px;
   height: 20px;
