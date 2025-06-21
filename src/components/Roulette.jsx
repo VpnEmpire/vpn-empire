@@ -5,6 +5,7 @@ const Roulette = ({ coins, setCoins }) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
   const winSoundRef = useRef(null);
+  const spinSoundRef = useRef(null);
 
   useEffect(() => {
     const lastSpinDate = localStorage.getItem('lastSpinDate');
@@ -14,6 +15,13 @@ const Roulette = ({ coins, setCoins }) => {
 
   const spinWheel = () => {
     if (!canSpin) return;
+
+    // Воспроизвести звук вращения
+    if (spinSoundRef.current) {
+      spinSoundRef.current.currentTime = 0;
+      spinSoundRef.current.play();
+    }
+
     setIsSpinning(true);
     const rewardOptions = [20, 50, 100, 200, 300, 400];
     const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
@@ -27,7 +35,7 @@ const Roulette = ({ coins, setCoins }) => {
       localStorage.setItem('coins', newCoins.toString());
       localStorage.setItem('lastSpinDate', new Date().toDateString());
 
-      // 🎵 Проиграть звук выигрыша
+      // Воспроизвести звук выигрыша
       if (winSoundRef.current) {
         winSoundRef.current.currentTime = 0;
         winSoundRef.current.play();
@@ -54,6 +62,7 @@ const Roulette = ({ coins, setCoins }) => {
         <div className="spin-result">+{spinResult} монет!</div>
       )}
 
+      <audio ref={spinSoundRef} src="/spin-sound.mp3" preload="auto" />
       <audio ref={winSoundRef} src="/coins_many.mp3" preload="auto" />
     </div>
   );
