@@ -28,3 +28,77 @@ function Top() {
 }
 
 export default Top;
+.top-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.top-title {
+  font-size: 1.8rem;
+  color: #ffd700;
+  margin-bottom: 10px;
+}
+
+.top-robot {
+  width: 120px;
+  margin-bottom: 15px;
+}
+
+.top-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.top-player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 300px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+  color: white;
+}
+
+.top-player .rank-number {
+  font-size: 1.4rem;
+}
+
+.top-player .player-name {
+  flex-grow: 1;
+  text-align: left;
+  margin-left: 10px;
+}
+
+.top-player .player-coins {
+  display: flex;
+  align-items: center;
+}
+
+.trophy-icon {
+  width: 20px;
+  margin-right: 5px;
+}
+
+/* Цветовые стили */
+.top-player.gold {
+  background: linear-gradient(to right, #ffd700, #ffecb3);
+  color: #333;
+}
+
+.top-player.blue {
+  background: linear-gradient(to right, #2196f3, #bbdefb);
+  color: #fff;
+}
+
+.top-player.purple {
+  background: linear-gradient(to right, #9c27b0, #e1bee7);
+  color: #fff;
+}
+
+.top-player.silver {
+  background: linear-gradient(to right, #9e9e9e, #eeeeee);
+  color: #333;
+}
