@@ -31,18 +31,16 @@ setDailyLimit(100 - storedClickCoins);
   }, []);
 
   const handleClick = () => {
-    if (coins < 100) {
-      const newCoins = coins + 1;
-      setCoins(newCoins);
-      setDailyLimit(100 - newCoins);
-      localStorage.setItem('coins', newCoins.toString());
-      if (clickSoundRef.current) {
-        clickSoundRef.current.currentTime = 0;
-        clickSoundRef.current.play();
-      }
-      setIsShaking(true);
-      setTimeout(() => setIsShaking(false), 300);
-    }
+    const storedClickCoins = parseInt(localStorage.getItem('clickCoins')) || 0;
+if (storedClickCoins < 100) {
+  const newClickCoins = storedClickCoins + 1;
+  const newTotalCoins = coins + 1;
+  setCoins(newTotalCoins);
+  setDailyLimit(100 - newClickCoins);
+  localStorage.setItem('coins', newTotalCoins.toString());
+  localStorage.setItem('clickCoins', newClickCoins.toString());
+  ...
+}
   };
 
   const getRank = () =>
@@ -59,9 +57,8 @@ setDailyLimit(100 - storedClickCoins);
 
   return (
     <div>
-      <div className="stats">
-        <p><strong>Монет:</strong> {coins} $RICH</p>
-        <p><strong>Звание:</strong> {getRank()}</p>
+      <div className="counter">
+        {100 - dailylimit}/100 монет (лимит на сегодня)
       </div>
       <img
         src="/robot.png"
