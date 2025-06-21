@@ -9,7 +9,7 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
         className={`nav-item ${currentTab === 'home' ? 'active' : ''}`}
         onClick={() => setCurrentTab('home')}
       >
-        🏠
+        <div className="icon">🏠</div>
         <div className="label">Главная</div>
       </div>
 
@@ -17,7 +17,7 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
         className={`nav-item ${currentTab === 'tasks' ? 'active' : ''}`}
         onClick={() => setCurrentTab('tasks')}
       >
-        📋
+        <div className="icon">📋</div>
         <div className="label">Задания</div>
       </div>
 
@@ -25,7 +25,7 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
         className={`nav-item ${currentTab === 'roulette' ? 'active' : ''}`}
         onClick={() => setCurrentTab('roulette')}
       >
-        🎰
+        <div className="icon">🎰</div>
         <div className="label">Рулетка</div>
       </div>
 
@@ -33,7 +33,7 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
         className={`nav-item ${currentTab === 'top' ? 'active' : ''}`}
         onClick={() => setCurrentTab('top')}
       >
-        🏆
+        <div className="icon">🏆</div>
         <div className="label">Топ</div>
       </div>
 
@@ -41,7 +41,7 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
         className={`nav-item ${currentTab === 'profile' ? 'active' : ''}`}
         onClick={() => setCurrentTab('profile')}
       >
-        👤
+        <div className="icon">👤</div>
         <div className="label">Профиль</div>
       </div>
     </div>
@@ -49,3 +49,5 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
 };
 
 export default BottomNav;
+
+ 
