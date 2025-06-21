@@ -1,3 +1,4 @@
+iimport React from 'react';
 import './BottomNav.css';
 
 const BottomNav = ({ currentTab, setCurrentTab }) => {
@@ -12,19 +13,19 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
       </div>
 
       <div
+        className={`nav-item ${currentTab === 'tasks' ? 'active' : ''}`}
+        onClick={() => setCurrentTab('tasks')}
+      >
+        <span role="img" aria-label="tasks">🎯</span>
+        <div className="label">Задания</div>
+      </div>
+
+      <div
         className={`nav-item ${currentTab === 'roulette' ? 'active' : ''}`}
         onClick={() => setCurrentTab('roulette')}
       >
         <span role="img" aria-label="roulette">🎰</span>
         <div className="label">Рулетка</div>
-      </div>
-
-      <div
-        className={`nav-item ${currentTab === 'tasks' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('tasks')}
-      >
-        <span role="img" aria-label="tasks">📋</span>
-        <div className="label">Задания</div>
       </div>
 
       <div
