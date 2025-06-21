@@ -4,6 +4,7 @@ import Home from './components/Home';
 import Tasks from './components/Tasks';
 import Roulette from './components/Roulette';
 import Top from './components/Top';
+import Profile from './components/Profile';
 import BottomNav from './components/BottomNav';
 
 const RANKS = [
@@ -39,6 +40,7 @@ function App() {
   const [isShaking, setIsShaking] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
+  const [username, setUsername] = useState(localStorage.getItem('username') || 'Ты');
   const clickSoundRef = useRef(null);
 
   useEffect(() => {
@@ -63,6 +65,14 @@ function App() {
     if (lastSpinDate === today) setCanSpin(false);
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem('coins', coins.toString());
+  }, [coins]);
+
+  useEffect(() => {
+    localStorage.setItem('username', username);
+  }, [username]);
+
   const resetTasks = () => {
     const reset = TASKS_TEMPLATE.map(task => {
       const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -86,31 +96,28 @@ function App() {
     localStorage.setItem('tasks', JSON.stringify(newTasks));
   };
 
-  const rendecase 'profile':
-  return <Profile username={username} setUsername={setUsername} />;
-rTab = () => {
-    import Profile from './components/Profile';
-    const commonProps = {
-      coins,
-      setCoins: updateCoins,
-      tasks,
-      setTasks: updateTasks,
-      dailyLimit,
-      setDailyLimit,
-      isShaking,
-      setIsShaking,
-      canSpin,
-      setCanSpin,
-      isSpinning,
-      setIsSpinning,
-      spinResult,
-      setSpinResult,
-      clickSoundRef,
-      resetTasks,
-      RANKS,
-      TASKS_TEMPLATE
-    };
+  const commonProps = {
+    coins,
+    setCoins: updateCoins,
+    tasks,
+    setTasks: updateTasks,
+    dailyLimit,
+    setDailyLimit,
+    isShaking,
+    setIsShaking,
+    canSpin,
+    setCanSpin,
+    isSpinning,
+    setIsSpinning,
+    spinResult,
+    setSpinResult,
+    clickSoundRef,
+    resetTasks,
+    RANKS,
+    TASKS_TEMPLATE
+  };
 
+  const renderTab = () => {
     switch (currentTab) {
       case 'home':
         return <Home {...commonProps} />;
@@ -119,7 +126,9 @@ rTab = () => {
       case 'roulette':
         return <Roulette {...commonProps} />;
       case 'top':
-        return <Top />;
+        return <Top username={username} />;
+      case 'profile':
+        return <Profile username={username} setUsername={setUsername} />;
       default:
         return <Home {...commonProps} />;
     }
@@ -135,8 +144,3 @@ rTab = () => {
 }
 
 export default App;
-const [username, setUsername] = useState(localStorage.getItem('username') || 'Ты');
-
-useEffect(() => {
-  localStorage.setItem('username', username);
-}, [username]);
