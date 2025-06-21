@@ -8,12 +8,24 @@ const mockTopPlayers = [
 ];
 
 function Top() {
+  // Получаем монеты пользователя
+  const userCoins = parseInt(localStorage.getItem('coins')) || 0;
+
+  // Создаём объект игрока
+  const currentUser = { name: 'Ты', coins: userCoins, color: 'cyan' };
+
+  // Объединяем фейковых игроков и текущего
+  const allPlayers = [...mockTopPlayers, currentUser];
+
+  // Сортируем по убыванию монет
+  const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 10);
+
   return (
     <div className="top-container">
       <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2>
       <img src="/robot.png" alt="Робот" className="top-robot" />
       <div className="top-list">
-        {mockTopPlayers.map((player, index) => (
+        {sorted.map((player, index) => (
           <div key={index} className={`top-player ${player.color}`}>
             <div className="rank-number">{index + 1}</div>
             <div className="player-name">{player.name}</div>
