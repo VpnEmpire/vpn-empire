@@ -1,7 +1,7 @@
 import React from 'react';
 import './Top.css';
 
-const mockTopPlayers = [
+const fakePlayers = [
   { name: 'Player1', coins: 1500, color: 'gold' },
   { name: 'Player2', coins: 1200, color: 'blue' },
   { name: 'Player4', coins: 800, color: 'purple' }
@@ -11,13 +11,13 @@ function Top() {
   // Получаем монеты пользователя
   const userCoins = parseInt(localStorage.getItem('coins')) || 0;
 
-  // Создаём объект игрока
+  // Создаём объект текущего игрока
   const currentUser = { name: 'Ты', coins: userCoins, color: 'cyan' };
 
-  // Объединяем фейковых игроков и текущего
-  const allPlayers = [...mockTopPlayers, currentUser];
+  // Объединяем всех игроков
+  const allPlayers = [...fakePlayers, currentUser];
 
-  // Сортируем по убыванию монет
+  // Сортировка по монетам и отбор топ-10
   const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 10);
 
   return (
