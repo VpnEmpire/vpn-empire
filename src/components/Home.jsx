@@ -9,38 +9,50 @@ const RANKS = [
 ];
 
 const Home = ({ coins, setCoins }) => {
+  const [clickCoins, setClickCoins] = useState(0);
   const [dailyLimit, setDailyLimit] = useState(100);
   const [isShaking, setIsShaking] = useState(false);
   const clickSoundRef = useRef(null);
 
   useEffect(() => {
-    const storedClickCoins = parseInt(localStorage.getItem('clickCoins')) || 0;
-setCoins(parseInt(localStorage.getItem('coins')) || 0);
-setDailyLimit(100 - storedClickCoins);
+    const today = new Date().toDateString();
+    const storedDate = localStorage.getItem('lastClickDate');
 
     if (storedDate !== today) {
-      setCoins(0);
-      setDailyLimit(100);
       localStorage.setItem('lastClickDate', today);
-      localStorage.setItem('coins', '0');
+      localStorage.setItem('clickCoins', '0');
+      setClickCoins(0);
+      setDailyLimit(100);
     } else {
-      const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
-      setCoins(storedCoins);
-      setDailyLimit(100 - storedCoins);
+      const storedClickCoins = parseInt(localStorage.getItem('clickCoins')) || 0;
+      setClickCoins(storedClickCoins);
+      setDailyLimit(100 - storedClickCoins);
     }
+
+    const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
+    setCoins(storedCoins);
   }, []);
 
   const handleClick = () => {
-    const storedClickCoins = parseInt(localStorage.getItem('clickCoins')) || 0;
-if (storedClickCoins < 100) {
-  const newClickCoins = storedClickCoins + 1;
-  const newTotalCoins = coins + 1;
-  setCoins(newTotalCoins);
-  setDailyLimit(100 - newClickCoins);
-  localStorage.setItem('coins', newTotalCoins.toString());
-  localStorage.setItem('clickCoins', newClickCoins.toString());
-  ...
-}
+    if (clickCoins < 100) {
+      const newClickCoins = clickCoins + 1;
+      const newTotalCoins = coins + 1;
+
+      setClickCoins(newClickCoins);
+      setCoins(newTotalCoins);
+      setDailyLimit(100 - newClickCoins);
+
+      localStorage.setItem('clickCoins', newClickCoins.toString());
+      localStorage.setItem('coins', newTotalCoins.toString());
+
+      if (clickSoundRef.current) {
+        clickSoundRef.current.currentTime = 0;
+        clickSoundRef.current.play();
+      }
+
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 300);
+    }
   };
 
   const getRank = () =>
@@ -57,8 +69,9 @@ if (storedClickCoins < 100) {
 
   return (
     <div>
-      <div className="counter">
-        {100 - dailylimit}/100 монет (лимит на сегодня)
+      <div className="stats">
+        <p><strong>Монет:</strong> {coins} $RICH</p>
+        <p><strong>Звание:</strong> {getRank()}</p>
       </div>
       <img
         src="/robot.png"
@@ -66,13 +79,13 @@ if (storedClickCoins < 100) {
         className={`robot ${isShaking ? 'shake' : ''}`}
         onClick={handleClick}
       />
-      <div className="counter">{coins}/100 монет {dailyLimit <= 0 && '(лимит на сегодня)'}</div>
+      <div className="counter">{clickCoins}/100 монет (лимит на сегодня)</div>
       <div className="helper">
         <p>{getHelperMessage()}</p>
       </div>
-      <audio ref={clickSoundRef} src="/click.mp3" preload="auto" />
+      <audio ref={clickSoundRef} src="/coin.mp3" preload="auto" />
     </div>
   );
 };
 
-export default Home;
+export default Home
