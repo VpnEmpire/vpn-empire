@@ -86,7 +86,10 @@ function App() {
     localStorage.setItem('tasks', JSON.stringify(newTasks));
   };
 
-  const renderTab = () => {
+  const rendecase 'profile':
+  return <Profile username={username} setUsername={setUsername} />;
+rTab = () => {
+    import Profile from './components/Profile';
     const commonProps = {
       coins,
       setCoins: updateCoins,
