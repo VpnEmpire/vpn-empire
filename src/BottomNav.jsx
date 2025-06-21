@@ -24,3 +24,10 @@ const BottomNav = ({ currentTab, setCurrentTab }) => {
 };
 
 export default BottomNav;
+<div
+  className={`nav-item ${currentTab === 'profile' ? 'active' : ''}`}
+  onClick={() => setCurrentTab('profile')}
+>
+  👤
+  <div className="label">Профиль</div>
+</div>
