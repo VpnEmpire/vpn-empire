@@ -121,12 +121,23 @@ function App() {
   );
 
   const renderWithdraw = () => (
-    <div className="withdraw-tab">
-      <h2>💸 Вывод</h2>
-      <p>Минимум для вывода: 1000 монет</p>
-      <p>Чтобы вывести средства, напиши в наш Telegram-бот <strong>@OrdoHereticusVPN</strong></p>
-    </div>
-  );
+  <div className="withdraw-tab">
+    <h2>💸 Вывод</h2>
+    <p>Минимум для вывода: 1000 монет</p>
+    <p>Чтобы вывести средства, нажми на кнопку ниже:</p>
+    <button
+      disabled={coins < 1000}
+      className={coins < 1000 ? 'withdraw-button disabled' : 'withdraw-button'}
+      onClick={() => {
+        if (coins >= 1000) {
+          window.open('https://t.me/OrdoHereticusVPN', '_blank');
+        }
+      }}
+    >
+      {coins < 1000 ? 'Недостаточно монет' : 'Вывести через Telegram'}
+    </button>
+  </div>
+);
 
   const renderTab = () => {
     switch (activeTab) {
