@@ -7,6 +7,39 @@ import TasksTab from './components/Tasks.jsx';
 import RouletteTab from './components/Roulette.jsx';
 import TopTab from './components/Top.jsx';
 function App() {
+  const [activeTab, setActiveTab] = useState('main');
+
+  let content;
+  switch (activeTab) {
+    case 'main':
+      content = <MainTab />;
+      break;
+    case 'tasks':
+      content = <TasksTab />;
+      break;
+    case 'roulette':
+      content = <RouletteTab />;
+      break;
+    case 'top':
+      content = <TopTab />;
+      break;
+    case 'withdraw':
+      content = <Withdraw />;
+      break;
+    default:
+      content = <MainTab />;
+  }
+
+  return (
+    <div className="App">
+      {content}
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+    </div>
+  );
+}
+
+export default App;
+
   const [activeTab, setActiveTab] = useState('home');
   const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
   const [rank, setRank] = useState('');
