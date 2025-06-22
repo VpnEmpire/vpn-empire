@@ -13,7 +13,7 @@ function App() {
   const [clicksToday, setClicksToday] = useState(() => Number(localStorage.getItem('clicksToday')) || 0);
   const [hasSubscription, setHasSubscription] = useState(() => localStorage.getItem('hasSubscription') === 'true');
   const maxClicksPerDay = 100;
- 
+
   useEffect(() => {
     localStorage.setItem('coins', coins);
     updateRank(coins);
