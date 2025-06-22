@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+mport React, { useState, useEffect } from 'react';
 import './App.css';
 import BottomNav from './components/BottomNav';
 import Withdraw from './components/Withdraw';
+
 function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
   const [rank, setRank] = useState('');
   const [clicksToday, setClicksToday] = useState(() => Number(localStorage.getItem('clicksToday')) || 0);
+  const [hasSubscription, setHasSubscription] = useState(() => localStorage.getItem('hasSubscription') === 'true');
   const maxClicksPerDay = 100;
 
   useEffect(() => {
@@ -120,7 +122,7 @@ function App() {
     </div>
   );
 
-  const renderWithdraw = () => (
+   const renderWithdraw = () => (
   <div className="withdraw-tab">
     <h2>💸 Вывод</h2>
     <p>Минимум для вывода: 1000 монет</p>
@@ -158,10 +160,28 @@ function App() {
     }
   };
 
+  const renderSubscriptionGate = () => (
+    <div className="subscription-lock">
+      <h2>🔐 Доступ ограничен</h2>
+      <p>Чтобы играть, оплати подписку на VPN (от 100 ₽) через Telegram-бота:</p>
+      <a href="https://t.me/OrdoHereticusVPN" target="_blank" rel="noreferrer">
+        👉 @OrdoHereticusVPN
+      </a>
+      <button onClick={() => {
+        localStorage.setItem('hasSubscription', 'true');
+        setHasSubscription(true);
+      }}>
+        ✅ Я оплатил
+      </button>
+    </div>
+  );
+
   return (
     <div className="App">
-      {renderTab()}
-      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      {!hasSubscription ? renderSubscriptionGate() : renderTab()}
+      {hasSubscription && (
+        <BottomNav currentTab={activeTab} setCurrentTab={setActiveTab} />
+      )}
     </div>
   );
 }
