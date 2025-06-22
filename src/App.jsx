@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import BottomNav from './components/BottomNav';
-import Withdraw from './components/Withdraw';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -122,7 +121,11 @@ function App() {
   );
 
   const renderWithdraw = () => (
-    <Withdraw coins={coins} />
+    <div className="withdraw-tab">
+      <h2>💸 Вывод</h2>
+      <p>Минимум для вывода: 1000 монет</p>
+      <p>Чтобы вывести средства, напиши в наш Telegram-бот <strong>@OrdoHereticusVPN</strong></p>
+    </div>
   );
 
   const renderTab = () => {
