@@ -4,11 +4,10 @@ import BottomNav from './components/BottomNav.jsx';
 import Withdraw from './components/Withdraw.jsx';
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import BottomNav from './components/BottomNav';
-import MainTab from './components/MainTab';
-import TasksTab from './components/TasksTab';
-import RouletteTab from './components/RouletteTab';
-import TopTab from './components/TopTab';
+import MainTab from './components/Main.jsx';
+import TasksTab from './components/Tasks.jsx';
+import RouletteTab from './components/Roulette.jsx';
+import TopTab from './components/Top.jsx';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
