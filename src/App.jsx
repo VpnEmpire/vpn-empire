@@ -6,6 +6,7 @@ import MainTab from './components/main.jsx';
 import TasksTab from './components/Tasks.jsx';
 import RouletteTab from './components/Roulette.jsx';
 import TopTab from './components/Top.jsx';
+
 function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
