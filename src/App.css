@@ -260,3 +260,46 @@ button:active {
   padding: 6px 12px;
   font-size: 16px;
 }
+.subscription-lock {
+  padding: 30px;
+  text-align: center;
+  background: #1c1c1c;
+  color: white;
+  border-radius: 10px;
+  margin: 40px auto;
+  max-width: 360px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.subscription-lock h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.subscription-lock p {
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.subscription-lock a {
+  display: block;
+  color: #00ffd1;
+  text-decoration: none;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.subscription-lock button {
+  background: #00ffd1;
+  color: #000;
+  padding: 10px 20px;
+  border: none;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.subscription-lock button:hover {
+  background: #00c6a8;
+}
