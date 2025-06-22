@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import BottomNav from './components/BottomNav.jsx';
 import Withdraw from './components/Withdraw.jsx';
-import MainTab from './components/main.jsx';
+import MainTab from './main.jsx';
 import TasksTab from './components/Tasks.jsx';
 import RouletteTab from './components/Roulette.jsx';
 import TopTab from './components/Top.jsx';
