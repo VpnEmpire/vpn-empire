@@ -1,4 +1,4 @@
-mport React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import BottomNav from './components/BottomNav';
 import Withdraw from './components/Withdraw';
@@ -58,18 +58,31 @@ function App() {
     else setRank('Новичок');
   };
 
+  const handleSubscriptionConfirm = () => {
+    localStorage.setItem('hasSubscription', 'true');
+    setHasSubscription(true);
+  };
+
+  const renderSubscriptionPrompt = () => (
+    <div className="subscription-block">
+      <h2>🔒 Доступ ограничен</h2>
+      <p>Чтобы играть, необходимо оплатить подписку от 100₽ в Telegram-боте:</p>
+      <a className="tg-link" href="https://t.me/OrdoHereticusVPN" target="_blank" rel="noopener noreferrer">
+        Перейти в бот
+      </a>
+      <button className="confirm-btn" onClick={handleSubscriptionConfirm}>
+        ✅ Я оплатил
+      </button>
+    </div>
+  );
+
   const renderHome = () => (
     <div className="main-content">
       <div className="stats-box">
         <p>Монет: {coins} $RICH</p>
         <p>Звание: {rank}</p>
       </div>
-      <img
-        src="/robot.png"
-        alt="robot"
-        className="robot"
-        onClick={handleClick}
-      />
+      <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
       <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
       <div className="helper-box">
         🤖 Я твой помощник! Кликай на робота и зарабатывай монеты.
@@ -114,14 +127,6 @@ function App() {
     </div>
   );
 
-  const renderProfile = () => (
-    <div className="profile-tab">
-      <h2>👤 Профиль</h2>
-      <p>Монет: {coins}</p>
-      <p>Звание: {rank}</p>
-    </div>
-  );
-
    const renderWithdraw = () => (
   <div className="withdraw-tab">
     <h2>💸 Вывод</h2>
@@ -151,8 +156,6 @@ function App() {
         return renderRoulette();
       case 'top':
         return renderTop();
-      case 'profile':
-        return renderProfile();
       case 'withdraw':
         return renderWithdraw();
       default:
@@ -160,30 +163,13 @@ function App() {
     }
   };
 
-  const renderSubscriptionGate = () => (
-    <div className="subscription-lock">
-      <h2>🔐 Доступ ограничен</h2>
-      <p>Чтобы играть, оплати подписку на VPN (от 100 ₽) через Telegram-бота:</p>
-      <a href="https://t.me/OrdoHereticusVPN" target="_blank" rel="noreferrer">
-        👉 @OrdoHereticusVPN
-      </a>
-      <button onClick={() => {
-        localStorage.setItem('hasSubscription', 'true');
-        setHasSubscription(true);
-      }}>
-        ✅ Я оплатил
-      </button>
-    </div>
-  );
-
   return (
     <div className="App">
-      {!hasSubscription ? renderSubscriptionGate() : renderTab()}
-      {hasSubscription && (
-        <BottomNav currentTab={activeTab} setCurrentTab={setActiveTab} />
-      )}
+      {!hasSubscription ? renderSubscriptionPrompt() : renderTab()}
+      {hasSubscription && <BottomNav currentTab={activeTab} setCurrentTab={setActiveTab} />}
     </div>
   );
 }
 
 export default App;
+
