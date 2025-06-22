@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import BottomNav from './BottomNav';
+import BottomNav from './components/BottomNav';
 import Withdraw from './components/Withdraw';
 
 function App() {
