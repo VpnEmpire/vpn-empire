@@ -2,26 +2,12 @@
 import React from 'react';
 import './BottomNav.css';
 
-function BottomNav({ activeTab, setActiveTab }) {
-  return (
-    <div className="bottom-nav">
-      <button onClick={() => setActiveTab('main')}>🏠 Главная</button>
-      <button onClick={() => setActiveTab('tasks')}>📋 Задания</button>
-      <button onClick={() => setActiveTab('roulette')}>🎰 Рулетка</button>
-      <button onClick={() => setActiveTab('top')}>🏆 Топ</button>
-      <button onClick={() => setActiveTab('withdraw')}>💸 Вывести</button>
-    </div>
-  );
-}
-
-export default BottomNav;
-
 const BottomNav = ({ activeTab, setActiveTab }) => {
   return (
     <div className="bottom-nav">
       <div
-        className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
-        onClick={() => setActiveTab('home')}
+        className={`nav-item ${activeTab === 'main' ? 'active' : ''}`}
+        onClick={() => setActiveTab('main')}
       >
         <div className="icon">🏠</div>
         <div className="label">Главная</div>
@@ -42,7 +28,7 @@ const BottomNav = ({ activeTab, setActiveTab }) => {
         <div className="icon">🎰</div>
         <div className="label">Рулетка</div>
       </div>
-      
+
       <div
         className={`nav-item ${activeTab === 'top' ? 'active' : ''}`}
         onClick={() => setActiveTab('top')}
