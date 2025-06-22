@@ -231,3 +231,19 @@ button:active {
   vertical-align: middle;
   margin-right: 5px;
 }
+.withdraw-button {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #ffc107;
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.withdraw-button.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
