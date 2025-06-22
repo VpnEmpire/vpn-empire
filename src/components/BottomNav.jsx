@@ -28,7 +28,7 @@ const BottomNav = ({ activeTab, setActiveTab }) => {
         <div className="icon">🎰</div>
         <div className="label">Рулетка</div>
       </div>
-
+      
       <div
         className={`nav-item ${activeTab === 'top' ? 'active' : ''}`}
         onClick={() => setActiveTab('top')}
