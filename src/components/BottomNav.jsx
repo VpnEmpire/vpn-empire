@@ -2,44 +2,44 @@
 import React from 'react';
 import './BottomNav.css';
 
-const BottomNav = ({ currentTab, setCurrentTab }) => {
+const BottomNav = ({ activeTab, setActiveTab }) => {
   return (
     <div className="bottom-nav">
       <div
-        className={`nav-item ${currentTab === 'home' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('home')}
+        className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
+        onClick={() => setActiveTab('home')}
       >
         <div className="icon">🏠</div>
         <div className="label">Главная</div>
       </div>
 
       <div
-        className={`nav-item ${currentTab === 'tasks' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('tasks')}
+        className={`nav-item ${activeTab === 'tasks' ? 'active' : ''}`}
+        onClick={() => setActiveTab('tasks')}
       >
         <div className="icon">📋</div>
         <div className="label">Задания</div>
       </div>
 
       <div
-        className={`nav-item ${currentTab === 'roulette' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('roulette')}
+        className={`nav-item ${activeTab === 'roulette' ? 'active' : ''}`}
+        onClick={() => setActiveTab('roulette')}
       >
         <div className="icon">🎰</div>
         <div className="label">Рулетка</div>
       </div>
 
       <div
-        className={`nav-item ${currentTab === 'top' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('top')}
+        className={`nav-item ${activeTab === 'top' ? 'active' : ''}`}
+        onClick={() => setActiveTab('top')}
       >
         <div className="icon">🏆</div>
         <div className="label">Топ</div>
       </div>
 
       <div
-        className={`nav-item ${currentTab === 'withdraw' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('withdraw')}
+        className={`nav-item ${activeTab === 'withdraw' ? 'active' : ''}`}
+        onClick={() => setActiveTab('withdraw')}
       >
         <div className="icon">💸</div>
         <div className="label">Вывести</div>
