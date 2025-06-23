@@ -1,45 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import BottomNav from './components/BottomNav.jsx';
-import Withdraw from './components/Withdraw.jsx';
-import MainTab from './main.jsx';
-import TasksTab from './components/Tasks.jsx';
-import RouletteTab from './components/Roulette.jsx';
-import TopTab from './components/Top.jsx';
+
 function App() {
-  const [activeTab, setActiveTab] = useState('main');
-
-  let content;
-  switch (activeTab) {
-    case 'main':
-      content = <MainTab />;
-      break;
-    case 'tasks':
-      content = <TasksTab />;
-      break;
-    case 'roulette':
-      content = <RouletteTab />;
-      break;
-    case 'top':
-      content = <TopTab />;
-      break;
-    case 'withdraw':
-      content = <Withdraw />;
-      break;
-    default:
-      content = <MainTab />;
-  }
-
-  return (
-    <div className="App">
-      {content}
-      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
-    </div>
-  );
-}
-
-export default App;
-
   const [activeTab, setActiveTab] = useState('home');
   const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
   const [rank, setRank] = useState('');
@@ -163,24 +126,24 @@ export default App;
     </div>
   );
 
-   const renderWithdraw = () => (
-  <div className="withdraw-tab">
-    <h2>💸 Вывод</h2>
-    <p>Минимум для вывода: 1000 монет</p>
-    <p>Чтобы вывести средства, нажми на кнопку ниже:</p>
-    <button
-      disabled={coins < 1000}
-      className={coins < 1000 ? 'withdraw-button disabled' : 'withdraw-button'}
-      onClick={() => {
-        if (coins >= 1000) {
-          window.open('https://t.me/OrdoHereticusVPN', '_blank');
-        }
-      }}
-    >
-      {coins < 1000 ? 'Недостаточно монет' : 'Вывести через Telegram'}
-    </button>
-  </div>
-);
+  const renderWithdraw = () => (
+    <div className="withdraw-tab">
+      <h2>💸 Вывод</h2>
+      <p>Минимум для вывода: 1000 монет</p>
+      <p>Чтобы вывести средства, нажми на кнопку ниже:</p>
+      <button
+        disabled={coins < 1000}
+        className={coins < 1000 ? 'withdraw-button disabled' : 'withdraw-button'}
+        onClick={() => {
+          if (coins >= 1000) {
+            window.open('https://t.me/OrdoHereticusVPN', '_blank');
+          }
+        }}
+      >
+        {coins < 1000 ? 'Недостаточно монет' : 'Вывести через Telegram'}
+      </button>
+    </div>
+  );
 
   const renderTab = () => {
     switch (activeTab) {
@@ -202,8 +165,9 @@ export default App;
   return (
     <div className="App">
       {!hasSubscription ? renderSubscriptionPrompt() : renderTab()}
-      {hasSubscription && <BottomNav currentTab={activeTab} setCurrentTab={setActiveTab} />}
+      {hasSubscription && <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />}
     </div>
   );
 }
+
 export default App;
