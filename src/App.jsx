@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import BottomNav from './components/BottomNav.jsx';
+import TopTab from './components/Top.jsx';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
