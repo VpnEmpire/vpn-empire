@@ -210,7 +210,15 @@ function App() {
         return renderHome();
     }
   };
-
+ return (
+    <div className="App">
+      {!hasSubscription ? renderSubscriptionPrompt() : renderTab()}
+      {hasSubscription && (
+        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      )}
+    </div>
+  );
+}
    return (
     <div className="App">
       <div className="header-box">
