@@ -211,12 +211,26 @@ function App() {
     }
   };
 
-  return (
+   return (
     <div className="App">
-      {!hasSubscription ? renderSubscriptionPrompt() : renderTab()}
-      {hasSubscription && (
-        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="header-box">
+        <div>💰 {coins}</div>
+        <div>{rank}</div>
+      </div>
+
+      {activeTab === 'home' && (
+        <MainTab
+          coins={coins}
+          clicksToday={clicksToday}
+          handleClick={handleClick}
+        />
       )}
+      {activeTab === 'tasks' && <TasksTab coins={coins} setCoins={setCoins} />}
+      {activeTab === 'roulette' && <RouletteTab coins={coins} setCoins={setCoins} />}
+      {activeTab === 'top' && <TopTab />}
+      {/* Можно добавить вкладку "withdraw" по аналогии */}
+
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }
