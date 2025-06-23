@@ -92,15 +92,26 @@ function App() {
 
   const renderHome = () => (
     <div className="main-content">
-      <div className="stats-box">
-        <p>Монет: {coins} $RICH</p>
-        <p>Звание: {rank}</p>
+      <div className="heander-box">
+        <div className "coins">💰 Монет: {coins} $RICH</div>
+        <div className=🎖 Звание: {rank}</div>
       </div>
-      <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
+  <div className="robot-container">
+      <img
+        src="/robot.png"
+        alt="robot"
+        className="robot"
+        onClick={handleClick}
+      />
       <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
-      <div className="helper-box">🤖 Я твой помощник! Кликай на робота и зарабатывай монеты.</div>
     </div>
-  );
+
+    <div className="helper-box">
+      🤖 <strong>Я твой помощник!</strong><br />
+      Кликай на робота и зарабатывай монеты.
+    </div>
+  </div>
+);
 
   const renderTasks = () => (
     <div className="tasks-tab">
