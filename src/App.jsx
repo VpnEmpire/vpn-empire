@@ -11,6 +11,8 @@ function App() {
   const [rank, setRank] = useState('');
   const [clicksToday, setClicksToday] = useState(() => Number(localStorage.getItem('clicksToday')) || 0);
   const [hasSubscription, setHasSubscription] = useState(() => localStorage.getItem('hasSubscription') === 'true');
+  const [completedTasks, setCompletedTasks] = useState(() => JSON.parse(localStorage.getItem('completedTasks')) || {});
+  const [flashes, setFlashes] = useState([]);
   const maxClicksPerDay = 100;
   
   // Звук и логика рулетки
@@ -19,31 +21,46 @@ function App() {
   const [canSpin, setCanSpin] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
-
+  
+  useEffect(() => {
+    localStorage.setItem('coins', coins);
+    localStorage.setItem('clicksToday', clicksToday);
+    localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+  }, [coins, clicksToday, completedTasks]);
+  
   useEffect(() => {
     const lastSpinDate = localStorage.getItem('lastSpinDate');
     const today = new Date().toDateString();
     if (lastSpinDate === today) setCanSpin(false);
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem('coins', coins);
-    updateRank(coins);
-  }, [coins]);
-
-  useEffect(() => {
+  
+useEffect(() => {
     const today = new Date().toDateString();
-    const lastClickDate = localStorage.getItem('lastClickDate');
-    if (lastClickDate !== today) {
+    if (localStorage.getItem('lastClickDate') !== today) {
       setClicksToday(0);
       localStorage.setItem('lastClickDate', today);
+    }
+    if (localStorage.getItem('dailyTaskDate') !== today) {
+      setCompletedTasks({});
+      localStorage.setItem('dailyTaskDate', today);
+    }
+    if (localStorage.getItem('lastSpinDate') === today) {
+      setCanSpin(false);
     }
   }, []);
 
   useEffect(() => {
     localStorage.setItem('clicksToday', clicksToday);
   }, [clicksToday]);
-
+  
+const updateRank = (totalCoins) => {
+    if (totalCoins >= 5000) setRank('Легенда VPN');
+    else if (totalCoins >= 2000) setRank('Эксперт');
+    else if (totalCoins >= 1000) setRank('Профи');
+    else if (totalCoins >= 500) setRank('Агент');
+    else setRank('Новичок');
+  };
+  
   const handleClick = () => {
     if (clicksToday < maxClicksPerDay) {
       setCoins(prev => prev + 1);
@@ -52,6 +69,17 @@ function App() {
       playClickSound();
     }
   };
+  
+const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
+    setFlashes(prev => [...prev, flash]);
+    setTimeout(() => {
+      setFlashes(prev => prev.filter(f => f.id !== flash.id));
+    }, 400);
+
+    const audio = new Audio('/click.mp3');
+    audio.play();
+  };
+
 
   const triggerAnimation = () => {
     const flash = document.createElement('div');
@@ -65,28 +93,32 @@ function App() {
     audio.play();
   };
   
-const App = () => {
-  const [tab, setTab] = useState('main');
-  const [coins, setCoins] = useState(() => parseInt(localStorage.getItem('coins')) || 0);
-  const [clicksLeft, setClicksLeft] = useState(() => parseInt(localStorage.getItem('clicksLeft')) || 100);
-  const [completedTasks, setCompletedTasks] = useState(() => JSON.parse(localStorage.getItem('completedTasks')) || {});
-  const [flashes, setFlashes] = useState([]);
-  const [showSubscription, setShowSubscription] = useState(() => !localStorage.getItem('subConfirmed'));
-  const [canSpin, setCanSpin] = useState(true);
-  const [spinResult, setSpinResult] = useState('');
-  const spinSoundRef = useRef(null);
-                             
-  const updateRank = (totalCoins) => {
-    if (totalCoins >= 5000) setRank('Легенда VPN');
-    else if (totalCoins >= 2000) setRank('Эксперт');
-    else if (totalCoins >= 1000) setRank('Профи');
-    else if (totalCoins >= 500) setRank('Агент');
-    else setRank('Новичок');
+ const handleComplete = (key, reward) => {
+    if (completedTasks[key]) return;
+    const updated = { ...completedTasks, [key]: true };
+    setCoins(prev => prev + reward);
+    setCompletedTasks(updated);
+  };
+
+  const spinWheel = () => {
+    if (!canSpin) return;
+    if (spinSoundRef.current) spinSoundRef.current.play();
+
+    const options = [20, 50, 100, 200, 300, 400];
+    const result = options[Math.floor(Math.random() * options.length)];
+
+    setTimeout(() => {
+      setCoins(prev => prev + result);
+      setSpinResult(result);
+      setCanSpin(false);
+      localStorage.setItem('lastSpinDate', new Date().toDateString());
+      if (winSoundRef.current) winSoundRef.current.play();
+    }, 2000);
   };
 
   const handleSubscriptionConfirm = () => {
-    localStorage.setItem('hasSubscription', 'true');
     setHasSubscription(true);
+    localStorage.setItem('hasSubscription', 'true');
   };
 
   const renderSubscriptionPrompt = () => (
@@ -109,177 +141,61 @@ const App = () => {
         <div className="rank">🎖 Звание: {rank}</div>
       </div>
   <div className="robot-container">
-      <img
-        src="/robot.png"
-        alt="robot"
-        className="robot"
-        onClick={handleClick}
-      />
+      <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
       <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
     </div>
-
     <div className="helper-box">
       🤖 <strong>Я твой помощник!</strong><br />
       Кликай на робота и зарабатывай монеты.
     </div>
-  </div>
-);
+ {flashes.map(f => (
+        <div key={f.id} className="flash" style={{ left: f.x, top: f.y }} />
+      ))}
+    </div>
+  );
   
-const renderTasks = () => (
-  <div className="tasks-tab">
-    <h2>📋 Задания</h2>
+ const renderTasks = () => {
+    const tasks = [
+      { key: 'invite1', label: 'Пригласи 1 друга', reward: 50 },
+      { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100 },
+      { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200 },
+      { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300 },
+      { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400 },
+      { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500 },
+      { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600 },
+      { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, link: 'https://t.me/OrdoHereticusVPN' },
+      { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
+      { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
+      { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
+      { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
+      { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 }
+    ];
 
-    <div className="task-card">
-      <span>Пригласи 1 друга – 🪙 50 монет</span>
-      {completedTasks['invite1'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('invite1', 50)}>Выполнить</button>
-      )}
-    </div>
-<div className="task-card">
-      <span>Пригласи 2 друзей – 🪙 100 монет</span>
-      {completedTasks['invite1'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('invite1', 100)}>Выполнить</button>
-      )}
-    </div>
-    
-    <div className="task-card">
-      <span>Пригласи 3 друзей – 🪙 200 монет</span>
-      {completedTasks['invite1'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('invite1', 200)}>Выполнить</button>
-      )}
-    </div>
-    
-    <div className="task-card">
-      <span>Пригласи 4 друзей – 🪙 300 монет</span>
-      {completedTasks['invite1'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('invite1', 300)}>Выполнить</button>
-      )}
-    </div>
-    
-    <div className="task-card">
-      <span>Пригласи 5 друзей – 🪙 400 монет</span>
-      {completedTasks['invite1'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('invite1', 400)}>Выполнить</button>
-      )}
-    </div
-      
-    <div className="task-card">
-      <span>Пригласи 6 друзей – 🪙 500 монет</span>
-      {completedTasks['invite1'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('invite1', 500)}>Выполнить</button>
-      )}
-    </div>
-    
-    <div className="task-card">
-      <span>Пригласи 7 друзей – 🪙 600 монет</span>
-      {completedTasks['invite1'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('invite1', 600)}>Выполнить</button>
-      )}
-    </div>
-    
-    <div className="task-card">
-      <span>Подписаться на Telegram – 🪙 100 монет</span>
-      {completedTasks['telegram'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('telegram', 100)}>Выполнить</button>
-      )}
-    </div>
+    return (
+      <div className="tasks-tab">
+        <h2>📋 Задания</h2>
+        {tasks.map(task => (
+          <div key={task.key} className="task-card">
+            <span>
+              {task.link ? (
+                <a href={task.link} target="_blank" rel="noopener noreferrer">{task.label}</a>
+              ) : (
+                task.label
+              )} — 🪙 {task.reward} монет
+            </span>
+            {completedTasks[task.key] ? (
+              <span className="done">✅</span>
+            ) : (
+              <button onClick={() => handleComplete(task.key, task.reward)}>Выполнить</button>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
-    <div className="task-card">
-      <span>Рассказать о нас в соцсетях – 🪙 100 монет</span>
-      {completedTasks['social'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('social', 100)}>Выполнить</button>
-      )}
-    </div>
-    <div className="task-card">
-      <span>Пригласи 1 друга – 🪙 50 монет</span>
-      {completedTasks['invite1'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('invite1', 50)}>Выполнить</button>
-      )}
-    </div>
-    const renderTasks = () => (
-  <div className="tasks-tab">
-    <h2>📋 Задания</h2>
 
-    <div className="task-card">
-      <span>
-        📨 Подписаться на Telegram-канал — <a href="https://t.me/OrdoHereticusVPN" target="_blank" rel="noopener noreferrer">OrdoHereticusVPN</a> — 🪙 100 монет
-      </span>
-      {completedTasks['subscribeTelegram'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('subscribeTelegram', 100)}>Выполнить</button>
-      )}
-    </div>
 
-    <div className="task-card">
-      <span>
-        Подписаться на Instagram — <a href="https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==" target="_blank" rel="noopener noreferrer">@internet.bot.001</a> — 🪙 100 монет
-      </span>
-      {completedTasks['subscribeInstagram'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('subscribeInstagram', 100)}>Выполнить</button>
-      )}
-    </div>
-
-    <div className="task-card">
-      <span>📢 Расскажи о нас в соцсетях — 🪙 100 монет</span>
-      {completedTasks['shareSocial'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('shareSocial', 100)}>Выполнить</button>
-      )}
-    </div>
-
-    <div className="task-card">
-      <span>💬 Оставить комментарий под последним постом — 🪙 50 монет</span>
-      {completedTasks['commentPost'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('commentPost', 50)}>Выполнить</button>
-      )}
-    </div>
-
-    <div className="task-card">
-      <span>❤️ Поставить реакцию на последнюю запись — 🪙 50 монет</span>
-      {completedTasks['reactPost'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('reactPost', 50)}>Выполнить</button>
-      )}
-    </div>
-
-    <div className="task-card">
-      <span>🛡 Заходить в VPN каждый день — 🪙 100 монет</span>
-      {completedTasks['dailyVpn'] ? (
-        <span className="done">✅</span>
-      ) : (
-        <button onClick={() => handleComplete('dailyVpn', 100)}>Выполнить</button>
-      )}
-    </div>
-  </div>
-);
-    
   const spinWheel = () => {
     if (!canSpin) return;
     if (spinSoundRef.current) {
@@ -304,16 +220,14 @@ const renderTasks = () => (
     }, 2000);
   };
 
-  const renderRoulette = () => (
+   const renderRoulette = () => (
     <div className="roulette-tab">
       <h2>🎰 Рулетка</h2>
       <img src="/roulette.gif" alt="Рулетка" className="roulette-image" style={{ width: '200px', marginBottom: '20px' }} />
-      <button className="spin-button" onClick={spinWheel} disabled={!canSpin || isSpinning}>
-        {isSpinning ? 'Крутится...' : 'Крутить рулетку'}
+      <button className="spin-button" onClick={spinWheel} disabled={!canSpin}>
+        Крутить
       </button>
-      {spinResult !== null && !isSpinning && (
-        <div className="spin-result">+{spinResult} монет!</div>
-      )}
+      {spinResult !== '' && <div className="spin-result">+{spinResult} монет!</div>}
       <audio ref={spinSoundRef} src="/spin-sound.mp3" preload="auto" />
       <audio ref={winSoundRef} src="/coins_many.mp3" preload="auto" />
     </div>
@@ -359,34 +273,9 @@ const renderTasks = () => (
   };
  return (
     <div className="App">
-      {!hasSubscription ? renderSubscriptionPrompt() : renderTab()}
-      {hasSubscription && (
-        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
-      )}
-    </div>
-  );
-   return (
-    <div className="App">
-      <div className="header-box">
-        <div>💰 {coins}</div>
-        <div>{rank}</div>
-      </div>
-
-      {activeTab === 'home' && (
-        <MainTab
-          coins={coins}
-          clicksToday={clicksToday}
-          handleClick={handleClick}
-        />
-      )}
-      {activeTab === 'tasks' && <TasksTab coins={coins} setCoins={setCoins} />}
-      {activeTab === 'roulette' && <RouletteTab coins={coins} setCoins={setCoins} />}
-      {activeTab === 'top' && <TopTab />}
-      {/* Можно добавить вкладку "withdraw" по аналогии */}
-
+      {renderTab()}
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }
-
 export default App;
