@@ -173,7 +173,7 @@ useEffect(() => {
                 <a href={task.link} target="_blank" rel="noopener noreferrer">{task.label}</a>
               ) : (
                 task.label
-              )} — 🪙 {task.reward} монет
+              )} — 🪙 {task.reward} 10000 монет
             </span>
             {completedTasks[task.key] ? (
               <span className="done">✅</span>
