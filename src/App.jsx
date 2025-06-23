@@ -4,7 +4,7 @@ import './App.css';
 import BottomNav from './components/BottomNav.jsx';
 import TopTab from './components/Top.jsx';
 import TasksTab from './components/Tasks.jsx';
-  
+
 function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
@@ -14,27 +14,20 @@ function App() {
   const [completedTasks, setCompletedTasks] = useState(() => JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [flashes, setFlashes] = useState([]);
   const maxClicksPerDay = 100;
-  
-  // Звук и логика рулетки
+
   const spinSoundRef = useRef(null);
   const winSoundRef = useRef(null);
   const [canSpin, setCanSpin] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
-  
+
   useEffect(() => {
     localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
     localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
   }, [coins, clicksToday, completedTasks]);
-  
+
   useEffect(() => {
-    const lastSpinDate = localStorage.getItem('lastSpinDate');
-    const today = new Date().toDateString();
-    if (lastSpinDate === today) setCanSpin(false);
-  }, []);
-  
-useEffect(() => {
     const today = new Date().toDateString();
     if (localStorage.getItem('lastClickDate') !== today) {
       setClicksToday(0);
@@ -49,37 +42,28 @@ useEffect(() => {
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('clicksToday', clicksToday);
-  }, [clicksToday]);
-  
-const updateRank = (totalCoins) => {
+  const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
     else if (totalCoins >= 1000) setRank('Профи');
     else if (totalCoins >= 500) setRank('Агент');
     else setRank('Новичок');
   };
-  
-  const handleClick = () => {
+
+  const handleClick = (e) => {
     if (clicksToday < maxClicksPerDay) {
       setCoins(prev => prev + 1);
       setClicksToday(prev => prev + 1);
       triggerAnimation();
       playClickSound();
+
+      const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
+      setFlashes(prev => [...prev, flash]);
+      setTimeout(() => {
+        setFlashes(prev => prev.filter(f => f.id !== flash.id));
+      }, 400);
     }
   };
-  
-const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
-    setFlashes(prev => [...prev, flash]);
-    setTimeout(() => {
-      setFlashes(prev => prev.filter(f => f.id !== flash.id));
-    }, 400);
-
-    const audio = new Audio('/click.mp3');
-    audio.play();
-  };
-
 
   const triggerAnimation = () => {
     const flash = document.createElement('div');
@@ -92,8 +76,8 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
     const audio = new Audio('/click.mp3');
     audio.play();
   };
-  
- const handleComplete = (key, reward) => {
+
+  const handleComplete = (key, reward) => {
     if (completedTasks[key]) return;
     const updated = { ...completedTasks, [key]: true };
     setCoins(prev => prev + reward);
@@ -140,21 +124,21 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
         <div className="coins">💰 Монет: {coins} $RICH</div>
         <div className="rank">🎖 Звание: {rank}</div>
       </div>
-  <div className="robot-container">
-      <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
-      <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
-    </div>
-    <div className="helper-box">
-      🤖 <strong>Я твой помощник!</strong><br />
-      Кликай на робота и зарабатывай монеты.
-    </div>
- {flashes.map(f => (
+      <div className="robot-container">
+        <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
+        <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
+      </div>
+      <div className="helper-box">
+        🤖 <strong>Я твой помощник!</strong><br />
+        Кликай на робота и зарабатывай монеты.
+      </div>
+      {flashes.map(f => (
         <div key={f.id} className="flash" style={{ left: f.x, top: f.y }} />
       ))}
     </div>
   );
-  
- const renderTasks = () => {
+
+  const renderTasks = () => {
     const tasks = [
       { key: 'invite1', label: 'Пригласи 1 друга', reward: 50 },
       { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100 },
@@ -194,7 +178,7 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
     );
   };
 
-   const renderRoulette = () => (
+  const renderRoulette = () => (
     <div className="roulette-tab">
       <h2>🎰 Рулетка</h2>
       <img src="/roulette.gif" alt="Рулетка" className="roulette-image" style={{ width: '200px', marginBottom: '20px' }} />
@@ -224,7 +208,7 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
           }
         }}
       >
-         {coins < 1000 ? 'Недостаточно монет' : 'Вывести через Telegram'}
+        {coins < 1000 ? 'Недостаточно монет' : 'Вывести через Telegram'}
       </button>
     </div>
   );
