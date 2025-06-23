@@ -19,6 +19,7 @@ function App() {
   const [canSpin, setCanSpin] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
+  const [userId, setUserId] = useState(null);
 const [isWithdrawApproved, setIsWithdrawApproved] = useState(() =>
   localStorage.getItem('isWithdrawApproved') === 'true'
 );
@@ -48,8 +49,12 @@ useEffect(() => {
     if (localStorage.getItem('lastSpinDate') === today) {
       setCanSpin(false);
     }
-  }, []);
-
+  useEffect(() => {
+  if (window?.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
+    setUserId(window.Telegram.WebApp.initDataUnsafe.user.id);
+  }
+}, []);
+    
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
