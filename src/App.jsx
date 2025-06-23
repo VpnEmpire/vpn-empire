@@ -92,28 +92,30 @@ useEffect(() => {
     audio.play();
   };
 
-  const handleComplete = async (key, reward, requiresCheck = false) => {
-  if (completedTasks[key]) return;
-    
-  if (requiresCheck) {
-    if (!userId) {
-      alert("Ошибка: не удалось получить user_id из Telegram.");
-      return;
-    }
-    const res = await fetch(`/api/check-subscription?user_id=${userId}`);
-    const data = await res.json();
+  const handleComplete = async (key, reward, requiresReferralCount = null) => {
+  if (completedTasks[key]) return;
 
-    if (!data.subscribed) {
-      alert("❗ Подпишись на канал, прежде чем выполнять задание.");
-      return;
-    }
-  }
+  if (!userId) {
+    alert("Ошибка: не удалось получить user_id из Telegram.");
+    return;
+  }
 
-  const updated = { ...completedTasks, [key]: true };
-  setCoins(prev => prev + reward);
-  setCompletedTasks(updated);
+  // Проверка количества приглашений
+  if (requiresReferralCount !== null) {
+    const res = await fetch(`/api/check-referrals?user_id=${userId}`);
+    const data = await res.json();
+
+    if (!data || data.referrals < requiresReferralCount) {
+      alert(`Пригласи как минимум ${requiresReferralCount} друзей для выполнения этого задания`);
+      return;
+    }
+  }
+
+  const updated = { ...completedTasks, [key]: true };
+  setCoins(prev => prev + reward);
+  setCompletedTasks(updated);
 };
-    
+
   const spinWheel = () => {
     if (!canSpin) return;
     if (spinSoundRef.current) spinSoundRef.current.play();
@@ -170,14 +172,14 @@ useEffect(() => {
 
   const renderTasks = () => {
   const tasks = [
-    { key: 'invite1', label: 'Пригласи 1 друга', reward: 50 },
-    { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100 },
-    { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200 },
-    { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300 },
-    { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400 },
-    { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500 },
-    { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600 },
-    { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, link: 'https://t.me/OrdoHereticusVPN', requiresCheck: true },
+    { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
+    { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
+    { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200, requiresReferralCount: 3 },
+    { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300, requiresReferralCount: 4 },
+    { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400, requiresReferralCount: 5 },
+    { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500, requiresReferralCount: 6 },
+    { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600, requiresReferralCount: 7 },
+    { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, link: 'https://t.me/OrdoHereticusVPN', requiresSubscription: true },
     { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
     { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
     { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
@@ -188,6 +190,7 @@ useEffect(() => {
   return (
     <div className="tasks-tab">
       <h2>📋 Задания</h2>
+
       {tasks.map(task => (
         <div key={task.key} className="task-card">
           <span>
@@ -200,12 +203,20 @@ useEffect(() => {
           {completedTasks[task.key] ? (
             <span className="done">✅</span>
           ) : (
-            <button onClick={() => handleComplete(task.key, task.reward, task.requiresCheck)}>
+            <button
+              onClick={() =>
+                handleComplete(task.key, task.reward, {
+                  requiresSubscription: task.requiresSubscription,
+                  requiresReferralCount: task.requiresReferralCount,
+                })
+              }
+            >
               Выполнить
             </button>
           )}
         </div>
       ))}
+
       <div className="task-card disabled-task">
         <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
       </div>
