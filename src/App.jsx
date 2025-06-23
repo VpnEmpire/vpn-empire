@@ -113,26 +113,162 @@ function App() {
     </div>
   </div>
 );
+  
+const renderTasks = () => (
+  <div className="tasks-tab">
+    <h2>📋 Задания</h2>
 
-  const renderTasks = () => (
-    <div className="tasks-tab">
-      <h2>🎯 Задания</h2>
-      <div className="task-card">Пригласи 1 друга – 💰 50 монет</div>
-      <div className="task-card">Пригласи 2 друзей – 💰 100 монет</div>
-      <div className="task-card">Пригласи 3 друзей – 💰 200 монет</div>
-      <div className="task-card">Пригласи 4 друзей – 💰 300 монет</div>
-      <div className="task-card">Пригласи 5 друзей – 💰 400 монет</div>
-      <div className="task-card">Пригласи 6 друзей – 💰 500 монет</div>
-      <div className="task-card">Пригласи 7 друзей – 💰 600 монет</div>
-      <div className="task-card">📨 Подписаться на Telegram – 💰 100 монет</div>
-      <div className="task-card">Подписаться на Instagram – 💰 100 монет</div>
-      <div className="task-card">Рассказать о нас в соцсетях – 💰 100 монет</div>
-      <div className="task-card">Оставить комментарий – 💰 50 монет</div>
-      <div className="task-card">Поставить реакцию – 💰 50 монет</div>
-      <div className="task-card">Заходить в VPN каждый день – 💰 100 монет</div>
+    <div className="task-card">
+      <span>Пригласи 1 друга – 🪙 50 монет</span>
+      {completedTasks['invite1'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('invite1', 50)}>Выполнить</button>
+      )}
     </div>
-  );
+<div className="task-card">
+      <span>Пригласи 2 друзей – 🪙 100 монет</span>
+      {completedTasks['invite1'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('invite1', 100)}>Выполнить</button>
+      )}
+    </div>
+    
+    <div className="task-card">
+      <span>Пригласи 3 друзей – 🪙 200 монет</span>
+      {completedTasks['invite1'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('invite1', 200)}>Выполнить</button>
+      )}
+    </div>
+    
+    <div className="task-card">
+      <span>Пригласи 4 друзей – 🪙 300 монет</span>
+      {completedTasks['invite1'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('invite1', 300)}>Выполнить</button>
+      )}
+    </div>
+    
+    <div className="task-card">
+      <span>Пригласи 5 друзей – 🪙 400 монет</span>
+      {completedTasks['invite1'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('invite1', 400)}>Выполнить</button>
+      )}
+    </div
+      
+    <div className="task-card">
+      <span>Пригласи 6 друзей – 🪙 500 монет</span>
+      {completedTasks['invite1'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('invite1', 500)}>Выполнить</button>
+      )}
+    </div>
+    
+    <div className="task-card">
+      <span>Пригласи 7 друзей – 🪙 600 монет</span>
+      {completedTasks['invite1'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('invite1', 600)}>Выполнить</button>
+      )}
+    </div>
+    
+    <div className="task-card">
+      <span>Подписаться на Telegram – 🪙 100 монет</span>
+      {completedTasks['telegram'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('telegram', 100)}>Выполнить</button>
+      )}
+    </div>
 
+    <div className="task-card">
+      <span>Рассказать о нас в соцсетях – 🪙 100 монет</span>
+      {completedTasks['social'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('social', 100)}>Выполнить</button>
+      )}
+    </div>
+    <div className="task-card">
+      <span>Пригласи 1 друга – 🪙 50 монет</span>
+      {completedTasks['invite1'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('invite1', 50)}>Выполнить</button>
+      )}
+    </div>
+    const renderTasks = () => (
+  <div className="tasks-tab">
+    <h2>📋 Задания</h2>
+
+    <div className="task-card">
+      <span>
+        📨 Подписаться на Telegram-канал — <a href="https://t.me/OrdoHereticusVPN" target="_blank" rel="noopener noreferrer">OrdoHereticusVPN</a> — 🪙 100 монет
+      </span>
+      {completedTasks['subscribeTelegram'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('subscribeTelegram', 100)}>Выполнить</button>
+      )}
+    </div>
+
+    <div className="task-card">
+      <span>
+        Подписаться на Instagram — <a href="https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==" target="_blank" rel="noopener noreferrer">@internet.bot.001</a> — 🪙 100 монет
+      </span>
+      {completedTasks['subscribeInstagram'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('subscribeInstagram', 100)}>Выполнить</button>
+      )}
+    </div>
+
+    <div className="task-card">
+      <span>📢 Расскажи о нас в соцсетях — 🪙 100 монет</span>
+      {completedTasks['shareSocial'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('shareSocial', 100)}>Выполнить</button>
+      )}
+    </div>
+
+    <div className="task-card">
+      <span>💬 Оставить комментарий под последним постом — 🪙 50 монет</span>
+      {completedTasks['commentPost'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('commentPost', 50)}>Выполнить</button>
+      )}
+    </div>
+
+    <div className="task-card">
+      <span>❤️ Поставить реакцию на последнюю запись — 🪙 50 монет</span>
+      {completedTasks['reactPost'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('reactPost', 50)}>Выполнить</button>
+      )}
+    </div>
+
+    <div className="task-card">
+      <span>🛡 Заходить в VPN каждый день — 🪙 100 монет</span>
+      {completedTasks['dailyVpn'] ? (
+        <span className="done">✅</span>
+      ) : (
+        <button onClick={() => handleComplete('dailyVpn', 100)}>Выполнить</button>
+      )}
+    </div>
+  </div>
+);
+    
   const spinWheel = () => {
     if (!canSpin) return;
     if (spinSoundRef.current) {
