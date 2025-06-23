@@ -93,7 +93,7 @@ function App() {
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
-        <div className="coins"💰>Монет: {coins} $RICH</div>
+        <div className="coins" 💰 Монет>: {coins} $RICH</div>
         <div className=🎖 Звание: {rank}</div>
       </div>
   <div className="robot-container">
