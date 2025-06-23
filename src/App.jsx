@@ -254,7 +254,7 @@ useEffect(() => {
   </div>
 );
 
-  const renderTab = () => {
+ const renderTab = () => {
     switch (activeTab) {
       case 'home': return renderHome();
       case 'tasks': return renderTasks();
@@ -274,4 +274,5 @@ useEffect(() => {
     </div>
   );
 }
-            export default App;
+
+export default App;
