@@ -31,7 +31,10 @@ const handleApproveWithdraw = () => {
     localStorage.setItem('clicksToday', clicksToday);
     localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
   }, [coins, clicksToday, completedTasks]);
-
+useEffect(() => {
+  updateRank(coins);
+}, [coins]);
+  
   useEffect(() => {
     const today = new Date().toDateString();
     if (localStorage.getItem('lastClickDate') !== today) {
