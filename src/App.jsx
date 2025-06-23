@@ -245,11 +245,11 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
         return renderHome();
     }
   };
- return (
+{return (
     <div className="App">
       {renderTab()}
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
-;
+};
 export default App;
