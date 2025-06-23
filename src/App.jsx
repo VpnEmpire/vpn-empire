@@ -64,7 +64,18 @@ function App() {
     const audio = new Audio('/click.mp3');
     audio.play();
   };
-
+  
+const App = () => {
+  const [tab, setTab] = useState('main');
+  const [coins, setCoins] = useState(() => parseInt(localStorage.getItem('coins')) || 0);
+  const [clicksLeft, setClicksLeft] = useState(() => parseInt(localStorage.getItem('clicksLeft')) || 100);
+  const [completedTasks, setCompletedTasks] = useState(() => JSON.parse(localStorage.getItem('completedTasks')) || {});
+  const [flashes, setFlashes] = useState([]);
+  const [showSubscription, setShowSubscription] = useState(() => !localStorage.getItem('subConfirmed'));
+  const [canSpin, setCanSpin] = useState(true);
+  const [spinResult, setSpinResult] = useState('');
+  const spinSoundRef = useRef(null);
+                             
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
