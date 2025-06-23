@@ -228,21 +228,22 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
       </button>
     </div>
   );
-
+const App = () => {
+  const [activeTab, setActiveTab] = useState("home");
   const renderTab = () => {
     switch (activeTab) {
       case "home":
-        return renderHome();
+        return <MainTab />;
       case "tasks":
-        return renderTasks();
+        return <TasksTab />;
       case "roulette":
-        return renderRoulette();
+        return <RouletteTab />;
       case "top":
-        return renderTop();
+        return <TopTab />;
       case "withdraw":
-        return renderWithdraw();
+        return <WithdrawTab />;
       default:
-        return renderHome();
+        return <MainTab />;
     }
   };
 
@@ -251,5 +252,7 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
       {renderTab()}
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
-    );
+  );
+};
+
 export default App;
