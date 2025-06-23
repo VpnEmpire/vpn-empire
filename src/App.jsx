@@ -218,7 +218,6 @@ function App() {
       )}
     </div>
   );
-}
    return (
     <div className="App">
       <div className="header-box">
