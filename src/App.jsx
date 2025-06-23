@@ -116,15 +116,19 @@ function App() {
   );
 
   const renderTop = () => (
-    <div className="top-tab">
-      <h2>🏆 ТОП ИГРОКОВ</h2>
+  <div className="top-tab">
+    <h2>🏆 ТОП ИГРОКОВ</h2>
+    <div className="top-robot-wrapper">
       <img src="/robot.png" alt="robot" className="top-robot" />
+    </div>
+    <div className="top-list">
       <div className="top-player gold">1. Player1 — 🏆 1500</div>
       <div className="top-player silver">2. Player2 — 🏆 1200</div>
       <div className="top-player bronze">3. Player4 — 🏆 800</div>
       <div className="top-player current">4. Ты — 🏆 {coins}</div>
     </div>
-  );
+  </div>
+);
 
   const renderWithdraw = () => (
     <div className="withdraw-tab">
