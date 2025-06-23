@@ -92,14 +92,12 @@ useEffect(() => {
 
   const handleComplete = async (key, reward, requiresCheck = false) => {
   if (completedTasks[key]) return;
-
-  // Если нужно проверить подписку на канал
+    
   if (requiresCheck) {
     if (!userId) {
       alert("Ошибка: не удалось получить user_id из Telegram.");
       return;
     }
-
     const res = await fetch(`/api/check-subscription?user_id=${userId}`);
     const data = await res.json();
 
