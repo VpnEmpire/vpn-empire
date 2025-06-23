@@ -173,7 +173,7 @@ useEffect(() => {
                 <a href={task.link} target="_blank" rel="noopener noreferrer">{task.label}</a>
               ) : (
                 task.label
-              )} — 🪙 {task.reward} 10000 монет
+              )} — 🪙 {task.reward} монет
             </span>
             {completedTasks[task.key] ? (
               <span className="done">✅</span>
@@ -206,7 +206,7 @@ useEffect(() => {
  const renderWithdraw = () => (
   <div className="withdraw-tab">
     <h2>💸 Вывод</h2>
-    <p>Минимум для вывода: 1000 монет</p>
+    <p>Минимум для вывода: 10000 монет</p>
 
     <button
       disabled={!isWithdrawApproved}
