@@ -224,28 +224,23 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
           }
         }}
       >
-        {coins < 1000 ? 'Недостаточно монет' : 'Вывести через Telegram'}
+         {coins < 1000 ? 'Недостаточно монет' : 'Вывести через Telegram'}
       </button>
     </div>
   );
-const App = () => {
-  const [activeTab, setActiveTab] = useState("home");
+
   const renderTab = () => {
     switch (activeTab) {
-      case "home":
-        return <MainTab />;
-      case "tasks":
-        return <TasksTab />;
-      case "roulette":
-        return <RouletteTab />;
-      case "top":
-        return <TopTab />;
-      case "withdraw":
-        return <WithdrawTab />;
-      default:
-        return <MainTab />;
+      case 'home': return renderHome();
+      case 'tasks': return renderTasks();
+      case 'roulette': return renderRoulette();
+      case 'top': return renderTop();
+      case 'withdraw': return renderWithdraw();
+      default: return renderHome();
     }
   };
+
+  if (!hasSubscription) return renderSubscriptionPrompt();
 
   return (
     <div className="App">
@@ -253,6 +248,6 @@ const App = () => {
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
-};
+}
 
 export default App;
