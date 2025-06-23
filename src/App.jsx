@@ -169,47 +169,49 @@ useEffect(() => {
   );
 
   const renderTasks = () => {
-    const tasks = [
-      { key: 'invite1', label: 'Пригласи 1 друга', reward: 50 },
-      { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100 },
-      { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200 },
-      { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300 },
-      { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400 },
-      { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500 },
-      { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600 },
-      { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, link: 'https://t.me/OrdoHereticusVPN' },
-      { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
-      { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
-      { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
-      { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
-      { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 }
-    ];
+  const tasks = [
+    { key: 'invite1', label: 'Пригласи 1 друга', reward: 50 },
+    { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100 },
+    { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200 },
+    { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300 },
+    { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400 },
+    { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500 },
+    { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600 },
+    { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, link: 'https://t.me/OrdoHereticusVPN', requiresCheck: true },
+    { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
+    { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
+    { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
+    { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
+    { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 }
+  ];
 
-    return (
-      <div className="tasks-tab">
-        <h2>📋 Задания</h2>
-        {tasks.map(task => (
-          <div key={task.key} className="task-card">
-            <span>
-              {task.link ? (
-                <a href={task.link} target="_blank" rel="noopener noreferrer">{task.label}</a>
-              ) : (
-                task.label
-              )} — 🪙 {task.reward}монет
-            </span>
-            {completedTasks[task.key] ? (
-              <span className="done">✅</span>
+  return (
+    <div className="tasks-tab">
+      <h2>📋 Задания</h2>
+      {tasks.map(task => (
+        <div key={task.key} className="task-card">
+          <span>
+            {task.link ? (
+              <a href={task.link} target="_blank" rel="noopener noreferrer">{task.label}</a>
             ) : (
-              <button onClick={() => handleComplete(task.key, task.reward)}>Выполнить</button>
-            )}
-          </div>
-        ))}
-          <div className="task-card disabled-task">
-  <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
-</div>
-  </div>
-    );
-  };
+              task.label
+            )} — 🪙 {task.reward} монет
+          </span>
+          {completedTasks[task.key] ? (
+            <span className="done">✅</span>
+          ) : (
+            <button onClick={() => handleComplete(task.key, task.reward, task.requiresCheck)}>
+              Выполнить
+            </button>
+          )}
+        </div>
+      ))}
+      <div className="task-card disabled-task">
+        <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
+      </div>
+    </div>
+  );
+};
 
   const renderRoulette = () => (
     <div className="roulette-tab">
