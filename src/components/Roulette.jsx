@@ -1,6 +1,8 @@
+// src/components/RouletteTab.jsx
 import { useState, useEffect, useRef } from 'react';
+import './RouletteTab.css';
 
-const Roulette = ({ coins, setCoins }) => {
+const RouletteTab = ({ coins, setCoins }) => {
   const [canSpin, setCanSpin] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
@@ -14,16 +16,16 @@ const Roulette = ({ coins, setCoins }) => {
   }, []);
 
   const spinWheel = () => {
-    if (!canSpin) return;
+    if (!canSpin || isSpinning) return;
 
-    // Воспроизвести звук вращения
+    // Звук вращения
     if (spinSoundRef.current) {
       spinSoundRef.current.currentTime = 0;
       spinSoundRef.current.play();
     }
 
     setIsSpinning(true);
-    const rewardOptions = [20, 50, 100, 200, 300, 400];
+    const rewardOptions = [0, 50, 100, 150, 200, 300];
     const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
 
     setTimeout(() => {
@@ -35,31 +37,31 @@ const Roulette = ({ coins, setCoins }) => {
       localStorage.setItem('coins', newCoins.toString());
       localStorage.setItem('lastSpinDate', new Date().toDateString());
 
-      // Воспроизвести звук выигрыша
+      // Звук выигрыша
       if (winSoundRef.current) {
         winSoundRef.current.currentTime = 0;
         winSoundRef.current.play();
       }
-    }, 2000);
+    }, 3000);
   };
 
   return (
-    <div className="roulette">
+    <div className="roulette-tab">
       <h2>🎰 Рулетка</h2>
+      <p>Крути рулетку и получай случайный приз!</p>
 
-      <img
-        src="/roulette.gif"
-        alt="Рулетка"
-        className="roulette-image"
-        style={{ width: '200px', marginBottom: '20px' }}
-      />
+      <div className={`wheel ${isSpinning ? 'spinning' : ''}`}></div>
 
       <button className="spin-button" onClick={spinWheel} disabled={!canSpin || isSpinning}>
         {isSpinning ? 'Крутится...' : 'Крутить рулетку'}
       </button>
 
       {spinResult !== null && !isSpinning && (
-        <div className="spin-result">+{spinResult} монет!</div>
+        <div className="prize-text">
+          {spinResult === 0
+            ? '😢 Не повезло... Попробуй завтра!'
+            : `🎉 Ты выиграл 💰 ${spinResult} монет!`}
+        </div>
       )}
 
       <audio ref={spinSoundRef} src="/spin-sound.mp3" preload="auto" />
@@ -68,5 +70,5 @@ const Roulette = ({ coins, setCoins }) => {
   );
 };
 
-export default Roulette;
+export default RouletteTab;
 
