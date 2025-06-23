@@ -251,5 +251,5 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
-};
+;
 export default App;
