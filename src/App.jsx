@@ -242,7 +242,7 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
     case 'withdraw':
       return renderWithdraw();
     default:
-      return renderHome();
+     return renderHome(); 
   }
 };
 return (
@@ -251,5 +251,5 @@ return (
     <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
   </div>
 );
-
+}
 export default App;
