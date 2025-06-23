@@ -7,7 +7,7 @@ import TasksTab from './components/TasksTab.jsx';
   
 function App() {
   const [activeTab, setActiveTab]('tasks') = useState('home');
-  const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
+  const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins') || 0);
   const [rank, setRank] = useState('');
   const [clicksToday, setClicksToday] = useState(() => Number(localStorage.getItem('clicksToday')) || 0);
   const [hasSubscription, setHasSubscription] = useState(() => localStorage.getItem('hasSubscription') === 'true');
