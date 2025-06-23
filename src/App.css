@@ -348,3 +348,43 @@ button:active {
   font-weight: bold;
   color: #00ccff;
 }
+.roulette-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 30px;
+}
+
+.roulette-image {
+  width: 200px;
+  height: 200px;
+  animation: spin 2s ease-in-out;
+  margin-bottom: 20px;
+}
+
+.spin-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.spin-button:disabled {
+  background-color: grey;
+}
+
+.spin-result {
+  margin-top: 20px;
+  font-size: 18px;
+  color: green;
+  font-weight: bold;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(1440deg); }
+}
