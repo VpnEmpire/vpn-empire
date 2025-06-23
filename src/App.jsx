@@ -49,6 +49,8 @@ useEffect(() => {
     if (localStorage.getItem('lastSpinDate') === today) {
       setCanSpin(false);
     }
+    }, []);
+  
   useEffect(() => {
   if (window?.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
     setUserId(window.Telegram.WebApp.initDataUnsafe.user.id);
