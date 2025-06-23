@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// src/App.jsx
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import BottomNav from './components/BottomNav.jsx';
 import TopTab from './components/Top.jsx';
@@ -10,6 +11,19 @@ function App() {
   const [clicksToday, setClicksToday] = useState(() => Number(localStorage.getItem('clicksToday')) || 0);
   const [hasSubscription, setHasSubscription] = useState(() => localStorage.getItem('hasSubscription') === 'true');
   const maxClicksPerDay = 100;
+
+  // Звук и логика рулетки
+  const spinSoundRef = useRef(null);
+  const winSoundRef = useRef(null);
+  const [canSpin, setCanSpin] = useState(true);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [spinResult, setSpinResult] = useState(null);
+
+  useEffect(() => {
+    const lastSpinDate = localStorage.getItem('lastSpinDate');
+    const today = new Date().toDateString();
+    if (lastSpinDate === today) setCanSpin(false);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('coins', coins);
@@ -84,9 +98,7 @@ function App() {
       </div>
       <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
       <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
-      <div className="helper-box">
-        🤖 Я твой помощник! Кликай на робота и зарабатывай монеты.
-      </div>
+      <div className="helper-box">🤖 Я твой помощник! Кликай на робота и зарабатывай монеты.</div>
     </div>
   );
 
@@ -109,33 +121,53 @@ function App() {
     </div>
   );
 
+  const spinWheel = () => {
+    if (!canSpin) return;
+    if (spinSoundRef.current) {
+      spinSoundRef.current.currentTime = 0;
+      spinSoundRef.current.play();
+    }
+    setIsSpinning(true);
+    const rewardOptions = [20, 50, 100, 200, 300, 400];
+    const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
+    setTimeout(() => {
+      const newCoins = coins + reward;
+      setCoins(newCoins);
+      setSpinResult(reward);
+      setCanSpin(false);
+      setIsSpinning(false);
+      localStorage.setItem('coins', newCoins.toString());
+      localStorage.setItem('lastSpinDate', new Date().toDateString());
+      if (winSoundRef.current) {
+        winSoundRef.current.currentTime = 0;
+        winSoundRef.current.play();
+      }
+    }, 2000);
+  };
+
   const renderRoulette = () => (
     <div className="roulette-tab">
       <h2>🎰 Рулетка</h2>
-      <p>Крути рулетку и получай случайный приз!</p>
+      <img src="/roulette.gif" alt="Рулетка" className="roulette-image" style={{ width: '200px', marginBottom: '20px' }} />
+      <button className="spin-button" onClick={spinWheel} disabled={!canSpin || isSpinning}>
+        {isSpinning ? 'Крутится...' : 'Крутить рулетку'}
+      </button>
+      {spinResult !== null && !isSpinning && (
+        <div className="spin-result">+{spinResult} монет!</div>
+      )}
+      <audio ref={spinSoundRef} src="/spin-sound.mp3" preload="auto" />
+      <audio ref={winSoundRef} src="/coins_many.mp3" preload="auto" />
     </div>
   );
 
   const renderTop = () => (
-  <div className="top-tab">
-    <h2>🏆 ТОП ИГРОКОВ</h2>
-    <div className="top-robot-wrapper">
-      <img src="/robot.png" alt="robot" className="top-robot" />
-    </div>
-    <div className="top-list">
-      <div className="top-player gold">1. Player1 — 🏆 1500</div>
-      <div className="top-player silver">2. Player2 — 🏆 1200</div>
-      <div className="top-player bronze">3. Player4 — 🏆 800</div>
-      <div className="top-player current">4. Ты — 🏆 {coins}</div>
-    </div>
-  </div>
-);
+    <TopTab coins={coins} />
+  );
 
   const renderWithdraw = () => (
     <div className="withdraw-tab">
       <h2>💸 Вывод</h2>
       <p>Минимум для вывода: 1000 монет</p>
-      <p>Чтобы вывести средства, нажми на кнопку ниже:</p>
       <button
         disabled={coins < 1000}
         className={coins < 1000 ? 'withdraw-button disabled' : 'withdraw-button'}
@@ -170,9 +202,12 @@ function App() {
   return (
     <div className="App">
       {!hasSubscription ? renderSubscriptionPrompt() : renderTab()}
-      {hasSubscription && <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />}
+      {hasSubscription && (
+        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      )}
     </div>
   );
 }
 
 export default App;
+
