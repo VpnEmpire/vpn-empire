@@ -228,7 +228,6 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
       </button>
     </div>
   );
- );
 
 const App = () => {
   const [activeTab, setActiveTab] = useState("home");
