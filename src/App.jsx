@@ -90,13 +90,30 @@ useEffect(() => {
     audio.play();
   };
 
-  const handleComplete = (key, reward) => {
-    if (completedTasks[key]) return;
-    const updated = { ...completedTasks, [key]: true };
-    setCoins(prev => prev + reward);
-    setCompletedTasks(updated);
-  };
+  const handleComplete = async (key, reward, requiresCheck = false) => {
+  if (completedTasks[key]) return;
 
+  // Если нужно проверить подписку на канал
+  if (requiresCheck) {
+    if (!userId) {
+      alert("Ошибка: не удалось получить user_id из Telegram.");
+      return;
+    }
+
+    const res = await fetch(`/api/check-subscription?user_id=${userId}`);
+    const data = await res.json();
+
+    if (!data.subscribed) {
+      alert("❗ Подпишись на канал, прежде чем выполнять задание.");
+      return;
+    }
+  }
+
+  const updated = { ...completedTasks, [key]: true };
+  setCoins(prev => prev + reward);
+  setCompletedTasks(updated);
+};
+    
   const spinWheel = () => {
     if (!canSpin) return;
     if (spinSoundRef.current) spinSoundRef.current.play();
