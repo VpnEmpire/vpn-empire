@@ -181,11 +181,11 @@ useEffect(() => {
               <button onClick={() => handleComplete(task.key, task.reward)}>Выполнить</button>
             )}
           </div>
-         <div className="task-card disabled-task">
+        ))}
+          <div className="task-card disabled-task">
   <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
 </div>
-    )}
-      </div>
+  </div>
     );
   };
 
