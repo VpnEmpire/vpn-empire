@@ -229,9 +229,6 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
     </div>
   );
 
-const App = () => {
-  const [activeTab, setActiveTab] = useState("home");
-
   const renderTab = () => {
     switch (activeTab) {
       case "home":
