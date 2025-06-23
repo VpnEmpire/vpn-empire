@@ -303,3 +303,48 @@ button:active {
 .subscription-lock button:hover {
   background: #00c6a8;
 }
+.top-tab {
+  text-align: center;
+  padding: 20px;
+}
+
+.top-robot-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.top-robot {
+  width: 150px;
+  height: auto;
+}
+
+.top-list {
+  font-size: 18px;
+  color: white;
+  line-height: 1.6;
+}
+
+.top-player {
+  margin: 8px 0;
+}
+
+.top-player.gold {
+  font-weight: bold;
+  color: gold;
+}
+
+.top-player.silver {
+  font-weight: bold;
+  color: silver;
+}
+
+.top-player.bronze {
+  font-weight: bold;
+  color: #cd7f32;
+}
+
+.top-player.current {
+  font-weight: bold;
+  color: #00ccff;
+}
