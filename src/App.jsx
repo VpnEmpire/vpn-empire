@@ -14,13 +14,18 @@ function App() {
   const [completedTasks, setCompletedTasks] = useState(() => JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [flashes, setFlashes] = useState([]);
   const maxClicksPerDay = 100;
-
   const spinSoundRef = useRef(null);
   const winSoundRef = useRef(null);
   const [canSpin, setCanSpin] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
-
+const [isWithdrawApproved, setIsWithdrawApproved] = useState(() =>
+  localStorage.getItem('isWithdrawApproved') === 'true'
+);
+const handleApproveWithdraw = () => {
+  setIsWithdrawApproved(true);
+  localStorage.setItem('isWithdrawApproved', 'true');
+};
   useEffect(() => {
     localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
@@ -195,23 +200,33 @@ function App() {
     <TopTab coins={coins} />
   );
 
-  const renderWithdraw = () => (
-    <div className="withdraw-tab">
-      <h2>💸 Вывод</h2>
-      <p>Минимум для вывода: 1000 монет</p>
-      <button
-        disabled={coins < 1000}
-        className={coins < 1000 ? 'withdraw-button disabled' : 'withdraw-button'}
-        onClick={() => {
-          if (coins >= 1000) {
-            window.open('https://t.me/OrdoHereticusVPN', '_blank');
-          }
-        }}
-      >
-        {coins < 1000 ? 'Недостаточно монет' : 'Вывести через Telegram'}
-      </button>
-    </div>
-  );
+ const renderWithdraw = () => (
+  <div className="withdraw-tab">
+    <h2>💸 Вывод</h2>
+    <p>Минимум для вывода: 1000 монет</p>
+
+    <button
+      disabled={!isWithdrawApproved}
+      className={isWithdrawApproved ? 'withdraw-button' : 'withdraw-button disabled'}
+      onClick={() => {
+        if (isWithdrawApproved) {
+          window.open('https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==', '_blank');
+        }
+      }}
+    >
+      {isWithdrawApproved ? 'Вывести через Instagram' : 'Ожидает одобрения'}
+    </button>
+
+    {/* Техническая кнопка "одобрить", только для тебя */}
+    <button
+      className="approve-button"
+      onClick={handleApproveWithdraw}
+      style={{ marginTop: '20px', backgroundColor: 'green', color: 'white' }}
+    >
+      ✅ Одобрить вывод (видишь только ты)
+    </button>
+  </div>
+);
 
   const renderTab = () => {
     switch (activeTab) {
