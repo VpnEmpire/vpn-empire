@@ -194,32 +194,6 @@ const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
     );
   };
 
-
-
-  const spinWheel = () => {
-    if (!canSpin) return;
-    if (spinSoundRef.current) {
-      spinSoundRef.current.currentTime = 0;
-      spinSoundRef.current.play();
-    }
-    setIsSpinning(true);
-    const rewardOptions = [20, 50, 100, 200, 300, 400];
-    const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
-    setTimeout(() => {
-      const newCoins = coins + reward;
-      setCoins(newCoins);
-      setSpinResult(reward);
-      setCanSpin(false);
-      setIsSpinning(false);
-      localStorage.setItem('coins', newCoins.toString());
-      localStorage.setItem('lastSpinDate', new Date().toDateString());
-      if (winSoundRef.current) {
-        winSoundRef.current.currentTime = 0;
-        winSoundRef.current.play();
-      }
-    }, 2000);
-  };
-
    const renderRoulette = () => (
     <div className="roulette-tab">
       <h2>🎰 Рулетка</h2>
