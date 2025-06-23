@@ -388,3 +388,45 @@ button:active {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(1440deg); }
 }
+.header-box {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  text-align: right;
+  font-size: 16px;
+  color: white;
+}
+
+.robot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 100px;
+}
+
+.robot {
+  width: 200px;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.robot:active {
+  transform: scale(1.05);
+}
+
+.clicks-left {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #ffcc00;
+}
+
+.helper-box {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 18px;
+  color: white;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
