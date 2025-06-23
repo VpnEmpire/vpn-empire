@@ -1,352 +1,234 @@
-/* 🌌 Основной фон */
+/* 🌌 Фон и базовые настройки */
 body, html {
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  color: white;
-  background-image: url('/bg-dark.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  min-height: 100vh;
-  text-align: center;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  color: white;
+  background-image: url('/bg-dark.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  text-align: center;
 }
 
-.app-wrapper {
-  background-image: url('/bg-dark.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  min-height: 100vh;
+.App {
+  padding-bottom: 80px;
 }
 
-/* Общая обёртка */
-.app {
-  padding: 2rem;
+/* 🎖 Заголовки, ранги, монеты */
+.header-box {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  text-align: right;
+  font-size: 16px;
+  color: white;
 }
 
-/* Экраны */
-.start-screen, .main-screen {
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 16px;
-  padding: 2rem;
-  max-width: 360px;
-  margin: auto;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  backdrop-filter: blur(8px);
+/* 🤖 Главный экран — робот */
+.robot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 140px;
 }
 
-/* Статистика */
-.stats {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 12px 16px;
-  margin: 16px auto;
-  max-width: 360px;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  text-align: left;
-  backdrop-filter: blur(4px);
-}
-.stats p {
-  margin: 6px 0;
-  color: white;
-}
-
-/* Кнопки */
-button {
-  padding: 12px 24px;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-  background: #ff9800;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: transform 0.1s ease;
-}
-button:active {
-  transform: scale(0.95);
-}
-
-/* Робот */
-.clickable-robot {
-  width: 200px;
-  cursor: pointer;
-  transition: transform 0.1s ease;
-}
-.clickable-robot:active {
-  transform: scale(0.95);
-}
 .robot {
-  width: 150px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  width: 200px;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.robot:active {
+  transform: scale(1.05);
 }
 
-/* Анимации */
-.shake {
-  animation: shake 0.3s;
-}
-@keyframes shake {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(7deg); }
-  50% { transform: rotate(-7deg); }
-  75% { transform: rotate(5deg); }
-  100% { transform: rotate(0deg); }
+.clicks-left {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #ffcc00;
 }
 
-.counter {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-top: 1rem;
+.helper-box {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 18px;
+  color: white;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
 }
 
-/* Эффекты */
+/* ✨ Анимации кликов */
 .flash {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  background: radial-gradient(circle, #ffecb3 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-  animation: fadeOut 0.6s forwards;
-  z-index: 10;
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, #ffecb3 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: fadeOut 0.6s forwards;
+  z-index: 10;
 }
 @keyframes fadeOut {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2);
-  }
-}
-.sparkle {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 2rem;
-  animation: sparkle-fade 0.5s ease-out;
-  pointer-events: none;
-}
-@keyframes sparkle-fade {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -20px) scale(1.2);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -40px) scale(0.8);
-  }
-}
-.click-area {
-  position: relative;
-  display: inline-block;
-}
-
-/* 💠 Карточки заданий */
-.task-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid #00bfa6;
-  border-radius: 12px;
-  padding: 10px 16px;
-  margin: 10px auto;
-  max-width: 360px;
-  font-size: 1rem;
-  color: white;
-  backdrop-filter: blur(4px);
-}
-.task-card button {
-  background: #00bfa6;
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-.task-card button:hover {
-  background: #009e8b;
-}
-.task-card a {
-  color: white;
-  text-decoration: none;
-}
-.task-card .done {
-  color: #28a745;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-/* Подсказка */
-.helper {
-  background: rgba(255, 255, 255, 0.07);
-  border-left: 5px solid #ffcc00;
-  padding: 12px 16px;
-  margin: 20px auto;
-  max-width: 360px;
-  font-size: 0.95rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  color: white;
-  backdrop-filter: blur(3px);
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2); }
 }
 
 /* 🎰 Рулетка */
-.roulette {
-  margin-top: 2rem;
+.roulette-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 80px;
+  padding: 20px;
+}
+.roulette-image {
+  width: 220px;
+  height: 220px;
+  margin-bottom: 20px;
+  animation: spin 2s ease-in-out;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(1440deg); }
 }
 .spin-button {
-  background-color: #ff9800;
-  color: white;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
 }
 .spin-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 .spin-result {
-  margin-top: 10px;
-  font-size: 1.2rem;
-  color: #4caf50;
-  font-weight: bold;
+  margin-top: 20px;
+  font-size: 18px;
+  color: #4caf50;
+  font-weight: bold;
 }
 
-/* 🏆 Иконка трофея */
-.trophy-icon {
-  width: 20px;
-  height: 20px;
-  vertical-align: middle;
-  margin-right: 5px;
+/* 📋 Задания */
+.task-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid #00bfa6;
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin: 10px auto;
+  max-width: 360px;
+  font-size: 1rem;
+  color: white;
+  backdrop-filter: blur(4px);
 }
-.withdraw-button {
-  padding: 12px 20px;
-  font-size: 16px;
-  background-color: #ffc107;
-  border: none;
-  border-radius: 8px;
-  color: #000;
-  cursor: pointer;
-  margin-top: 16px;
+.task-card button {
+  background: #00bfa6;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
 }
-
-.withdraw-button.disabled {
-  background-color: #ccc;
-  color: #666;
-  cursor: not-allowed;
+.task-card button:hover {
+  background: #009e8b;
 }
-.subscribe-warning {
-  background-color: #ffe0e0;
-  padding: 10px;
-  margin: 20px;
-  border: 2px dashed red;
-  text-align: center;
-  font-weight: bold;
-}
-.subscribe-warning button {
-  margin-top: 10px;
-  padding: 6px 12px;
-  font-size: 16px;
-}
-.subscription-lock {
-  padding: 30px;
-  text-align: center;
-  background: #1c1c1c;
-  color: white;
-  border-radius: 10px;
-  margin: 40px auto;
-  max-width: 360px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+.task-card .done {
+  color: #28a745;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
-.subscription-lock h2 {
-  font-size: 22px;
-  margin-bottom: 10px;
-}
-
-.subscription-lock p {
-  font-size: 16px;
-  margin-bottom: 15px;
-}
-
-.subscription-lock a {
-  display: block;
-  color: #00ffd1;
-  text-decoration: none;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.subscription-lock button {
-  background: #00ffd1;
-  color: #000;
-  padding: 10px 20px;
-  border: none;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.subscription-lock button:hover {
-  background: #00c6a8;
-}
+/* 🏆 Топ */
 .top-tab {
-  text-align: center;
-  padding: 20px;
+  text-align: center;
+  padding: 20px;
 }
-
 .top-robot-wrapper {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
 }
-
 .top-robot {
-  width: 150px;
-  height: auto;
+  width: 150px;
 }
-
 .top-list {
-  font-size: 18px;
-  color: white;
-  line-height: 1.6;
+  font-size: 18px;
+  color: white;
+  line-height: 1.6;
 }
-
 .top-player {
-  margin: 8px 0;
+  margin: 8px 0;
+}
+.top-player.gold { color: gold; font-weight: bold; }
+.top-player.silver { color: silver; font-weight: bold; }
+.top-player.bronze { color: #cd7f32; font-weight: bold; }
+.top-player.current { color: #00ccff; font-weight: bold; }
+
+/* 💸 Вывод */
+.withdraw-button {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #ffc107;
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  cursor: pointer;
+  margin-top: 16px;
+}
+.withdraw-button.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
 }
 
-.top-player.gold {
-  font-weight: bold;
-  color: gold;
+/* 🔒 Подписка */
+.subscription-lock {
+  padding: 30px;
+  text-align: center;
+  background: #1c1c1c;
+  color: white;
+  border-radius: 10px;
+  margin: 40px auto;
+  max-width: 360px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
-
-.top-player.silver {
-  font-weight: bold;
-  color: silver;
+.subscription-lock h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
 }
-
-.top-player.bronze {
-  font-weight: bold;
-  color: #cd7f32;
+.subscription-lock p {
+  font-size: 16px;
+  margin-bottom: 15px;
 }
-
-.top-player.current {
-  font-weight: bold;
-  color: #00ccff;
+.subscription-lock a {
+  display: block;
+  color: #00ffd1;
+  text-decoration: none;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.subscription-lock button {
+  background: #00ffd1;
+  color: #000;
+  padding: 10px 20px;
+  border: none;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.subscription-lock button:hover {
+  background: #00c6a8;
 }
 .roulette-tab {
   display: flex;
