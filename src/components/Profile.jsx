@@ -1,6 +1,6 @@
 // src/components/Profile.jsx
 import React, { useState, useEffect } from 'react';
-import './Profile.css'; // можно заменить на App.css, если всё в одном
+import './App.css'; // 
 
 function Profile({ username, setUsername }) {
   const [tempName, setTempName] = useState(username);
