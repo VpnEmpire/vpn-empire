@@ -1,13 +1,26 @@
 // src/components/RouletteTab.jsx
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Wheel } from 'react-custom-roulette';
 import './RouletteTab.css';
+
+const data = [
+  { option: '50', style: { backgroundColor: '#1e1e1e', textColor: '#00ffcc' } },
+  { option: '100', style: { backgroundColor: '#292929', textColor: '#ffe600' } },
+  { option: '200', style: { backgroundColor: '#1e1e1e', textColor: '#00ffcc' } },
+  { option: '300', style: { backgroundColor: '#292929', textColor: '#ffe600' } },
+  { option: '400', style: { backgroundColor: '#1e1e1e', textColor: '#00ffcc' } },
+  { option: '300', style: { backgroundColor: '#292929', textColor: '#ffe600' } },
+  { option: '200', style: { backgroundColor: '#1e1e1e', textColor: '#00ffcc' } },
+  { option: '100', style: { backgroundColor: '#292929', textColor: '#ffe600' } }
+];
 
 const RouletteTab = ({ coins, setCoins }) => {
   const [canSpin, setCanSpin] = useState(true);
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [spinResult, setSpinResult] = useState(null);
-  const winSoundRef = useRef(null);
+  const [mustSpin, setMustSpin] = useState(false);
+  const [prizeNumber, setPrizeNumber] = useState(0);
+  const [reward, setReward] = useState(null);
   const spinSoundRef = useRef(null);
+  const winSoundRef = useRef(null);
 
   useEffect(() => {
     const lastSpinDate = localStorage.getItem('lastSpinDate');
@@ -15,60 +28,19 @@ const RouletteTab = ({ coins, setCoins }) => {
     if (lastSpinDate === today) setCanSpin(false);
   }, []);
 
-  const spinWheel = () => {
-    if (!canSpin || isSpinning) return;
+  const handleSpinClick = () => {
+    if (!canSpin || mustSpin) return;
 
-    // Звук вращения
     if (spinSoundRef.current) {
       spinSoundRef.current.currentTime = 0;
       spinSoundRef.current.play();
     }
 
-    setIsSpinning(true);
-    const rewardOptions = [0, 50, 100, 150, 200, 300];
-    const reward = rewardOptions[Math.floor(Math.random() * rewardOptions.length)];
-
-    setTimeout(() => {
-      const newCoins = coins + reward;
-      setCoins(newCoins);
-      setSpinResult(reward);
-      setCanSpin(false);
-      setIsSpinning(false);
-      localStorage.setItem('coins', newCoins.toString());
-      localStorage.setItem('lastSpinDate', new Date().toDateString());
-
-      // Звук выигрыша
-      if (winSoundRef.current) {
-        winSoundRef.current.currentTime = 0;
-        winSoundRef.current.play();
-      }
-    }, 3000);
+    const newPrizeNumber = Math.floor(Math.random() * data.length);
+    setPrizeNumber(newPrizeNumber);
+    setMustSpin(true);
   };
 
-  return (
-    <div className="roulette-tab">
-      <h2>🎰 Рулетка</h2>
-      <p>Крути рулетку и получай случайный приз!</p>
-
-      <div className={`wheel ${isSpinning ? 'spinning' : ''}`}></div>
-
-      <button className="spin-button" onClick={spinWheel} disabled={!canSpin || isSpinning}>
-        {isSpinning ? 'Крутится...' : 'Крутить рулетку'}
-      </button>
-
-      {spinResult !== null && !isSpinning && (
-        <div className="prize-text">
-          {spinResult === 0
-            ? '😢 Не повезло... Попробуй завтра!'
-            : `🎉 Ты выиграл 💰 ${spinResult} монет!`}
-        </div>
-      )}
-
-      <audio ref={spinSoundRef} src="/spin-sound.mp3" preload="auto" />
-      <audio ref={winSoundRef} src="/coins_many.mp3" preload="auto" />
-    </div>
-  );
-};
-
-export default RouletteTab;
-
+  const onStopSpinning = () => {
+    const rewardValue = parseInt(data[prizeNumber].option);
+    setReward(rewardValue);
