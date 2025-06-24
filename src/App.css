@@ -251,3 +251,26 @@ body, html {
 .subscription-lock button:hover {
   background: #00c6a8;
 }
+
+/* 🧑🤝🧑 Рефералы */
+.referral-box {
+  margin-top: 10px;
+  background-color: #1a1a1a;
+  padding: 10px;
+  border-radius: 8px;
+  word-break: break-word;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.copy-btn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
