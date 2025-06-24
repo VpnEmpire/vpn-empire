@@ -1,9 +1,17 @@
 .roulette-tab {
   text-align: center;
-  padding: 20px;
+  padding: 30px 20px;
   color: white;
+  background-color: #0a0a0a;
+  min-height: 100vh;
 }
 
+.wheel-wrapper {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* Если ты продолжаешь использовать кастомный круг — оставим wheel и spinning */
 .wheel {
   margin: 30px auto;
   font-size: 60px;
@@ -27,9 +35,22 @@
   100% { transform: rotate(1080deg); } /* 3 круга */
 }
 
-.prize-text {
-  margin-top: 20px;
-  font-size: 20px;
-  color: #00ffcc;
-  font-weight: bold;
+.spin-button {
+  margin-top: 40px;
+  padding: 12px 28px;
+  font-size: 18px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
+  transition: transform 0.2s;
 }
+
+.spin-button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.spin-b
