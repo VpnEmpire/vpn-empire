@@ -4,6 +4,7 @@ import './App.css';
 import BottomNav from './components/BottomNav.jsx';
 import TopTab from './components/Top.jsx';
 import TasksTab from './components/Tasks.jsx';
+import Roulette from './components/Roulette.jsx';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home');
