@@ -1,7 +1,7 @@
 // src/components/Roulette.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Wheel } from 'react-custom-roulette';
-import './RouletteTab.css';
+import './Roulette.css';
 
 const data = [
   { option: '50', style: { backgroundColor: '#1e1e1e', textColor: '#00ffcc' } },
