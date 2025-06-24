@@ -11,7 +11,7 @@
   margin: 0 auto;
 }
 
-/* Если ты продолжаешь использовать кастомный круг — оставим wheel и spinning */
+/* Кастомное колесо (если будешь использовать свою реализацию вместо react-custom-roulette) */
 .wheel {
   margin: 30px auto;
   font-size: 60px;
@@ -53,4 +53,13 @@
   cursor: not-allowed;
 }
 
-.spin-b
+.spin-button:active {
+  transform: scale(0.95);
+}
+
+.prize-text {
+  margin-top: 20px;
+  font-size: 20px;
+  color: #ffd700;
+  font-weight: bold;
+}
