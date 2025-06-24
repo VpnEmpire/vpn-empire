@@ -1,12 +1,22 @@
+// src/components/Profile.jsx
 import React, { useState, useEffect } from 'react';
-import '../App.css'; // если нужно, можно заменить на отдельный профиль-стиль
+import './Profile.css'; // можно заменить на App.css, если всё в одном
 
 function Profile({ username, setUsername }) {
   const [tempName, setTempName] = useState(username);
+  const [userId, setUserId] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setTempName(username);
   }, [username]);
+
+  useEffect(() => {
+    const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (tgUserId) {
+      setUserId(tgUserId);
+    }
+  }, []);
 
   const handleSave = () => {
     const newName = tempName.trim();
@@ -14,9 +24,18 @@ function Profile({ username, setUsername }) {
     alert('Имя сохранено!');
   };
 
+  const handleCopy = () => {
+    const referralLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+    navigator.clipboard.writeText(referralLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
   return (
     <div className="main-screen" style={{ padding: '20px', textAlign: 'center' }}>
       <h2 style={{ marginBottom: '16px' }}>👤 Профиль</h2>
+
       <label style={{ fontWeight: 'bold' }}>
         Введите имя:
         <input
@@ -36,6 +55,7 @@ function Profile({ username, setUsername }) {
           }}
         />
       </label>
+
       <button
         onClick={handleSave}
         style={{
@@ -50,8 +70,24 @@ function Profile({ username, setUsername }) {
       >
         Сохранить
       </button>
+
+      {userId && (
+        <>
+          <div style={{ marginTop: '30px' }}>
+            <p><strong>Ваш Telegram ID:</strong> {userId}</p>
+            <p><strong>Ваша реферальная ссылка:</strong></p>
+            <div className="referral-box">
+              <code>{`https://t.me/OrdoHereticus_bot?start=${userId}`}</code>
+              <button className="copy-btn" onClick={handleCopy}>
+                {copied ? '✅ Скопировано!' : '📋 Скопировать'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
 export default Profile;
+
