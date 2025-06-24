@@ -1,31 +1,37 @@
+// src/components/TasksTab.jsx
 import React, { useState, useEffect } from 'react';
 import '../App.css';
 
-const tasksData = [
-  { id: 1, title: 'Пригласить 1 друга', reward: 50, requiresRef: 1 },
-  { id: 2, title: 'Пригласить 3 друга', reward: 150, requiresRef: 3 },
-  { id: 3, title: 'Пригласить 5 друзей', reward: 300, requiresRef: 5 },
-  { id: 4, title: 'Подписаться на Telegram', reward: 100 },
-  { id: 5, title: 'Подписаться на Instagram', reward: 100 },
-  { id: 6, title: 'Рассказать в соцсетях', reward: 200 },
-  { id: 7, title: 'Комментировать пост', reward: 100 },
-  { id: 8, title: 'Поставить реакцию', reward: 100 },
-  { id: 9, title: 'Зайти в VPN сегодня', reward: 100 },
+const defaultTasks = [
+  { title: 'Пригласить 1 друга', reward: 50 },
+  { title: 'Пригласить 3 друга', reward: 150 },
+  { title: 'Пригласить 5 друзей', reward: 300 },
+  { title: 'Подписаться на Telegram', reward: 100 },
+  { title: 'Подписаться на Instagram', reward: 100 },
+  { title: 'Рассказать в соцсетях', reward: 200 },
+  { title: 'Комментировать пост', reward: 100 },
+  { title: 'Поставить реакцию', reward: 100 },
+  { title: 'Зайти в VPN сегодня', reward: 100 },
 ];
 
-function TasksTab({ coins, setCoins }) {
-  const [completedTasks, setCompletedTasks] = useState(() => {
-    const saved = localStorage.getItem('completedTasks');
-    return saved ? JSON.parse(saved) : [];
+const TasksTab = ({ coins, setCoins }) => {
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('tasks');
+    return saved ? JSON.parse(saved) : defaultTasks.map(t => ({ ...t, done: false }));
   });
 
   const [userId, setUserId] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [referrals, setReferrals] = useState(3); // 🔁 заглушка — подставить реальное число с backend
+  const [referrals, setReferrals] = useState(0);
 
   useEffect(() => {
     const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-    if (tgUserId) setUserId(tgUserId);
+    if (tgUserId) {
+      setUserId(tgUserId);
+      fetch(`/api/check-referrals?user_id=${tgUserId}`)
+        .then((res) => res.json())
+        .then((data) => setReferrals(data.referrals || 0));
+    }
   }, []);
 
   const handleCopy = () => {
@@ -36,50 +42,57 @@ function TasksTab({ coins, setCoins }) {
     });
   };
 
-  const handleComplete = (task) => {
-    if (completedTasks.includes(task.id)) return;
+  const handleComplete = (index) => {
+    const task = tasks[index];
+    if (task.done) return;
 
-    // 🔐 Проверка условий задания
-    if (task.requiresRef && referrals < task.requiresRef) {
-      alert(`Вы пригласили ${referrals}, нужно ${task.requiresRef}`);
-      return;
+    const match = task.title.match(/пригласить (\d+)/i);
+    if (match) {
+      const required = parseInt(match[1]);
+      if (referrals < required) {
+        alert(`Нужно пригласить минимум ${required} друзей. Сейчас: ${referrals}`);
+        return;
+      }
     }
 
-    const newCompleted = [...completedTasks, task.id];
-    setCompletedTasks(newCompleted);
-    setCoins(prev => {
-      const updated = prev + task.reward;
-      localStorage.setItem('coins', updated.toString());
-      return updated;
-    });
+    const updatedTasks = [...tasks];
+    updatedTasks[index].done = true;
+    setTasks(updatedTasks);
 
-    localStorage.setItem('completedTasks', JSON.stringify(newCompleted));
+    const updatedCoins = coins + task.reward;
+    setCoins(updatedCoins);
+
+    localStorage.setItem('coins', updatedCoins.toString());
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 
   return (
     <div className="main-screen">
       <h2>📋 Задания</h2>
-      {tasksData.map((task) => (
-        <div key={task.id} className="task-card">
+      {tasks.map((task, index) => (
+        <div key={index} className="task-card">
           <span>
             {task.title}
-            {completedTasks.includes(task.id) && <span className="done"> ✅</span>}
-            {!completedTasks.includes(task.id) && task.title.toLowerCase().includes('пригласить') && userId && (
+            {task.done && <span className="done"> ✅</span>}
+            {!task.done && task.title.toLowerCase().includes('пригласить') && userId && (
               <div className="referral-box">
                 <code>{`https://t.me/OrdoHereticus_bot?start=${userId}`}</code>
                 <button className="copy-btn" onClick={handleCopy}>
                   {copied ? '✅ Скопировано!' : '📋 Скопировать'}
                 </button>
+                <div style={{ fontSize: '12px', marginTop: '6px', color: '#ccc' }}>
+                  Приглашено: {referrals}
+                </div>
               </div>
             )}
           </span>
-          {!completedTasks.includes(task.id) && (
-            <button onClick={() => handleComplete(task)}>Выполнить</button>
+          {!task.done && (
+            <button onClick={() => handleComplete(index)}>Выполнить</button>
           )}
         </div>
       ))}
     </div>
   );
-}
+};
 
 export default TasksTab;
