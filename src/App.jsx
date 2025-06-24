@@ -56,7 +56,21 @@ useEffect(() => {
     setUserId(window.Telegram.WebApp.initDataUnsafe.user.id);
   }
 }, []);
-    
+    useEffect(() => {
+  const checkPayment = async () => {
+    const res = await fetch(`/api/check-payment?user_id=${userId}`);
+    const data = await res.json();
+    if (data.paid) {
+      setHasSubscription(true);
+      localStorage.setItem('hasSubscription', 'true');
+    }
+  };
+
+  if (userId && !hasSubscription) {
+    checkPayment();
+  }
+}, [userId]);
+
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
