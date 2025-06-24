@@ -58,18 +58,33 @@ useEffect(() => {
 }, []);
     useEffect(() => {
   const checkPayment = async () => {
-    const res = await fetch(`/api/check-payment?user_id=${userId}`);
-    const data = await res.json();
-    if (data.paid) {
+    const stored = localStorage.getItem('hasSubscription');
+    if (stored === 'true') {
       setHasSubscription(true);
-      localStorage.setItem('hasSubscription', 'true');
+      return;
+    }
+
+    if (window?.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
+      const uid = window.Telegram.WebApp.initDataUnsafe.user.id;
+      setUserId(uid);
+
+      try {
+        const res = await fetch(`/api/check-payment?user_id=${uid}`);
+        const data = await res.json();
+
+        if (data.paid) {
+          setHasSubscription(true);
+          localStorage.setItem('hasSubscription', 'true');
+        }
+      } catch (err) {
+        console.error('Ошибка при проверке оплаты:', err);
+      }
     }
   };
 
-  if (userId && !hasSubscription) {
-    checkPayment();
-  }
-}, [userId]);
+  checkPayment();
+}, []);
+
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
