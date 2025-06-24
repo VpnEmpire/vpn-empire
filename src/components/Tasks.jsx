@@ -4,8 +4,12 @@ import '../App.css';
 
 const defaultTasks = [
   { title: 'Пригласить 1 друга', reward: 50 },
-  { title: 'Пригласить 3 друга', reward: 150 },
-  { title: 'Пригласить 5 друзей', reward: 300 },
+  { title: 'Пригласить 2 друга', reward: 100 },
+  { title: 'Пригласить 3 друга', reward: 200 },
+  { title: 'Пригласить 4 друга', reward: 300 },
+  { title: 'Пригласить 5 друзей', reward: 400 },
+  { title: 'Пригласить 6 друзей', reward: 500 },
+  { title: 'Пригласить 7 друзей', reward: 600 },
   { title: 'Подписаться на Telegram', reward: 100 },
   { title: 'Подписаться на Instagram', reward: 100 },
   { title: 'Рассказать в соцсетях', reward: 200 },
