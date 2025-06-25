@@ -3,19 +3,20 @@ import React, { useState, useEffect } from 'react';
 import '../App.css';
 
 const defaultTasks = [
-  { title: 'Пригласить 1 друга', reward: 50 },
-  { title: 'Пригласить 2 друга', reward: 100 },
-  { title: 'Пригласить 3 друга', reward: 200 },
-  { title: 'Пригласить 4 друга', reward: 300 },
-  { title: 'Пригласить 5 друзей', reward: 400 },
-  { title: 'Пригласить 6 друзей', reward: 500 },
-  { title: 'Пригласить 7 друзей', reward: 600 },
-  { title: 'Подписаться на Telegram', reward: 100 },
-  { title: 'Подписаться на Instagram', reward: 100 },
-  { title: 'Рассказать в соцсетях', reward: 200 },
-  { title: 'Комментировать пост', reward: 100 },
-  { title: 'Поставить реакцию', reward: 100 },
-  { title: 'Зайти в VPN сегодня', reward: 100 },
+  { id: 1, title: 'Пригласить 1 друга', reward: 50, requiresRef: 1 },
+  { id: 2, title: 'Пригласить 2 друга', reward: 100, requiresRef: 2 },
+  { id: 3, title: 'Пригласить 3 друга', reward: 200, requiresRef: 3 },
+  { id: 4, title: 'Пригласить 4 друга', reward: 300, requiresRef: 4 },
+  { id: 5, title: 'Пригласить 5 друзей', reward: 400, requiresRef: 5 },
+  { id: 6, title: 'Пригласить 6 друзей', reward: 500, requiresRef: 6 },
+  { id: 7, title: 'Пригласить 7 друзей', reward: 600, requiresRef: 7 },
+  { id: 8, title: 'Подписаться на Telegram', reward: 100, requiresSub: true },
+  { id: 9, title: 'Подписаться на Instagram', reward: 100 },
+  { id: 10, title: 'Рассказать в соцсетях', reward: 200 },
+  { id: 11, title: 'Комментировать пост', reward: 100 },
+  { id: 12, title: 'Поставить реакцию', reward: 100 },
+  { id: 13, title: 'Зайти в VPN сегодня', reward: 100 },
+  { id: 14, title: 'Активировать VPN', reward: 1000, requiresVpn: true },
 ];
 
 const TasksTab = ({ coins, setCoins }) => {
@@ -27,15 +28,25 @@ const TasksTab = ({ coins, setCoins }) => {
   const [userId, setUserId] = useState(null);
   const [copied, setCopied] = useState(false);
   const [referrals, setReferrals] = useState(0);
+  const [vpnActivated, setVpnActivated] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
 
   useEffect(() => {
     const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
     if (tgUserId) {
       setUserId(tgUserId);
+
       fetch(`/api/check-referrals?user_id=${tgUserId}`)
-        .then((res) => res.json())
-        .then((data) => setReferrals(data.referrals || 0));
+        .then(res => res.json())
+        .then(data => setReferrals(data.referrals || 0));
+
+      fetch(`/api/check-subscription?user_id=${tgUserId}`)
+        .then(res => res.json())
+        .then(data => setSubscribed(data.subscribed || false));
     }
+
+    const vpn = localStorage.getItem('vpnActivated');
+    if (vpn === 'true') setVpnActivated(true);
   }, []);
 
   const handleCopy = () => {
@@ -46,28 +57,36 @@ const TasksTab = ({ coins, setCoins }) => {
     });
   };
 
-  const handleComplete = (index) => {
-    const task = tasks[index];
-    if (task.done) return;
+  const handleComplete = (task, index) => {
+    if (tasks[index].done) return;
 
-    const match = task.title.match(/пригласить (\d+)/i);
-    if (match) {
-      const required = parseInt(match[1]);
-      if (referrals < required) {
-        alert(`Нужно пригласить минимум ${required} друзей. Сейчас: ${referrals}`);
-        return;
-      }
+    if (task.requiresRef && referrals < task.requiresRef) {
+      alert(`Нужно пригласить минимум ${task.requiresRef} друзей. Сейчас: ${referrals}`);
+      return;
+    }
+
+    if (task.requiresVpn && !vpnActivated) {
+      alert('Чтобы выполнить это задание, активируйте VPN в боте.');
+      return;
+    }
+
+    if (task.requiresSub && !subscribed) {
+      alert('Подпишитесь на Telegram-канал, чтобы выполнить задание.');
+      return;
     }
 
     const updatedTasks = [...tasks];
     updatedTasks[index].done = true;
     setTasks(updatedTasks);
-
-    const updatedCoins = coins + task.reward;
-    setCoins(updatedCoins);
-
-    localStorage.setItem('coins', updatedCoins.toString());
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+
+    let total = coins + task.reward;
+    if (task.title === 'Активировать VPN') {
+      localStorage.setItem('clickMultiplier', '2');
+    }
+
+    setCoins(total);
+    localStorage.setItem('coins', total.toString());
   };
 
   return (
@@ -78,6 +97,7 @@ const TasksTab = ({ coins, setCoins }) => {
           <span>
             {task.title}
             {task.done && <span className="done"> ✅</span>}
+
             {!task.done && task.title.toLowerCase().includes('пригласить') && userId && (
               <div className="referral-box">
                 <code>{`https://t.me/OrdoHereticus_bot?start=${userId}`}</code>
@@ -89,9 +109,25 @@ const TasksTab = ({ coins, setCoins }) => {
                 </div>
               </div>
             )}
+
+            {!task.done && task.title === 'Активировать VPN' && (
+              <div className="referral-box">
+                <a
+                  href={`https://t.me/OrdoHereticus_bot?start=pay`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="copy-btn"
+                >
+                  🔒 Активировать VPN
+                </a>
+                <div style={{ fontSize: '12px', marginTop: '6px', color: '#ccc' }}>
+                  После оплаты нажмите «Выполнить»
+                </div>
+              </div>
+            )}
           </span>
           {!task.done && (
-            <button onClick={() => handleComplete(index)}>Выполнить</button>
+            <button onClick={() => handleComplete(task, index)}>Выполнить</button>
           )}
         </div>
       ))}
@@ -100,3 +136,4 @@ const TasksTab = ({ coins, setCoins }) => {
 };
 
 export default TasksTab;
+
