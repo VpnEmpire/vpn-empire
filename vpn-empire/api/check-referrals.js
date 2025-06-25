@@ -24,5 +24,5 @@ export default function handler(req, res) {
 
   const referrals = Array.isArray(data[user_id]) ? data[user_id].length : 0;
 
-  res.status(200).json({ referrals });
+  return res.status(200).json({ referrals });
 }
