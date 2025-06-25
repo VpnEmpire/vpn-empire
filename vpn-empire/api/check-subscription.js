@@ -1,13 +1,14 @@
 // /api/check-subscription.js
+import fetch from 'node-fetch';
+
+const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN; // Убедись, что в .env указано TELEGRAM_BOT_TOKEN
+const CHANNEL_ID = '@OrdoHereticusVPN';
 
 export default async function handler(req, res) {
-  const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-  const CHANNEL_ID = "@OrdoHereticusVPN";
-
   const { user_id } = req.query;
 
   if (!user_id) {
-    return res.status(400).json({ error: "Missing user_id" });
+    return res.status(400).json({ error: 'Missing user_id' });
   }
 
   try {
@@ -15,17 +16,13 @@ export default async function handler(req, res) {
     const tgRes = await fetch(tgUrl);
     const tgData = await tgRes.json();
 
-    if (
+    const isMember =
       tgData.ok &&
-      ["member", "creator", "administrator"].includes(tgData.result.status)
-    ) {
-      return res.status(200).json({ subscribed: true });
-    } else {
-      return res.status(200).json({ subscribed: false });
-    }
+      ['member', 'creator', 'administrator'].includes(tgData?.result?.status);
+
+    return res.status(200).json({ subscribed: isMember });
   } catch (err) {
-    console.error("Error checking subscription:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error('Ошибка при проверке подписки:', err);
+    return res.status(500).json({ error: 'Subscription check failed' });
   }
 }
-
