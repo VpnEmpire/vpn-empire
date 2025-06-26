@@ -11,6 +11,7 @@ function App() {
   const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
   const [rank, setRank] = useState('');
   const [clicksToday, setClicksToday] = useState(() => Number(localStorage.getItem('clicksToday')) || 0);
+  const [hasSubscription, setHasSubscription] = useState(() => localStorage.getItem('hasSubscription') === 'true');
   const [completedTasks, setCompletedTasks] = useState(() => JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [flashes, setFlashes] = useState([]);
   const [userId, setUserId] = useState(null);
@@ -98,9 +99,7 @@ useEffect(() => {
    const handleComplete = async (key, reward, options = {}) => {
     if (completedTasks[key]) return;
 
-    if (!userId) {
-      alert("Ошибка: не удалось получить user_id из Telegram.");
-      return;
+    if (!userId) return alert("Ошибка: не удалось получить user_id из Telegram.");
     }
      
     if (options.requiresReferralCount !== undefined) {
@@ -117,15 +116,16 @@ useEffect(() => {
       const res = await fetch(`/api/check-subscription?user_id=${userId}`);
       const data = await res.json();
       if (!data.subscribed) {
-        alert("Подпишись на канал, чтобы выполнить задание");
-        return;
+      return alert("Подпишись на канал, чтобы выполнить задание");
       }
+      setHasSubscription (true);
+      localStorage.setItem ( 'HasSubscription', 'true' );
     }
 
     if (options.requiresPayment) {
       const res = await fetch(`/api/check-payment?user_id=${userId}`);
       const data = await res.json();
-      if (!data.success) {
+      if (!data.subscribed) {
         alert("Сначала активируй VPN через Telegram-бота");
         return;
       }
