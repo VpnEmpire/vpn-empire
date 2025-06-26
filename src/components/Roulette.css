@@ -1,19 +1,25 @@
+.roulette-tab {
+  text-align: center;
+  padding: 20px;
+}
+
 .roulette-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  min-height: 400px;
-  max-width: 100%;
-  overflow: hidden;
+  justify-content: center;
+}
+
+.wheel-container {
+  width: 250px;
+  height: 250px;
+  transition: transform 4s ease-out;
 }
 
 .wheel {
-  width: 80vw;
-  max-width: 300px;
+  width: 100%;
   height: auto;
-  transition: transform 4s ease-out;
-  cursor: pointer;
+  user-select: none;
 }
 
 .spinning {
@@ -30,53 +36,30 @@
 }
 
 .logo-center {
-  margin-top: 10px;
+  margin-top: 12px;
   color: #00eaff;
   font-size: 18px;
   font-weight: bold;
-  text-align: center;
 }
 
-.result {
-  margin-top: 20px;
-  font-size: 18px;
-  color: #00e676;
-}
-.cooldown {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #ff1744;
-}
-.wheel-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80px;
-  height: 80px;
-  pointer-events: none;
-}
 .spin-button {
   margin-top: 20px;
   padding: 10px 20px;
-  font-size: 16px;
-  background-color: #00eaff;
+  background: #00eaff;
   border: none;
-  border-radius: 8px;
-  color: #000;
-  font-weight: bold;
+  border-radius: 10px;
+  color: white;
+  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
 
 .spin-button:disabled {
-  background-color: #555;
+  background: #aaa;
   cursor: not-allowed;
 }
 
 .spin-result {
-  font-size: 20px;
   margin-top: 20px;
+  font-size: 18px;
   color: #00e676;
-  font-weight: bold;
 }
