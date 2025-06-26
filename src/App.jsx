@@ -215,15 +215,9 @@ const playClickSound = () => {
   );
 
     const renderRoulette = () => (
-  <div className="roulette-container">
-    <h2>🎯 Рулетка</h2>
-    <img src="/wheel.png" className={`wheel ${isSpinning ? 'spinning' : ''}`} onClick={spin} />
-    <div className="logo-center">VPN Empire</div>
-    {prize && <p className="result">Вы выиграли: {prize} монет</p>}
-    {!canSpin && <p className="cooldown">Вы уже крутили сегодня. Попробуйте завтра</p>}
-  </div>
-);
-
+ return <Roulette setCoins={setCoins} />;
+};
+  
   const renderTop = () => (
     <TopTab coins={coins} />
   );
