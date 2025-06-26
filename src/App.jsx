@@ -178,7 +178,6 @@ useEffect(() => {
   const renderTasks = () => (<TasksTab coins={coins} setCoins={setCoins} 
   userId={userId} completedTasks={completedTasks} setCompletedTasks={setCompletedTasks} handleComplete={handleComplete}
   />;
-  );
   const renderRoulette = () => <Roulette coins={coins} setCoins={setCoins} />;
   const renderTop = () => <TopTab coins={coins} />;
   const renderTasks = [
