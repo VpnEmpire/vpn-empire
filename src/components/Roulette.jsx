@@ -1,6 +1,6 @@
 // src/components/roulette.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import './roulette.css';
+import './Roulette.css';
 
 const sectors = [50, 100, 200, 300, 400, 500, 600, 700];
 
