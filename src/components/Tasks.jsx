@@ -1,6 +1,6 @@
 // src/components/Tasks.jsx
 import React, { useEffect, useState } from 'react';
-import './Tasks.css';
+import './App.css';
 
 const defaultTasks = [
   { id: 1, title: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
