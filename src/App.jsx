@@ -235,9 +235,6 @@ const tasks = [
       ))}
     </div>
   );
-
-  const renderRoulette = () => <Roulette coins={coins} setCoins={setCoins} />;
-  const renderTop = () => <TopTab coins={coins} />;
  
   const renderRoulette = () => (
     <div className="roulette-tab">
