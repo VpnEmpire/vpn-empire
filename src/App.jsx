@@ -70,7 +70,7 @@ useEffect(() => {
 
   const handleClick = (e) => {
   if (clicksToday < maxClicksPerDay) {
-    const multiplier = Number(localStorage.getItem('clickMultiplier')) || 1;
+    const multiplier = localStorage.getItem('clickBoost')=== 'true' ? 2 : 1;
     setCoins(prev => prev + 1 * multiplier);
     setClicksToday(prev => prev + 1);
     triggerAnimation();
@@ -138,7 +138,7 @@ useEffect(() => {
   setCoins(prev => prev + reward);
   setCompletedTasks(updated);
 };
-const renderTasks = () => {
+
 const tasks = [
     { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
     { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
@@ -157,11 +157,12 @@ const tasks = [
       key: 'activateVpn',
       label: '🚀 Активируй VPN',
       reward: 1000,
-      isPaymentTask: true,
+      requiresPayment: true,
       link: 'https://t.me/OrdoHereticusVPN'
     } 
   ];
   
+  const renderTasks = () => {
    return (
     <div className="tasks-tab">
       <h2>📋 Задания</h2>
@@ -172,8 +173,7 @@ const tasks = [
             {task.link ? (
               <a href={task.link} target="_blank" rel="noopener noreferrer">{task.label}</a>
             ) : (
-              task.label
-            )} — 🪙 {task.reward} монет
+          {task.label} — 🪙 {task.reward} монет {task.requiresPayment && ' + x2 кликов ' } 
           </span>
           {completedTasks[task.key] ? (
             <span className="done">✅</span>
