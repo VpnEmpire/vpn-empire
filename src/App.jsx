@@ -171,9 +171,14 @@ const tasks = [
         <div key={task.key} className="task-card">
           <span>
             {task.link ? (
-              <a href={task.link} target="_blank" rel="noopener noreferrer">{task.label}</a>
+              <a href={task.link} target="_blank" rel="noopener noreferrer">
+                {task.label} - 🪙 {task.reward} монет {task.requiresPayment && ' + x2 кликов ' }
+                </a>
             ) : (
+          <>
           {task.label} — 🪙 {task.reward} монет {task.requiresPayment && ' + x2 кликов ' } 
+          </>
+          )}
           </span>
           {completedTasks[task.key] ? (
             <span className="done">✅</span>
