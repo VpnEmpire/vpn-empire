@@ -17,7 +17,7 @@ const defaultTasks = [
   { id: 12, title: 'Поставить реакцию', reward: 100 },
   { id: 13, title: 'Зайти в VPN сегодня', reward: 100 },
   { id: 14, title: 'Активировать VPN', reward: 1000, type: 'payment', done: completedTasks.includes(14),
-  checkEndpoint: '/api/check-payment' requiresVpn: true },
+  checkEndpoint: '/api/check-payment', requiresVpn: true },
 ];
 
 const TasksTab = ({ coins, setCoins }) => {
