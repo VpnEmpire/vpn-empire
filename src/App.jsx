@@ -267,12 +267,12 @@ function App() {
 
   const renderTab = () => {
     switch (activeTab) {
-      case 'main': return renderMain();
+      case 'home': return renderHome();
       case 'tasks': return renderTasks();
       case 'roulette': return renderRoulette();
       case 'top': return renderTop();
       case 'withdraw': return renderWithdraw();
-      default: return renderMain();
+      default: return renderHome();
     }
   };
 
