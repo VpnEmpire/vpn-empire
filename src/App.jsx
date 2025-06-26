@@ -11,7 +11,6 @@ function App() {
   const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
   const [rank, setRank] = useState('');
   const [clicksToday, setClicksToday] = useState(() => Number(localStorage.getItem('clicksToday')) || 0);
-  const [hasSubscription, setHasSubscription] = useState(() => localStorage.getItem('hasSubscription') === 'true');
   const [completedTasks, setCompletedTasks] = useState(() => JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [flashes, setFlashes] = useState([]);
   const [userId, setUserId] = useState(null);
@@ -103,7 +102,7 @@ useEffect(() => {
       alert("Ошибка: не удалось получить user_id из Telegram.");
       return;
     }
-
+     
     if (options.requiresReferralCount !== undefined) {
       const res = await fetch(`/api/check-referrals?user_id=${userId}`);
       const data = await res.json();
@@ -294,7 +293,7 @@ const tasks = [
       case 'top': return renderTop();
       case 'withdraw': return renderWithdraw();
       default: return renderHome();
-    }
+      }
   };
 
   return (
@@ -303,5 +302,6 @@ const tasks = [
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
-};
+}
+
 export default App;
