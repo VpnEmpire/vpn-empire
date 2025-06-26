@@ -16,8 +16,8 @@ const defaultTasks = [
   { id: 11, title: 'Комментировать пост', reward: 100 },
   { id: 12, title: 'Поставить реакцию', reward: 100 },
   { id: 13, title: 'Зайти в VPN сегодня', reward: 100 },
-  { id: 14, title: 'Активировать VPN', reward: 1000, type: 'payment', done: completedTasks.includes(14),
-  checkEndpoint: '/api/check-payment', requiresVpn: true },
+  { id: 14, title: 'Активировать VPN', reward: 1000, requiresPayment: true? Link: ' https://t.me/OrdoHereticusVpn'
+ }
 ];
 
 const TasksTab = ({ coins, setCoins }) => {
