@@ -1,74 +1,44 @@
-.roulette-tab {
+.roulette-container {
   text-align: center;
   padding: 20px;
-}
-
-.wheel-container {
-  position: relative;
-  width: 250px;
-  height: 250px;
-  margin: 0 auto 20px;
+  min-height: 400px;
 }
 
 .wheel {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 5px solid #444;
-  background: #f0f0f0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transform: rotate(0deg);
+  width: 300px;
+  height: 300px;
+  transition: transform 4s ease-out;
+  cursor: pointer;
 }
 
-.sector {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  background-color: #fcd34d;
-  color: #000;
-  font-weight: bold;
-  transform-origin: 100% 100%;
-  text-align: center;
-  line-height: 1;
-  padding-top: 20px;
+.spinning {
+  animation: spin 4s ease-out;
 }
 
-.center-logo {
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  background: white;
-  border-radius: 50%;
-  overflow: hidden;
-  z-index: 2;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(1800deg);
+  }
 }
 
-.center-logo img {
-  width: 100%;
-  height: auto;
-}
-
-.pointer {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 24px;
-  color: red;
-}
-
-.spin-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  margin-top: 15px;
-}
-
-.spin-result {
+.logo-center {
   margin-top: 10px;
+  color: #00eaff;
   font-size: 18px;
-  color: green;
+  font-weight: bold;
 }
 
+.result {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #00e676;
+}
+
+.cooldown {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #ff1744;
+}
