@@ -1,68 +1,51 @@
-// src/components/Roulette.jsx
-import React, { useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Roulette.css';
 
-const rewards = [50, 100, 200, 300, 400, 500, 600, 700];
+const prizes = [50, 100, 200, 300, 400, 500, 600, 700];
 
-function getRandomRewardIndex() {
-  return Math.floor(Math.random() * rewards.length);
-}
+const getRandomPrize = () => {
+  const randomIndex = Math.floor(Math.random() * prizes.length);
+  return prizes[randomIndex];
+};
 
-const Roulette = ({ coins, setCoins }) => {
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [canSpin, setCanSpin] = useState(() => {
-    const lastSpin = localStorage.getItem('lastSpinDate');
-    return lastSpin !== new Date().toDateString();
-  });
-  const [result, setResult] = useState(null);
-  const wheelRef = useRef(null);
+function Roulette({ coins, setCoins }) {
+  const [spinning, setSpinning] = useState(false);
+  const [prize, setPrize] = useState(null);
+  const [lastSpinDate, setLastSpinDate] = useState(localStorage.getItem('lastSpinDate'));
+
+  const canSpin = () => {
+    const today = new Date().toLocaleDateString();
+    return lastSpinDate !== today;
+  };
 
   const spin = () => {
-    if (!canSpin || isSpinning) return;
-    setIsSpinning(true);
-    const rewardIndex = getRandomRewardIndex();
-    const rotation = 360 * 5 + (360 / rewards.length) * rewardIndex;
+    if (spinning || !canSpin()) return;
 
-    wheelRef.current.style.transition = 'transform 5s ease-out';
-    wheelRef.current.style.transform = `rotate(${rotation}deg)`;
+    setSpinning(true);
+    const audio = new Audio('/spin-sound.mp3');
+    audio.play();
 
     setTimeout(() => {
-      const reward = rewards[rewardIndex];
-      setCoins(prev => prev + reward);
-      setResult(reward);
-      setCanSpin(false);
-      localStorage.setItem('lastSpinDate', new Date().toDateString());
-      setIsSpinning(false);
-    }, 5200);
+      const result = getRandomPrize();
+      setPrize(result);
+      setCoins(prev => prev + result);
+      localStorage.setItem('lastSpinDate', new Date().toLocaleDateString());
+      setLastSpinDate(new Date().toLocaleDateString());
+      setSpinning(false);
+    }, 3000);
   };
 
   return (
     <div className="roulette-container">
       <h2>🎰 Рулетка</h2>
-      <div className="wheel-wrapper">
-        <div className="wheel" ref={wheelRef}>
-          {rewards.map((reward, index) => (
-            <div
-              key={index}
-              className="sector"
-              style={{
-                transform: `rotate(${index * 45}deg)`,
-              }}
-            >
-              <span>{reward}</span>
-            </div>
-          ))}
-          <div className="center-circle">VPN Empire</div>
-        </div>
-        <div className="pointer" />
+      <div className="wheel" onClick={spin}>
+        <img src="/roulette.gif" alt="Крутить" className={spinning ? 'spinning' : ''} />
+        <div className="logo-center">VPN Empire</div>
       </div>
-      <button className="spin-button" onClick={spin} disabled={!canSpin || isSpinning}>
-        {canSpin ? 'Крутить' : 'Завтра снова'}
-      </button>
-      {result && <div className="spin-result">+{result} монет!</div>}
+      {prize && <p className="result">Вы выиграли: 🪙 {prize} монет</p>}
+      {!canSpin() && <p className="cooldown">Вы уже крутили сегодня. Попробуйте завтра!</p>}
     </div>
   );
-};
+}
 
 export default Roulette;
-
