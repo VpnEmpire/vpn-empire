@@ -254,19 +254,28 @@ const playClickSound = () => {
   );
 
   const spinWheel = () => {
-    if (!canSpin) return;
-    if (spinSoundRef.current) spinSoundRef.current.play();
-    const options = [20, 50, 100, 200, 300, 400];
-    const result = options[Math.floor(Math.random() * options.length)];
+  if (!canSpin) return;
 
-    setTimeout(() => {
-      setCoins(prev => prev + result);
-      setSpinResult(result);
-      setCanSpin(false);
-      localStorage.setItem('lastSpinDate', new Date().toDateString());
-      if (winSoundRef.current) winSoundRef.current.play();
-    }, 2000);
-  };
+  setIsSpinning(true);
+
+  const options = [50, 100, 200, 300, 400, 500, 600, 700];
+  const result = options[Math.floor(Math.random() * options.length)];
+
+  if (wheelRef.current) {
+    wheelRef.current.style.transition = 'transform 4s ease-out';
+    const angle = 360 * 5 + Math.floor(Math.random() * 360);
+    wheelRef.current.style.transform = `rotate(${angle}deg)`;
+  }
+
+  setTimeout(() => {
+    setIsSpinning(false);
+    setSpinResult(result);
+    setCoins((prev) => prev + result);
+    setCanSpin(false);
+    localStorage.setItem('lastSpinDate', new Date().toDateString());
+    if (winSoundRef.current) winSoundRef.current.play();
+  }, 4000);
+};
 
   const renderTab = () => {
     switch (activeTab) {
