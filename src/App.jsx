@@ -70,21 +70,27 @@ function App() {
     else if (totalCoins >= 500) setRank('Агент');
     else setRank('Новичок');
   };
+  
+const playClickSound = () => {
+  const audio = new Audio('/click.mp3');
+  audio.play().catch((e) => console.log('Ошибка воспроизведения звука:', e));
+};
 
   const handleClick = (e) => {
-    if (clicksToday < maxClicksPerDay) {
-      const multiplier = localStorage.getItem('clickBoost') === 'true' ? 2 : 1;
-      setCoins(prev => prev + 1 * multiplier);
-      setClicksToday(prev => prev + 1);
-      triggerAnimation();
+  if (clicksToday < maxClicksPerDay) {
+    const multiplier = Number(localStorage.getItem('clickMultiplier')) || 1;
+    setCoins(prev => prev + 1 * multiplier);
+    setClicksToday(prev => prev + 1);
+    triggerAnimation();
+    playClickSound();
 
-      const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
-      setFlashes(prev => [...prev, flash]);
-      setTimeout(() => {
-        setFlashes(prev => prev.filter(f => f.id !== flash.id));
-      }, 400);
-    }
-  };
+    const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
+    setFlashes(prev => [...prev, flash]);
+    setTimeout(() => {
+      setFlashes(prev => prev.filter(f => f.id !== flash.id));
+    }, 400);
+  }
+};
 
   const triggerAnimation = () => {
     const flash = document.createElement('div');
