@@ -219,7 +219,7 @@ const playClickSound = () => {
     <div className="roulette-container">
       <h2>🎰 Рулетка</h2>
       <div className="wheel" onClick={spin}>
-        <img src="/wheel.gif" alt="Крутить" className={spinning ? 'spinning' : ''} />
+        <img src="/wheel.png" alt="Крутить" className={spinning ? 'spinning' : ''} />
         <div className="logo-center">VPN Empire</div>
       </div>
       {prize && <p className="result">Вы выиграли: 🪙 {prize} монет</p>}
