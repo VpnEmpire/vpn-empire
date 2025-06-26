@@ -181,7 +181,7 @@ useEffect(() => {
   );
   const renderRoulette = () => <Roulette coins={coins} setCoins={setCoins} />;
   const renderTop = () => <TopTab coins={coins} />;
-  const renderTasks = [
+  const tasks = [
     { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
     { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
     { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200, requiresReferralCount: 3 },
@@ -305,5 +305,4 @@ useEffect(() => {
     </div>
   );
 }
-
 export default App;
