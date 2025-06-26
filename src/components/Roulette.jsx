@@ -1,96 +1,68 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Wheel } from 'react-custom-roulette';
+// src/components/Roulette.jsx
+import React, { useRef, useState } from 'react';
 import './Roulette.css';
 
-const data = [
-  { option: '50', style: { backgroundColor: '#1e1e1e', textColor: '#00ffcc' } },
-  { option: '100', style: { backgroundColor: '#292929', textColor: '#ffe600' } },
-  { option: '200', style: { backgroundColor: '#1e1e1e', textColor: '#00ffcc' } },
-  { option: '300', style: { backgroundColor: '#292929', textColor: '#ffe600' } },
-  { option: '400', style: { backgroundColor: '#1e1e1e', textColor: '#00ffcc' } },
-  { option: '500', style: { backgroundColor: '#292929', textColor: '#ffe600' } },
-  { option: '300', style: { backgroundColor: '#1e1e1e', textColor: '#00ffcc' } },
-  { option: '100', style: { backgroundColor: '#292929', textColor: '#ffe600' } }
-];
+const rewards = [50, 100, 200, 300, 400, 500, 600, 700];
+
+function getRandomRewardIndex() {
+  return Math.floor(Math.random() * rewards.length);
+}
 
 const Roulette = ({ coins, setCoins }) => {
-  const [canSpin, setCanSpin] = useState(true);
-  const [mustSpin, setMustSpin] = useState(false);
-  const [prizeNumber, setPrizeNumber] = useState(0);
-  const [reward, setReward] = useState(null);
-  const spinSoundRef = useRef(null);
-  const winSoundRef = useRef(null);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [canSpin, setCanSpin] = useState(() => {
+    const lastSpin = localStorage.getItem('lastSpinDate');
+    return lastSpin !== new Date().toDateString();
+  });
+  const [result, setResult] = useState(null);
+  const wheelRef = useRef(null);
 
-  useEffect(() => {
-    const lastSpinDate = localStorage.getItem('lastSpinDate');
-    const today = new Date().toDateString();
-    if (lastSpinDate === today) setCanSpin(false);
-  }, []);
+  const spin = () => {
+    if (!canSpin || isSpinning) return;
+    setIsSpinning(true);
+    const rewardIndex = getRandomRewardIndex();
+    const rotation = 360 * 5 + (360 / rewards.length) * rewardIndex;
 
-  const handleSpinClick = () => {
-    if (!canSpin || mustSpin) return;
+    wheelRef.current.style.transition = 'transform 5s ease-out';
+    wheelRef.current.style.transform = `rotate(${rotation}deg)`;
 
-    if (spinSoundRef.current) {
-      spinSoundRef.current.currentTime = 0;
-      spinSoundRef.current.play();
-    }
-
-    const newPrizeNumber = Math.floor(Math.random() * data.length);
-    setPrizeNumber(newPrizeNumber);
-    setMustSpin(true);
-  };
-
-  const onStopSpinning = () => {
-    const rewardValue = parseInt(data[prizeNumber].option);
-    setReward(rewardValue);
-    setMustSpin(false);
-    setCoins(prev => prev + rewardValue);
-    setCanSpin(false);
-    localStorage.setItem('lastSpinDate', new Date().toDateString());
-
-    if (winSoundRef.current) {
-      winSoundRef.current.currentTime = 0;
-      winSoundRef.current.play();
-    }
+    setTimeout(() => {
+      const reward = rewards[rewardIndex];
+      setCoins(prev => prev + reward);
+      setResult(reward);
+      setCanSpin(false);
+      localStorage.setItem('lastSpinDate', new Date().toDateString());
+      setIsSpinning(false);
+    }, 5200);
   };
 
   return (
-    <div className="roulette-tab">
+    <div className="roulette-container">
       <h2>🎰 Рулетка</h2>
-      <p>Крути рулетку и получай случайный приз!</p>
-
       <div className="wheel-wrapper">
-        <Wheel
-          mustStartSpinning={mustSpin}
-          prizeNumber={prizeNumber}
-          data={data}
-          outerBorderColor={'#ffd700'}
-          outerBorderWidth={8}
-          innerRadius={20}
-          radiusLineColor={'#444'}
-          radiusLineWidth={2}
-          textDistance={60}
-          fontSize={18}
-          onStopSpinning={onStopSpinning}
-        />
-      </div>
-
-      <button className="spin-button" onClick={handleSpinClick} disabled={!canSpin || mustSpin}>
-        {mustSpin ? 'Крутится...' : 'Крутить рулетку'}
-      </button>
-
-      {reward !== null && !mustSpin && (
-        <div className="prize-text">
-          {reward === 0
-            ? '😢 Не повезло... Попробуй завтра!'
-            : `🎉 Ты выиграл 💰 ${reward} монет!`}
+        <div className="wheel" ref={wheelRef}>
+          {rewards.map((reward, index) => (
+            <div
+              key={index}
+              className="sector"
+              style={{
+                transform: `rotate(${index * 45}deg)`,
+              }}
+            >
+              <span>{reward}</span>
+            </div>
+          ))}
+          <div className="center-circle">VPN Empire</div>
         </div>
-      )}
-
-      <audio ref={spinSoundRef} src="/spin-sound.mp3" preload="auto" />
-      <audio ref={winSoundRef} src="/coins_many.mp3" preload="auto" />
+        <div className="pointer" />
+      </div>
+      <button className="spin-button" onClick={spin} disabled={!canSpin || isSpinning}>
+        {canSpin ? 'Крутить' : 'Завтра снова'}
+      </button>
+      {result && <div className="spin-result">+{result} монет!</div>}
     </div>
   );
 };
 
 export default Roulette;
+
