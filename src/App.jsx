@@ -138,50 +138,8 @@ useEffect(() => {
   setCoins(prev => prev + reward);
   setCompletedTasks(updated);
 };
-
-  const spinWheel = () => {
-    if (!canSpin) return;
-    if (spinSoundRef.current) spinSoundRef.current.play();
-
-    const options = [20, 50, 100, 200, 300, 400];
-    const result = options[Math.floor(Math.random() * options.length)];
-
-    setTimeout(() => {
-      setCoins(prev => prev + result);
-      setSpinResult(result);
-      setCanSpin(false);
-      localStorage.setItem('lastSpinDate', new Date().toDateString());
-      if (winSoundRef.current) winSoundRef.current.play();
-    }, 2000);
-  };
-
-  const renderHome = () => (
-    <div className="main-content">
-      <div className="heander-box">
-        <div className="coins">💰 Монет: {coins} $RICH</div>
-        <div className="rank">🎖 Звание: {rank}</div>
-      </div>
-      <div className="robot-container">
-        <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
-        <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
-      </div>
-      <div className="helper-box">
-        🤖 <strong>Я твой помощник!</strong><br />
-        Кликай на робота и зарабатывай монеты.
-      </div>
-      {flashes.map(f => (
-        <div key={f.id} className="flash" style={{ left: f.x, top: f.y }} />
-      ))}
-    </div>
-  );
-
-  const renderTasks = () => (<TasksTab coins={coins} setCoins={setCoins} 
-  userId={userId} completedTasks={completedTasks} setCompletedTasks={setCompletedTasks} handleComplete={handleComplete}
-  />
-  );
-  const renderRoulette = () => <Roulette coins={coins} setCoins={setCoins} />;
-  const renderTop = () => <TopTab coins={coins} />;
-  const tasks = [
+  
+const tasks = [
     { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
     { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
     { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200, requiresReferralCount: 3 },
@@ -203,8 +161,12 @@ useEffect(() => {
       link: 'https://t.me/OrdoHereticusVPN'
     } 
   ];
-
-  return (
+  
+ const renderTasks = () => (<TasksTab coins={coins} setCoins={setCoins} 
+  userId={userId} completedTasks={completedTasks} setCompletedTasks={setCompletedTasks} handleComplete={handleComplete}
+  />
+  );
+   return (
     <div className="tasks-tab">
       <h2>📋 Задания</h2>
 
@@ -241,7 +203,46 @@ useEffect(() => {
     </div>
   );
 };
+  
+  const spinWheel = () => {
+    if (!canSpin) return;
+    if (spinSoundRef.current) spinSoundRef.current.play();
 
+    const options = [20, 50, 100, 200, 300, 400];
+    const result = options[Math.floor(Math.random() * options.length)];
+
+    setTimeout(() => {
+      setCoins(prev => prev + result);
+      setSpinResult(result);
+      setCanSpin(false);
+      localStorage.setItem('lastSpinDate', new Date().toDateString());
+      if (winSoundRef.current) winSoundRef.current.play();
+    }, 2000);
+  };
+
+  const renderHome = () => (
+    <div className="main-content">
+      <div className="heander-box">
+        <div className="coins">💰 Монет: {coins} $RICH</div>
+        <div className="rank">🎖 Звание: {rank}</div>
+      </div>
+      <div className="robot-container">
+        <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
+        <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
+      </div>
+      <div className="helper-box">
+        🤖 <strong>Я твой помощник!</strong><br />
+        Кликай на робота и зарабатывай монеты.
+      </div>
+      {flashes.map(f => (
+        <div key={f.id} className="flash" style={{ left: f.x, top: f.y }} />
+      ))}
+    </div>
+  );
+
+  const renderRoulette = () => <Roulette coins={coins} setCoins={setCoins} />;
+  const renderTop = () => <TopTab coins={coins} />;
+ 
   const renderRoulette = () => (
     <div className="roulette-tab">
       <h2>🎰 Рулетка</h2>
@@ -304,5 +305,5 @@ useEffect(() => {
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
-}
+};
 export default App;
