@@ -1,6 +1,6 @@
 // src/App.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import './App.css'; 
+import './App.css';
 import BottomNav from './components/BottomNav.jsx';
 import TopTab from './components/Top.jsx';
 import TasksTab from './components/Tasks.jsx';
