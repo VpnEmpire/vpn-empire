@@ -214,7 +214,7 @@ const playClickSound = () => {
     </div>
   );
 
-    const renderRoulette = () => (
+    const renderRoulette = () => {
  return <Roulette setCoins={setCoins} />;
 };
   
