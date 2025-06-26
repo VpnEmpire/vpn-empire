@@ -1,14 +1,14 @@
-// src/components/Roulette.jsx
-import React, { useRef, useState, useEffect } from 'react';
-import './Roulette.css';
+// src/components/roulette.jsx
+import React, { useState, useEffect, useRef } from 'react';
+import './roulette.css';
 
 const sectors = [50, 100, 200, 300, 400, 500, 600, 700];
 
 const Roulette = ({ setCoins }) => {
-  const [canSpin, setCanSpin] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
+  const [spinAngle, setSpinAngle] = useState(0);
   const [spinResult, setSpinResult] = useState(null);
-  const wheelRef = useRef(null);
+  const [canSpin, setCanSpin] = useState(true);
   const spinSoundRef = useRef(null);
   const winSoundRef = useRef(null);
 
@@ -20,53 +20,55 @@ const Roulette = ({ setCoins }) => {
     }
   }, []);
 
-  const spinWheel = () => {
+  const handleSpin = () => {
     if (!canSpin || isSpinning) return;
 
     const resultIndex = Math.floor(Math.random() * sectors.length);
+    const reward = sectors[resultIndex];
     const angle = 3600 + (360 / sectors.length) * resultIndex;
 
     setIsSpinning(true);
     if (spinSoundRef.current) spinSoundRef.current.play();
 
-    wheelRef.current.style.transition = 'transform 4s ease-out';
-    wheelRef.current.style.transform = `rotate(${angle}deg)`;
+    setSpinAngle(angle);
 
     setTimeout(() => {
-      const reward = sectors[resultIndex];
-      setCoins(prev => prev + reward);
-      setSpinResult(reward);
       setIsSpinning(false);
+      setSpinResult(reward);
+      setCoins(prev => prev + reward);
       setCanSpin(false);
       localStorage.setItem('lastSpinDate', new Date().toDateString());
       if (winSoundRef.current) winSoundRef.current.play();
-    }, 4200);
+    }, 4500);
   };
 
   return (
     <div className="roulette-tab">
       <h2>🎰 Рулетка</h2>
-      <div className="wheel-container">
-        <div className="wheel" ref={wheelRef}>
-          {sectors.map((val, i) => (
-            <div
-              key={i}
-              className="sector"
-              style={{ transform: `rotate(${(360 / sectors.length) * i}deg)` }}
-            >
-              {val}
-            </div>
-          ))}
-          <div className="center-logo">
-            <img src="/logo.png" alt="logo" />
-          </div>
+      <div className="roulette-container">
+        <div
+          className={`wheel ${isSpinning ? 'spinning' : ''}`}
+          style={{ transform: `rotate(${spinAngle}deg)` }}
+        >
+          <img src="/wheel.png" alt="Рулетка" />
         </div>
-        <div className="pointer">▲</div>
+        <div className="wheel-center">
+          <img src="/logo.png" alt="Logo" />
+        </div>
       </div>
-      <button className="spin-button" onClick={spinWheel} disabled={!canSpin || isSpinning}>
+
+      <button
+        className="spin-button"
+        onClick={handleSpin}
+        disabled={!canSpin || isSpinning}
+      >
         {canSpin ? 'Крутить' : 'Завтра снова можно'}
       </button>
-      {spinResult && <div className="spin-result">+{spinResult} монет!</div>}
+
+      {spinResult && (
+        <div className="spin-result">+{spinResult} монет!</div>
+      )}
+
       <audio ref={spinSoundRef} src="/spin-sound.mp3" preload="auto" />
       <audio ref={winSoundRef} src="/coins_many.mp3" preload="auto" />
     </div>
