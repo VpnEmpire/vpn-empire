@@ -1,40 +1,74 @@
 .roulette-tab {
   text-align: center;
-  padding: 30px 20px;
-  color: white;
-  min-height: 100vh;
+  padding: 20px;
 }
 
-.wheel-wrapper {
-  max-width: 320px;
-  margin: 0 auto;
+.wheel-container {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  margin: 0 auto 20px;
+}
+
+.wheel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 5px solid #444;
+  background: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: rotate(0deg);
+}
+
+.sector {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  background-color: #fcd34d;
+  color: #000;
+  font-weight: bold;
+  transform-origin: 100% 100%;
+  text-align: center;
+  line-height: 1;
+  padding-top: 20px;
+}
+
+.center-logo {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.center-logo img {
+  width: 100%;
+  height: auto;
+}
+
+.pointer {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  color: red;
 }
 
 .spin-button {
-  margin-top: 40px;
-  padding: 12px 28px;
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-top: 15px;
+}
+
+.spin-result {
+  margin-top: 10px;
   font-size: 18px;
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
-  transition: transform 0.2s;
+  color: green;
 }
 
-.spin-button:disabled {
-  background-color: #999;
-  cursor: not-allowed;
-}
-
-.spin-button:active {
-  transform: scale(0.95);
-}
-
-.prize-text {
-  margin-top: 20px;
-  font-size: 20px;
-  color: #00ffcc;
-  font-weight: bold;
-}
