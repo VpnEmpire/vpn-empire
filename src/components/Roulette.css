@@ -1,40 +1,96 @@
-.roulette-tab {
+.roulette-container {
   text-align: center;
-  padding: 30px 20px;
-  color: white;
-  min-height: 100vh;
+  padding: 20px;
 }
 
 .wheel-wrapper {
-  max-width: 320px;
+  position: relative;
+  width: 250px;
+  height: 250px;
   margin: 0 auto;
 }
 
+.wheel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 5px solid #1e1e2f;
+  background: #fff;
+  overflow: hidden;
+}
+
+.sector {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  background: #2f2f57;
+  color: white;
+  text-align: right;
+  transform-origin: 100% 100%;
+  clip-path: polygon(100% 100%, 0% 100%, 100% 0%);
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 10px;
+}
+
+.sector:nth-child(odd) {
+  background: #4a4a7f;
+}
+
+.center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #1e1e2f;
+  color: white;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.pointer {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 20px solid red;
+  z-index: 3;
+}
+
 .spin-button {
-  margin-top: 40px;
-  padding: 12px 28px;
-  font-size: 18px;
-  background-color: #ff9800;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #2f2f57;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
+  font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 0 12px rgba(255, 152, 0, 0.5);
-  transition: transform 0.2s;
 }
 
 .spin-button:disabled {
-  background-color: #999;
+  background-color: #888;
   cursor: not-allowed;
 }
 
-.spin-button:active {
-  transform: scale(0.95);
-}
-
-.prize-text {
-  margin-top: 20px;
-  font-size: 20px;
-  color: #00ffcc;
+.spin-result {
+  margin-top: 15px;
+  font-size: 18px;
   font-weight: bold;
+  color: green;
 }
