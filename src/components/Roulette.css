@@ -51,3 +51,27 @@
   height: 80px;
   pointer-events: none;
 }
+.spin-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #00eaff;
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.spin-button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.spin-result {
+  font-size: 20px;
+  margin-top: 20px;
+  color: #00e676;
+  font-weight: bold;
+}
