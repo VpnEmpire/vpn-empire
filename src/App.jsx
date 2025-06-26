@@ -96,19 +96,21 @@ useEffect(() => {
   };
 
   const handleClick = (e) => {
-    if (clicksToday < maxClicksPerDay) {
-      setCoins(prev => prev + 1);
-      setClicksToday(prev => prev + 1);
-      triggerAnimation();
-      playClickSound();
+  if (clicksToday < maxClicksPerDay) {
+    const multiplier = Number(localStorage.getItem('clickMultiplier')) || 1;
 
-      const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
-      setFlashes(prev => [...prev, flash]);
-      setTimeout(() => {
-        setFlashes(prev => prev.filter(f => f.id !== flash.id));
-      }, 400);
-    }
-  };
+    setCoins(prev => prev + 1 * multiplier);
+    setClicksToday(prev => prev + 1);
+    triggerAnimation();
+    playClickSound();
+
+    const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
+    setFlashes(prev => [...prev, flash]);
+    setTimeout(() => {
+      setFlashes(prev => prev.filter(f => f.id !== flash.id));
+    }, 400);
+  }
+};
 
   const triggerAnimation = () => {
     const flash = document.createElement('div');
