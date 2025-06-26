@@ -14,17 +14,18 @@ function App() {
   const [hasSubscription, setHasSubscription] = useState(() => localStorage.getItem('hasSubscription') === 'true');
   const [completedTasks, setCompletedTasks] = useState(() => JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [flashes, setFlashes] = useState([]);
+  const [userId, setUserId] = useState(null);
+const [isWithdrawApproved, setIsWithdrawApproved] = useState(() =>
+  localStorage.getItem('isWithdrawApproved') === 'true'
+);
   const maxClicksPerDay = 100;
   const spinSoundRef = useRef(null);
   const winSoundRef = useRef(null);
   const [canSpin, setCanSpin] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinResult, setSpinResult] = useState(null);
-  const [userId, setUserId] = useState(null);
-const [isWithdrawApproved, setIsWithdrawApproved] = useState(() =>
-  localStorage.getItem('isWithdrawApproved') === 'true'
-);
-const handleApproveWithdraw = () => {
+  
+  const handleApproveWithdraw = () => {
   setIsWithdrawApproved(true);
   localStorage.setItem('isWithdrawApproved', 'true');
 };
@@ -57,35 +58,6 @@ useEffect(() => {
     setUserId(window.Telegram.WebApp.initDataUnsafe.user.id);
   }
 }, []);
-    useEffect(() => {
-  const checkPayment = async () => {
-    const stored = localStorage.getItem('hasSubscription');
-    if (stored === 'true') {
-      setHasSubscription(true);
-      return;
-    }
-
-    if (window?.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
-      const uid = window.Telegram.WebApp.initDataUnsafe.user.id;
-      setUserId(uid);
-
-      try {
-        const res = await fetch(`/api/check-payment?user_id=${uid}`);
-        const data = await res.json();
-
-        if (data.paid) {
-          setHasSubscription(true);
-          localStorage.setItem('hasSubscription', 'true');
-        }
-      } catch (err) {
-        console.error('Ошибка при проверке оплаты:', err);
-      }
-    }
-  };
-
-  checkPayment();
-}, []);
-
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
@@ -98,7 +70,6 @@ useEffect(() => {
   const handleClick = (e) => {
   if (clicksToday < maxClicksPerDay) {
     const multiplier = Number(localStorage.getItem('clickMultiplier')) || 1;
-
     setCoins(prev => prev + 1 * multiplier);
     setClicksToday(prev => prev + 1);
     triggerAnimation();
@@ -124,7 +95,7 @@ useEffect(() => {
     audio.play();
   };
 
-  const handleComplete = async (key, reward, requiresReferralCount = null) => {
+  const handleComplete = async (key, reward, options = {}) => {
   if (completedTasks[key]) return;
 
   if (!userId) {
@@ -132,15 +103,34 @@ useEffect(() => {
     return;
   }
 
-  // Проверка количества приглашений
-  if (requiresReferralCount !== null) {
+  if (options.requiresReferralCount !== undefined) {
     const res = await fetch(`/api/check-referrals?user_id=${userId}`);
     const data = await res.json();
 
-    if (!data || data.referrals < requiresReferralCount) {
-      alert(`Пригласи как минимум ${requiresReferralCount} друзей для выполнения этого задания`);
+    if (!data || data.referrals < options.requiresReferralCount) {
+      alert(`Пригласи как минимум ${options.requiresReferralCount} друзей для выполнения этого задания`);
       return;
     }
+  }
+
+  if (options.requiresSubscription) {
+    const res = await fetch(`/api/check-subscription?user_id=${userId}`);
+    const data = await res.json();
+    if (!data.subscribed) {
+      alert("Подпишись на канал, чтобы выполнить задание");
+      return;
+    }
+  }
+
+  if (options.requiresPayment) {
+    const res = await fetch(`/api/check-payment?user_id=${userId}`);
+    const data = await res.json();
+    if (!data.success) {
+      alert("Сначала активируй VPN через Telegram-бота");
+      return;
+    }
+    // x2 кликов — активация
+    localStorage.setItem('clickBoost', 'true');
   }
 
   const updated = { ...completedTasks, [key]: true };
@@ -169,19 +159,6 @@ useEffect(() => {
     localStorage.setItem('hasSubscription', 'true');
   };
 
-  const renderSubscriptionPrompt = () => (
-    <div className="subscription-block">
-      <h2>🔒 Доступ ограничен</h2>
-      <p>Чтобы играть, необходимо оплатить подписку от 100₽ в Telegram-боте:</p>
-      <a className="tg-link" href="https://t.me/OrdoHereticusVPN" target="_blank" rel="noopener noreferrer">
-        Перейти в бот
-      </a>
-      <button className="confirm-btn" onClick={handleSubscriptionConfirm}>
-        ✅ Я оплатил
-      </button>
-    </div>
-  );
-
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
@@ -202,7 +179,9 @@ useEffect(() => {
     </div>
   );
 
-  const renderTasks = () => {
+  const renderTasks = () => <TasksTab coins={coins} setCoins={setCoins} />;
+  const renderRoulette = () => <Roulette coins={coins} setCoins={setCoins} />;
+  const renderTop = () => <TopTab coins={coins} />;
   const tasks = [
     { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
     { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
@@ -311,8 +290,6 @@ useEffect(() => {
       default: return renderHome();
     }
   };
-
-  if (!hasSubscription) return renderSubscriptionPrompt();
 
   return (
     <div className="App">
