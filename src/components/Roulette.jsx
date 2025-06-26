@@ -52,9 +52,6 @@ const Roulette = ({ setCoins }) => {
         >
           <img src="/wheel.png" alt="Рулетка" />
         </div>
-        <div className="wheel-center">
-          <img src="/logo.png" alt="Logo" />
-        </div>
       </div>
 
       <button
