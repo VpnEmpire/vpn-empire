@@ -1,12 +1,17 @@
 .roulette-container {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
   min-height: 400px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .wheel {
-  width: 300px;
-  height: 300px;
+  width: 80vw;
+  max-width: 300px;
+  height: auto;
   transition: transform 4s ease-out;
   cursor: pointer;
 }
@@ -29,6 +34,7 @@
   color: #00eaff;
   font-size: 18px;
   font-weight: bold;
+  text-align: center;
 }
 
 .result {
@@ -36,7 +42,6 @@
   font-size: 18px;
   color: #00e676;
 }
-
 .cooldown {
   margin-top: 10px;
   font-size: 14px;
