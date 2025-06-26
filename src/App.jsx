@@ -214,18 +214,15 @@ const playClickSound = () => {
     </div>
   );
 
-  const renderRoulette = () => (
-
-    <div className="roulette-container">
-      <h2>🎰 Рулетка</h2>
-      <div className="wheel" onClick={spin}>
-        <img src="/wheel.png" alt="Крутить" className={spinning ? 'spinning' : ''} />
-        <div className="logo-center">VPN Empire</div>
-      </div>
-      {prize && <p className="result">Вы выиграли: 🪙 {prize} монет</p>}
-      {!canSpin() && <p className="cooldown">Вы уже крутили сегодня. Попробуйте завтра!</p>}
-    </div> 
-  );
+    const renderRoulette = () => (
+  <div className="roulette-container">
+    <h2>🎯 Рулетка</h2>
+    <img src="/wheel.png" className={`wheel ${isSpinning ? 'spinning' : ''}`} onClick={spin} />
+    <div className="logo-center">VPN Empire</div>
+    {prize && <p className="result">Вы выиграли: {prize} монет</p>}
+    {!canSpin && <p className="cooldown">Вы уже крутили сегодня. Попробуйте завтра</p>}
+  </div>
+);
 
   const renderTop = () => (
     <TopTab coins={coins} />
