@@ -138,7 +138,7 @@ useEffect(() => {
   setCoins(prev => prev + reward);
   setCompletedTasks(updated);
 };
-  
+const renderTasks = () => {
 const tasks = [
     { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
     { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
@@ -162,10 +162,6 @@ const tasks = [
     } 
   ];
   
- const renderTasks = () => (<TasksTab coins={coins} setCoins={setCoins} 
-  userId={userId} completedTasks={completedTasks} setCompletedTasks={setCompletedTasks} handleComplete={handleComplete}
-  />
-  );
    return (
     <div className="tasks-tab">
       <h2>📋 Задания</h2>
