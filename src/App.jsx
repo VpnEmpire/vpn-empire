@@ -215,16 +215,16 @@ const playClickSound = () => {
   );
 
   const renderRoulette = () => (
-    <div className="roulette-tab">
+
+    <div className="roulette-container">
       <h2>🎰 Рулетка</h2>
-      <img src="/roulette.gif" alt="Рулетка" className="roulette-image" style={{ width: '200px', marginBottom: '20px' }} />
-      <button className="spin-button" onClick={spinWheel} disabled={!canSpin}>
-        Крутить
-      </button>
-      {spinResult !== '' && <div className="spin-result">+{spinResult} монет!</div>}
-      <audio ref={spinSoundRef} src="/spin-sound.mp3" preload="auto" />
-      <audio ref={winSoundRef} src="/coins_many.mp3" preload="auto" />
-    </div>
+      <div className="wheel" onClick={spin}>
+        <img src="/roulette.gif" alt="Крутить" className={spinning ? 'spinning' : ''} />
+        <div className="logo-center">VPN Empire</div>
+      </div>
+      {prize && <p className="result">Вы выиграли: 🪙 {prize} монет</p>}
+      {!canSpin() && <p className="cooldown">Вы уже крутили сегодня. Попробуйте завтра!</p>}
+    </div> 
   );
 
   const renderTop = () => (
