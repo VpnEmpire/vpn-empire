@@ -22,16 +22,14 @@ const Roulette = ({ setCoins }) => {
 const handleSpin = () => {
     if (!canSpin || isSpinning) return;
 
-    const sectorCount = sectors.length;
-    const sectorAngle = 360 / sectorCount;
-    const resultIndex = Math.floor(Math.random() * sectorCount);
+    const resultIndex = Math.floor(Math.random() * sectors.length);
     const reward = sectors[resultIndex];
-    const extraSpins = 5;
-    const targetRotation = rotation + (extraSpins * 360) + (sectorAngle * resultIndex) + sectorAngle / 2;
+    const angle = 3600 + (360 / sectors.length) * resultIndex;
 
     setIsSpinning(true);
     if (spinSoundRef.current) spinSoundRef.current.play();
-    setRotation(targetRotation);
+
+    setSpinAngle(angle);
 
     setTimeout(() => {
       setIsSpinning(false);
