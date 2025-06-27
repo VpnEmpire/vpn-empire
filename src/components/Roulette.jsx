@@ -47,10 +47,9 @@ const Roulette = ({ setCoins }) => {
       <h2>🎰 Рулетка</h2>
       <div className="roulette-container">
         <div
-          className={`wheel ${isSpinning ? 'spinning' : ''}`}
           style={{ transform: `rotate(${spinAngle}deg)` }}
         >
-          <img src="/wheel.png" alt="Рулетка" />
+          <img src="/wheel.png" alt="Рулетка" /> className={`wheel ${isSpinning ? 'spinning' : ''}`} onClick={spin} />
         </div>
       </div>
 
