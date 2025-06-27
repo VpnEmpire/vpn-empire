@@ -24,7 +24,8 @@ const handleSpin = () => {
 
     const resultIndex = Math.floor(Math.random() * sectors.length);
     const reward = sectors[resultIndex];
-    const angle = 3600 + (360 / sectors.length) * resultIndex;
+    const sectorAngle = 360 / sectors.length;
+const angle = 3600 + resultIndex * sectorAngle + sectorAngle / 2;
 
     setIsSpinning(true);
     if (spinSoundRef.current) spinSoundRef.current.play();
