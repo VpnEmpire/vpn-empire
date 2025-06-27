@@ -20,30 +20,28 @@ const Roulette = ({ setCoins }) => {
   }, []);
   
 const handleSpin = () => {
-  if (!canSpin || isSpinning) return;
+    if (!canSpin || isSpinning) return;
 
-  const sectorCount = sectors.length;
-  const sectorAngle = 360 / sectorCount;
-  const resultIndex = Math.floor(Math.random() * sectorCount);
-  const reward = sectors[resultIndex];
+    const sectorCount = sectors.length;
+    const sectorAngle = 360 / sectorCount;
+    const resultIndex = Math.floor(Math.random() * sectorCount);
+    const reward = sectors[resultIndex];
+    const extraSpins = 5;
+    const targetRotation = rotation + (extraSpins * 360) + (sectorAngle * resultIndex) + sectorAngle / 2;
 
-  const extraSpins = 5;
-  const newRotation = rotation + (360 * extraSpins) + (sectorAngle * resultIndex) + sectorAngle / 2;
+    setIsSpinning(true);
+    if (spinSoundRef.current) spinSoundRef.current.play();
+    setRotation(targetRotation);
 
-  setIsSpinning(true);
-  if (spinSoundRef.current) spinSoundRef.current.play();
-
-  setRotation(newRotation);
-
-  setTimeout(() => {
-    setIsSpinning(false);
-    setSpinResult(reward);
-    setCoins(prev => prev + reward);
-    setCanSpin(false);
-    localStorage.setItem('lastSpinDate', new Date().toDateString());
-    if (winSoundRef.current) winSoundRef.current.play();
-  }, 4500);
-};
+    setTimeout(() => {
+      setIsSpinning(false);
+      setSpinResult(reward);
+      setCoins(prev => prev + reward);
+      setCanSpin(false);
+      localStorage.setItem('lastSpinDate', new Date().toDateString());
+      if (winSoundRef.current) winSoundRef.current.play();
+    }, 4500);
+  };
 
     return (
     <div className="roulette-tab">
