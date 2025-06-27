@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Roulette.css';
 
 const sectors = [50, 100, 200, 300, 400, 500, 600, 700];
-
 const Roulette = ({ setCoins }) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinAngle, setSpinAngle] = useState(0);
