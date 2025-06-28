@@ -307,7 +307,6 @@ const renderTasks = () => {
       setCoins={setCoins}
     />
   );
-};
 
   return (
     <div className="App">
