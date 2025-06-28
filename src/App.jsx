@@ -19,7 +19,7 @@ function App() {
  const [referrals, setReferrals] = useState(0);
   const [vpnActivated, setVpnActivated] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
-
+}
   useEffect(() => {
     const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
     if (tgUserId) {
@@ -157,7 +157,7 @@ const playClickSound = () => {
       }
       localStorage.setItem('clickBoost', 'true');
     }
- 
+  }
  const isCompleted = (task) => {
     if (task.type === 'referral') return referrals >= task.count;
     if (task.type === 'subscribe') return subscribed;
@@ -251,7 +251,7 @@ const playClickSound = () => {
     </div>
   );
 };
- 
+  }
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
