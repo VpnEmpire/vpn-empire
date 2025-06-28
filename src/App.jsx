@@ -251,7 +251,7 @@ const playClickSound = () => {
     </div>
   );
 };
-  }
+ 
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
