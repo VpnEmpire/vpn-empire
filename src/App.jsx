@@ -183,7 +183,7 @@ const playClickSound = () => {
     setTasks(updated);
     localStorage.setItem('tasks', JSON.stringify(updated));
     setCoins(prev => prev + task.reward);
-  };
+  });
 
  const handleTaskClick = (task) => {
     if (isCompleted(task)) return;
