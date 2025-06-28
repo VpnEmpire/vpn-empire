@@ -58,37 +58,45 @@ function App() {
   }, []);
 
  useEffect(() => {
-  const init = () => {
+  const initTelegram = () => {
     try {
-      const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+      const tg = window.Telegram?.WebApp;
+      if (!tg || !tg.initDataUnsafe) {
+        console.warn('Telegram WebApp API не доступен.');
+        return;
+      }
+
+      tg.ready(); // Telegram WebApp готов
+
+      const user = tg.initDataUnsafe.user;
+      const ref = tg.initDataUnsafe.start_param;
+
       if (user?.id) {
         setUserId(user.id);
         localStorage.setItem('user_id', user.id);
+        console.log('user_id:', user.id);
+
+        if (ref) {
+          localStorage.setItem('referrer_id', ref);
+          console.log('referrer_id:', ref);
+        }
       } else {
-        console.error("User not found in initDataUnsafe");
-        alert('❌ Не удалось получить user_id из Telegram.');
+        console.warn('user.id не получен');
       }
-    } catch (err) {
-      console.error("Telegram WebApp init error:", err);
-      alert('❌ Ошибка инициализации Telegram.');
+
+    } catch (error) {
+      console.error('Ошибка инициализации Telegram:', error);
     }
   };
 
-  if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.ready(); // обязательно
-    init();
+  // Ждём загрузки документа
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initTelegram();
   } else {
-    // Ожидаем появления Telegram WebApp, если загрузился медленно
-    const interval = setInterval(() => {
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.ready();
-        init();
-        clearInterval(interval);
-      }
-    }, 200);
-    // Через 5 секунд останавливаем попытки
-    setTimeout(() => clearInterval(interval), 5000);
+    window.addEventListener('DOMContentLoaded', initTelegram);
   }
+
+  return () => window.removeEventListener('DOMContentLoaded', initTelegram);
 }, []);
 
   const updateRank = (totalCoins) => {
