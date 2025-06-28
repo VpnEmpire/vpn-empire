@@ -58,10 +58,24 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (window?.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
-      setUserId(window.Telegram.WebApp.initDataUnsafe.user.id);
+  if (window.Telegram && window.Telegram.WebApp) {
+    try {
+      window.Telegram.WebApp.ready(); // ⬅️ обязательно!
+      const user = window.Telegram.WebApp.initDataUnsafe?.user;
+      if (user?.id) {
+        setUserId(user.id);
+        localStorage.setItem('user_id', user.id);
+      } else {
+        alert('Ошибка: не удалось получить user_id из Telegram.');
+      }
+    } catch (e) {
+      console.error("Ошибка инициализации Telegram WebApp:", e);
+      alert('Ошибка: Telegram WebApp API не доступен.');
     }
-  }, []);
+  } else {
+    alert('Пожалуйста, откройте мини-приложение через Telegram.');
+  }
+}, []);
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
