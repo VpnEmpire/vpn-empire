@@ -179,59 +179,105 @@ const playClickSound = () => {
   };
   
  const renderTasks = () => {
-    const tasks = [
-      { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
-      { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
-      { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200, requiresReferralCount: 3 },
-      { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300, requiresReferralCount: 4 },
-      { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400, requiresReferralCount: 5 },
-      { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500, requiresReferralCount: 6 },
-      { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600, requiresReferralCount: 7 },
-      { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, link: 'https://t.me/OrdoHereticusVPN', requiresSubscription: true },
-      { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
-      { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
-      { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
-      { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
-      { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
-      { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticusVPN', requiresPayment: true }
-    ];
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('tasks');
+    return saved ? JSON.parse(saved) : [
+      { key: 'ref1', title: '👤 Пригласи 1 друга', reward: 50, requires: 1, type: 'referral' },
+      { key: 'ref2', title: '👥 Пригласи 2 друзей', reward: 100, requires: 2, type: 'referral' },
+      { key: 'ref3', title: '👥 Пригласи 3 друзей', reward: 200, requires: 3, type: 'referral' },
+      { key: 'ref4', title: '👥 Пригласи 4 друзей', reward: 300, requires: 4, type: 'referral' },
+      { key: 'ref5', title: '👥 Пригласи 5 друзей', reward: 400, requires: 5, type: 'referral' },
+      { key: 'ref6', title: '👥 Пригласи 6 друзей', reward: 500, requires: 6, type: 'referral' },
+      { key: 'ref7', title: '👥 Пригласи 7 друзей', reward: 600, requires: 7, type: 'referral' },
+      { key: 'subtg', title: '📨 Подписаться на Telegram', reward: 100, type: 'subscription', link: 'https://t.me/OrdoHereticusVPN' },
+      { key: 'subinsta', title: '📸 Подписаться на Instagram', reward: 100, type: 'link', link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
+      { key: 'socialshare', title: '📢 Расскажи о нас в соцсетях', reward: 100, type: 'info' },
+      { key: 'comment', title: '💬 Комментировать пост', reward: 100, type: 'info' },
+      { key: 'reaction', title: '❤️ Поставить реакцию', reward: 100, type: 'info' },
+      { key: 'dailyvpn', title: '🛡 Зайти в VPN сегодня', reward: 100, type: 'daily' },
+      { key: 'activatevpn', title: '🚀 Активировать VPN', reward: 1000, type: 'payment', link: 'https://t.me/OrdoHereticusVPN' },
+    ].map(task => ({ ...task, done: false }));
+  });
 
-    return (
-      <div className="tasks-tab">
-        <h2>📋 Задания</h2>
-        {tasks.map(task => (
-          <div key={task.key} className="task-card">
-            <span>
-              {task.link ? (
-                <a href={task.link} target="_blank" rel="noopener noreferrer">{task.label}</a>
-              ) : (
-                task.label
-              )} — 🪙 {task.reward} монет {task.requiresPayment && ' + x2 кликов'}
-            </span>
-            {completedTasks[task.key] ? (
-              <span className="done">✅</span>
-            ) : (
-              <button
-                onClick={() =>
-                  handleComplete(task.key, task.reward, {
-                    requiresSubscription: task.requiresSubscription,
-                    requiresReferralCount: task.requiresReferralCount,
-                    requiresPayment: task.requiresPayment
-                  })
-                }
-              >
-                Выполнить
-              </button>
-            )}
-          </div>
-        ))}
-        <div className="task-card disabled-task">
-          <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
-        </div>
-      </div>
-    );
+  const [referrals, setReferrals] = useState(0);
+  const [userId, setUserId] = useState(localStorage.getItem('user_id') || null);
+  const [subscribed, setSubscribed] = useState(false);
+  const [vpnActivated, setVpnActivated] = useState(false);
+
+  useEffect(() => {
+    const tgId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (tgId) {
+      setUserId(tgId);
+      fetch(`/api/check-referrals?user_id=${tgId}`).then(res => res.json()).then(data => setReferrals(data.referrals || 0));
+      fetch(`/api/check-subscription?user_id=${tgId}`).then(res => res.json()).then(data => setSubscribed(data.subscribed));
+      fetch(`/api/check-payment?user_id=${tgId}`).then(res => res.json()).then(data => setVpnActivated(data.success));
+    }
+  }, []);
+
+  const completeTask = (task) => {
+    if (task.done) return;
+    if (task.type === 'referral' && referrals < task.requires) {
+      alert(`Пригласи ${task.requires} друзей`);
+      return;
+    }
+    if (task.type === 'subscription' && !subscribed) {
+      alert('Подпишись на канал');
+      return;
+    }
+    if (task.type === 'payment' && !vpnActivated) {
+      alert('Активируй VPN через Telegram-бота');
+      return;
+    }
+
+    const updated = tasks.map(t => t.key === task.key ? { ...t, done: true } : t);
+    setTasks(updated);
+    localStorage.setItem('tasks', JSON.stringify(updated));
+    setCoins(prev => prev + task.reward);
   };
 
+  const handleClick = (task) => {
+    if (task.type === 'referral') {
+      const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+      navigator.clipboard.writeText(link);
+      alert(`Ссылка скопирована:\n${link}`);
+    } else if (task.link) {
+      window.open(task.link, '_blank');
+    }
+  };
+   
+  return (
+    <div className="tasks-tab">
+      <h2>📋 Задания</h2>
+      {tasks.map(task => (
+        <div
+          key={task.key}
+          className={`task-card ${task.done ? 'completed' : ''}`}
+          onClick={() => handleClick(task)}
+        >
+          <span>
+            {task.title}
+            {task.type === 'referral' && (
+              <span style={{ fontSize: '14px', color: '#888' }}>
+                {Math.min(referrals, task.requires)}/{task.requires}
+              </span>
+            )}
+          </span>
+          {task.done ? (
+            <span className="done">✅</span>
+          ) : (
+            <button onClick={(e) => { e.stopPropagation(); completeTask(task); }}>
+              🎁 Получить {task.reward} монет
+            </button>
+          )}
+        </div>
+      ))}
+
+      <div className="task-card disabled-task">
+        <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
+      </div>
+    </div>
+  );
+};
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
