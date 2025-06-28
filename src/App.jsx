@@ -41,6 +41,35 @@ useEffect(() => {
       .then(data => setVpnActivated(data.success));
   }
 }, []);
+  const handleClick = (task) => {
+    if (task.requiresReferralCount) {
+      const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+      if (referrals < task.requiresReferralCount) {
+        navigator.clipboard.writeText(link);
+        alert(`Ты пригласил ${referrals}/${task.requiresReferralCount}. Реф. ссылка скопирована:\n${link}`);
+        return;
+      }
+    }
+
+    if (task.requiresSubscription && !hasSubscription) {
+      if (task.link) window.open(task.link, '_blank');
+      alert('Подпишись на канал для получения награды!');
+      return;
+    }
+
+    if (task.requiresPayment && !hasPayment) {
+      if (task.link) window.open(task.link, '_blank');
+      alert('Активируй VPN через бота для получения награды!');
+      return;
+    }
+
+    if (!task.done) {
+      const updated = tasks.map(t => t.id === task.id ? { ...t, done: true } : t);
+      setTasks(updated);
+      localStorage.setItem('tasks', JSON.stringify(updated));
+      setCoins(prev => prev + task.reward);
+    }
+  };
   
   const [isWithdrawApproved, setIsWithdrawApproved] = useState(() =>
     localStorage.getItem('isWithdrawApproved') === 'true'
