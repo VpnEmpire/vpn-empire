@@ -209,8 +209,6 @@ const playClickSound = () => {
         const done = completedTasks.includes(task.key);
         const showProgress = task.requiresReferralCount;
         const progress = showProgress ? `${Math.min(referrals, task.requiresReferralCount)}/${task.requiresReferralCount}` : '';
-
-        return (
           <div
             key={task.key}
             className={`task-card ${done ? 'completed' : ''}`}
@@ -234,7 +232,6 @@ const playClickSound = () => {
   );
 };
 
- 
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
