@@ -73,21 +73,29 @@ const TasksTab = ({ coins, setCoins }) => {
   };
 
   const completeTask = (task) => {
-    if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
-      alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
-      return;
-    }
+  if (completedTasks[task.key]) return;
 
-    if (task.requiresSubscription && !subscribed) {
-      alert('Подпишись на Telegram-канал');
-      return;
-    }
+  if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
+    alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
+    return;
+  }
 
-    if (task.requiresPayment && !vpnActivated) {
-      alert('Активируй VPN через Telegram-бота');
-      return;
-    }
-  setCompletedTasks(prev => ({ ...prev, [task.key]: true }));
+  if (task.requiresSubscription && !subscribed) {
+    alert('Подпишись на Telegram-канал');
+    return;
+  }
+
+  if (task.requiresPayment && !vpnActivated) {
+    alert('Активируй VPN через Telegram-бота');
+    return;
+  }
+
+  // ✅ Отмечаем задание как выполненное
+  const updatedCompleted = { ...completedTasks, [task.key]: true };
+  setCompletedTasks(updatedCompleted);
+  localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
+
+  // ✅ Начисляем монеты
   setCoins(prev => prev + task.reward);
 };
     const updated = tasks.map(t => t.id === task.id ? { ...t, done: true } : t);
