@@ -103,27 +103,32 @@ const TasksTab = ({ coins, setCoins }) => {
     }
   };
 
-  return (
+   return (
     <div className="tasks-tab">
       <h2>📋 Задания</h2>
       {tasks.map(task => (
         <div
-          key={task.key}
-          className={`task-card ${completedTasks[task.key] ? 'completed' : ''}`}
+          key={task.id}
+          className={`task-card ${task.done ? 'completed' : ''}`}
           onClick={() => handleTaskClick(task)}
         >
-          <h3>{task.label}</h3>
-          {task.requiresReferralCount && (
+          <h3>{task.title}</h3>
+          {task.type === 'referral' && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount} друзей</p>
           )}
           <p>🪙 Награда: {task.reward} монет</p>
-          {completedTasks[task.key] ? (
+          {task.done ? (
             <span className="done">✅ Выполнено</span>
           ) : (
             <button onClick={(e) => { e.stopPropagation(); completeTask(task); }}>Выполнить</button>
           )}
         </div>
       ))}
+{task.requiresReferralCount && (
+  <div className="task-progress">
+    Приглашено: {referrals}/{task.requiresReferralCount}
+  </div>
+)}
       <div className="task-card disabled-task">
         <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
       </div>
