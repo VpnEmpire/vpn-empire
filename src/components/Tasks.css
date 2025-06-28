@@ -72,6 +72,18 @@
   font-size: 22px;
 }
 
+.task-card.completed {
+  background: #e0fbe6;
+  border-color: #b2dfdb;
+  opacity: 0.85;
+}
+
+.task-progress {
+  font-size: 14px;
+  color: #888;
+  margin-top: 4px;
+}
+
 .disabled-task {
   background: #eeeeee;
   border: 2px dashed #ccc;
