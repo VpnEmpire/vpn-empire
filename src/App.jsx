@@ -63,6 +63,32 @@ function App() {
     }
   }, []);
  
+ const renderTasks = () => {
+  const userId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  const [referrals, setReferrals] = useState(0);
+  const [subscribed, setSubscribed] = useState(false);
+  const [vpnActivated, setVpnActivated] = useState(false);
+  const [completedTasks, setCompletedTasks] = useState(() => {
+    const saved = localStorage.getItem('completedTasks');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    if (userId) {
+      fetch(`/api/check-referrals?user_id=${userId}`)
+        .then(res => res.json())
+        .then(data => setReferrals(data.referrals || 0));
+
+      fetch(`/api/check-subscription?user_id=${userId}`)
+        .then(res => res.json())
+        .then(data => setSubscribed(data.subscribed));
+
+      fetch(`/api/check-payment?user_id=${userId}`)
+        .then(res => res.json())
+        .then(data => setVpnActivated(data.success));
+    }
+  }, [userId]);
+  
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
@@ -99,45 +125,40 @@ const playClickSound = () => {
     setTimeout(() => document.body.removeChild(flash), 300);
   };
  
-  const handleComplete = async (key, reward, options = {}) => {
-    if (completedTasks[key]) return;
- 
-    if (!userId) {
-      alert("Ошибка: не удалось получить user_id из Telegram.");
+  const handleComplete = (task) => {
+    if (completedTasks.includes(task.key)) return;
+
+    if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
+      alert(`Нужно пригласить ${task.requiresReferralCount} друзей`);
       return;
     }
- 
-    if (options.requiresReferralCount !== undefined) {
-      const res = await fetch(`/api/check-referrals?user_id=${userId}`);
-      const data = await res.json();
-      if (!data || data.referrals < options.requiresReferralCount) {
-        alert(`Пригласи как минимум ${options.requiresReferralCount} друзей для выполнения этого задания`);
-        return;
-      }
+
+    if (task.requiresSubscription && !subscribed) {
+      alert('Сначала подпишись на Telegram-канал');
+      return;
     }
- 
-    if (options.requiresSubscription) {
-      const res = await fetch(`/api/check-subscription?user_id=${userId}`);
-      const data = await res.json();
-      if (!data.subscribed) {
-        alert("Подпишись на канал, чтобы выполнить задание");
-        return;
-      }
+
+    if (task.requiresPayment && !vpnActivated) {
+      alert('Сначала активируй VPN через Telegram-бота');
+      return;
     }
- 
-    if (options.requiresPayment) {
-      const res = await fetch(`/api/check-payment?user_id=${userId}`);
-      const data = await res.json();
-      if (!data.success) {
-        alert("Сначала активируй VPN через Telegram-бота");
-        return;
-      }
-      localStorage.setItem('clickBoost', 'true');
-    }
- 
-    const updated = { ...completedTasks, [key]: true };
-    setCoins(prev => prev + reward);
+
+    const updated = [...completedTasks, task.key];
     setCompletedTasks(updated);
+    localStorage.setItem('completedTasks', JSON.stringify(updated));
+    setCoins(prev => prev + task.reward);
+  };
+
+  const handleTaskClick = (task) => {
+    if (task.requiresReferralCount) {
+      const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+      navigator.clipboard.writeText(link);
+      alert(`Реферальная ссылка скопирована:\n${link}`);
+    }
+
+    if (task.link) {
+      window.open(task.link, '_blank');
+    }
   };
  
   const renderTasks = () => {
