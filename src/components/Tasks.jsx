@@ -16,7 +16,7 @@ const defaultTasks = [
       { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
       { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
       { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
-      { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticusVPN', requiresPayment: true }
+      { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticus_bot', requiresPayment: true }
 ];
 
 const TasksTab = ({ coins, setCoins }) => {
