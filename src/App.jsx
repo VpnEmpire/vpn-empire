@@ -142,25 +142,26 @@ function App() {
   };
 
   const handleTaskClick = (task) => {
-    if (task.done) return;
+  if (task.done) return;
 
-    if (task.type === 'referral') {
-      const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
-      navigator.clipboard.writeText(link);
-      alert(`Твоя реферальная ссылка скопирована:\n${link}`);
+  if (task.type === 'referral') {
+    const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+    navigator.clipboard.writeText(link);
+    alert(`Твоя реферальная ссылка скопирована:\n${link}`);
+  }
+
+  if ((task.type === 'subscribe' || task.type === 'vpn') && task.link) {
+    if (window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+      window.Telegram.WebApp.openTelegramLink(task.link);
+    } else {
+      window.open(task.link, '_blank'); // fallback на случай, если WebApp не доступен
     }
 
-    if (task.type === 'subscribe' || task.type === 'vpn') {
-      if (task.link) {
-        window.open(task.link, '_blank');
-        setTimeout(() => {
-        if (task.type === 'subscribe') {
-          alert('Подпишись на Telegram-канал, чтобы получить награду');
-        }
-        if (task.type === 'vpn') {
-          alert('Активируй VPN через Telegram-бота');
-        }
-      }, 300); 
+    if (task.type === 'subscribe') {
+      alert('Подпишись на Telegram-канал, чтобы получить награду');
+    }
+    if (task.type === 'vpn') {
+      alert('Активируй VPN через Telegram-бота');
     }
   }
 };
