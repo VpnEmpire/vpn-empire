@@ -65,7 +65,7 @@ const TasksTab = ({ coins, setCoins }) => {
     }
   }, []);
 
-const completeTask = async (task) => {
+  const completeTask = async (task) => {
     if (completedTasks[task.key]) return;
 
     if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
@@ -97,87 +97,57 @@ const completeTask = async (task) => {
     setTasks(updated);
     localStorage.setItem('tasks', JSON.stringify(updated));
   };
-    
- const isCompleted = (task) => {
-    if (task.type === 'referral') return referrals >= task.count;
-    if (task.type === 'subscribe') return subscribed;
-    if (task.type === 'vpn') return vpnActivated;
-    return false;
-  };
-  
-  const updatedCompleted = { ...completedTasks, [task.key]: true };
-setCompletedTasks(updatedCompleted);
-localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
-setCoins(prev => prev + task.reward);
-  
-    const updated = tasks.map(t => t.id === task.id ? { ...t, done: true } : t);
-    setTasks(updated);
-    localStorage.setItem('tasks', JSON.stringify(updated));
-    setCoins(prev => prev + task.reward);
-  };
-  
- const handleTaskClick = (task) => {
-  if (task.done) return;
 
-  console.log('Нажали на задание:', task);
+  const handleTaskClick = (task) => {
+    if (task.done) return;
 
-  if (task.type === 'referral') {
-    const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
-    navigator.clipboard.writeText(link);
-    alert(`Твоя реферальная ссылка скопирована:\n${link}`);
-  }
+    if (task.type === 'referral') {
+      const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+      navigator.clipboard.writeText(link);
+      alert(`Твоя реферальная ссылка скопирована:\n${link}`);
+    }
 
-  if ((task.type === 'subscribe' || task.type === 'vpn') && task.link) {
-    console.log('Открываем ссылку:', task.link);
-
-    try {
-      if (window?.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-        console.log('Ссылка открыта через openTelegramLink');
-      } else {
-        window.open(task.link, '_blank');
-        console.log('Ссылка открыта через window.open');
+    if ((task.type === 'subscribe' || task.type === 'vpn') && task.link) {
+      try {
+        if (window?.Telegram?.WebApp?.openTelegramLink) {
+          window.Telegram.WebApp.openTelegramLink(task.link);
+        } else {
+          window.open(task.link, '_blank');
+        }
+      } catch (error) {
+        alert('Не удалось открыть ссылку. Попробуй позже.');
       }
-    } catch (error) {
-      console.error('Ошибка при открытии ссылки:', error);
-      alert('Не удалось открыть ссылку. Попробуй позже.');
-    }
 
-    if (task.type === 'subscribe') {
-      alert('Подпишись на канал, чтобы получить награду');
+      if (task.type === 'subscribe') {
+        alert('Подпишись на канал, чтобы получить награду');
+      }
+      if (task.type === 'vpn') {
+        alert('Активируй VPN через Telegram-бота');
+      }
     }
-    if (task.type === 'vpn') {
-      alert('Активируй VPN через Telegram-бота');
-    }
-  }
-};
-  
-   return (
+  };
+
+  return (
     <div className="tasks-tab">
       <h2>📋 Задания</h2>
       {tasks.map(task => (
         <div
-          key={task.id}
-          className={`task-card ${task.done ? 'completed' : ''}`}
+          key={task.key}
+          className={`task-card ${completedTasks[task.key] ? 'completed' : ''}`}
           onClick={() => handleTaskClick(task)}
         >
-          <h3>{task.title}</h3>
-          {task.type === 'referral' && (
+          <h3>{task.label}</h3>
+          {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount} друзей</p>
           )}
           <p>🪙 Награда: {task.reward} монет</p>
-          {task.done ? (
+          {completedTasks[task.key] ? (
             <span className="done">✅ Выполнено</span>
           ) : (
             <button onClick={(e) => { e.stopPropagation(); completeTask(task); }}>Выполнить</button>
           )}
         </div>
       ))}
-{task.requiresReferralCount && (
-  <div className="task-progress">
-    Приглашено: {referrals}/{task.requiresReferralCount}
-  </div>
-)}
       <div className="task-card disabled-task">
         <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
       </div>
@@ -186,3 +156,4 @@ setCoins(prev => prev + task.reward);
 };
 
 export default TasksTab;
+
