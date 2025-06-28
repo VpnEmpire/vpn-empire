@@ -175,6 +175,24 @@ const playClickSound = () => {
     setCoins(prev => prev + reward);
     setCompletedTasks(updated);
   };
+  
+ const renderTasks = () => {
+    const tasks = [
+      { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
+      { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
+      { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200, requiresReferralCount: 3 },
+      { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300, requiresReferralCount: 4 },
+      { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400, requiresReferralCount: 5 },
+      { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500, requiresReferralCount: 6 },
+      { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600, requiresReferralCount: 7 },
+      { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, link: 'https://t.me/OrdoHereticusVPN', requiresSubscription: true },
+      { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
+      { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
+      { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
+      { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
+      { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
+      { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticusVPN', requiresPayment: true }
+    ];
 
     return (
       <div className="tasks-tab">
@@ -300,14 +318,6 @@ const playClickSound = () => {
     }
   };
   
-const renderTasks = () => {
-  return (
-    <TasksTab
-      coins={coins}
-      setCoins={setCoins}
-    />
-  );
-
   return (
     <div className="App">
       {renderTab()}
