@@ -58,23 +58,33 @@ function App() {
   }, []);
 
   useEffect(() => {
-  if (window.Telegram && window.Telegram.WebApp) {
-    try {
-      window.Telegram.WebApp.ready(); // ⬅️ обязательно!
-      const user = window.Telegram.WebApp.initDataUnsafe?.user;
-      if (user?.id) {
-        setUserId(user.id);
-        localStorage.setItem('user_id', user.id);
-      } else {
-        alert('Ошибка: не удалось получить user_id из Telegram.');
+  const initTelegram = () => {
+    if (window.Telegram?.WebApp) {
+      try {
+        window.Telegram.WebApp.ready();
+        const user = window.Telegram.WebApp.initDataUnsafe?.user;
+        if (user?.id) {
+          setUserId(user.id);
+          localStorage.setItem('user_id', user.id);
+        } else {
+          alert('❌ Ошибка: user_id не получен.');
+        }
+      } catch (e) {
+        console.error("Ошибка Telegram WebApp:", e);
+        alert('❌ Telegram WebApp API не работает.');
       }
-    } catch (e) {
-      console.error("Ошибка инициализации Telegram WebApp:", e);
-      alert('Ошибка: Telegram WebApp API не доступен.');
+    } else {
+      alert('❌ Пожалуйста, открой мини-приложение через Telegram.');
     }
+  };
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initTelegram();
   } else {
-    alert('Пожалуйста, откройте мини-приложение через Telegram.');
+    window.addEventListener('DOMContentLoaded', initTelegram);
   }
+
+  return () => window.removeEventListener('DOMContentLoaded', initTelegram);
 }, []);
 
   const updateRank = (totalCoins) => {
