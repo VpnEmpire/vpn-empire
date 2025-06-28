@@ -13,13 +13,11 @@ function App() {
   const [rank, setRank] = useState('');
   const [clicksToday, setClicksToday] = useState(() => Number(localStorage.getItem('clicksToday')) || 0);
   const [hasSubscription, setHasSubscription] = useState(() => localStorage.getItem('hasSubscription') === 'true');
-
   const [flashes, setFlashes] = useState([]);
   const [userId, setUserId] = useState(null);
   const [referrals, setReferrals] = useState(0);
   const [vpnActivated, setVpnActivated] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
-  
   const [isWithdrawApproved, setIsWithdrawApproved] = useState(() =>
     localStorage.getItem('isWithdrawApproved') === 'true'
   );
