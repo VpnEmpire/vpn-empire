@@ -16,61 +16,6 @@ function App() {
 
   const [flashes, setFlashes] = useState([]);
   const [userId, setUserId] = useState(null);
-const [referrals, setReferrals] = useState(0);
-const [subscribed, setSubscribed] = useState(false);
-const [vpnActivated, setVpnActivated] = useState(false);
-const [completedTasks, setCompletedTasks] = useState(() => {
-  return JSON.parse(localStorage.getItem('completedTasks') || '[]');
-});
-
-useEffect(() => {
-  const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-  if (tgUserId) {
-    setUserId(tgUserId);
-
-    fetch(`/api/check-referrals?user_id=${tgUserId}`)
-      .then(res => res.json())
-      .then(data => setReferrals(data.referrals || 0));
-
-    fetch(`/api/check-subscription?user_id=${tgUserId}`)
-      .then(res => res.json())
-      .then(data => setSubscribed(data.subscribed));
-
-    fetch(`/api/check-payment?user_id=${tgUserId}`)
-      .then(res => res.json())
-      .then(data => setVpnActivated(data.success));
-  }
-}, []);
-  const handleClick = (task) => {
-    if (task.requiresReferralCount) {
-      const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
-      if (referrals < task.requiresReferralCount) {
-        navigator.clipboard.writeText(link);
-        alert(`Ты пригласил ${referrals}/${task.requiresReferralCount}. Реф. ссылка скопирована:\n${link}`);
-        return;
-      }
-    }
-
-    if (task.requiresSubscription && !hasSubscription) {
-      if (task.link) window.open(task.link, '_blank');
-      alert('Подпишись на канал для получения награды!');
-      return;
-    }
-
-    if (task.requiresPayment && !hasPayment) {
-      if (task.link) window.open(task.link, '_blank');
-      alert('Активируй VPN через бота для получения награды!');
-      return;
-    }
-
-    if (!task.done) {
-      const updated = tasks.map(t => t.id === task.id ? { ...t, done: true } : t);
-      setTasks(updated);
-      localStorage.setItem('tasks', JSON.stringify(updated));
-      setCoins(prev => prev + task.reward);
-    }
-  };
-  
   const [isWithdrawApproved, setIsWithdrawApproved] = useState(() =>
     localStorage.getItem('isWithdrawApproved') === 'true'
   );
