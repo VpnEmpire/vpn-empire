@@ -19,7 +19,7 @@ function App() {
  const [referrals, setReferrals] = useState(0);
   const [vpnActivated, setVpnActivated] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
-}
+
   useEffect(() => {
     const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
     if (tgUserId) {
@@ -39,10 +39,8 @@ function App() {
     }
   }, []);
   
-  const [isWithdrawApproved, setIsWithdrawApproved] = useState(() =>
-    localStorage.getItem('isWithdrawApproved') === 'true'
-  );
- 
+  const [isWithdrawApproved, setIsWithdrawApproved] = useState(() => localStorage.getItem('isWithdrawApproved') === 'true');
+
   const maxClicksPerDay = 100;
   const spinSoundRef = useRef(null);
   const winSoundRef = useRef(null);
@@ -98,7 +96,7 @@ const playClickSound = () => {
   const audio = new Audio('/click.mp3');
   audio.play().catch((e) => console.log('Ошибка воспроизведения звука:', e));
 };
- 
+
   const handleClick = (e) => {
   if (clicksToday < maxClicksPerDay) {
     const multiplier = Number(localStorage.getItem('clickMultiplier')) || 1;
@@ -106,22 +104,21 @@ const playClickSound = () => {
     setClicksToday(prev => prev + 1);
     triggerAnimation();
     playClickSound();
- 
+  };
     const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
     setFlashes(prev => [...prev, flash]);
     setTimeout(() => {
       setFlashes(prev => prev.filter(f => f.id !== flash.id));
     }, 400);
-  }
-};
- 
+  };
+
   const triggerAnimation = () => {
     const flash = document.createElement('div');
     flash.className = 'flash';
     document.body.appendChild(flash);
     setTimeout(() => document.body.removeChild(flash), 300);
   };
- 
+
   const handleComplete = async (key, reward, options = {}) => {
     if (completedTasks[key]) return;
  
@@ -129,7 +126,7 @@ const playClickSound = () => {
       alert("Ошибка: не удалось получить user_id из Telegram.");
       return;
     }
- 
+  
     if (options.requiresReferralCount !== undefined) {
       const res = await fetch(`/api/check-referrals?user_id=${userId}`);
       const data = await res.json();
@@ -138,7 +135,7 @@ const playClickSound = () => {
         return;
       }
     }
- 
+  
     if (options.requiresSubscription) {
       const res = await fetch(`/api/check-subscription?user_id=${userId}`);
       const data = await res.json();
@@ -170,23 +167,23 @@ const playClickSound = () => {
       alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
       return;
     }
-
+  
     if (task.requiresSubscription && !subscribed) {
       alert('Подпишись на Telegram-канал');
       return;
     }
-
+  
     if (task.requiresPayment && !vpnActivated) {
       alert('Активируй VPN через Telegram-бота');
       return;
     }
-
-    const updated = tasks.map(t => t.id === task.id ? { ...t, done: true } : t);
+  }
+    const updated = tasks.map(t => {t.id === task.id ? { ...t, done: true } : t);
     setTasks(updated);
     localStorage.setItem('tasks', JSON.stringify(updated));
     setCoins(prev => prev + task.reward);
   };
-  
+
  const handleTaskClick = (task) => {
     if (isCompleted(task)) return;
 
@@ -200,7 +197,7 @@ const playClickSound = () => {
       if (task.link) window.open(task.link, '_blank');
     }
   };
- 
+
   const renderTasks = () => {
     const tasks = [
       { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
@@ -218,7 +215,7 @@ const playClickSound = () => {
       { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
       { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticusVPN', requiresPayment: true }
     ];
- 
+  
       return (
     <div className="tasks-tab">
       <h2>📋 Задания</h2>
@@ -251,7 +248,7 @@ const playClickSound = () => {
     </div>
   );
 };
- 
+
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
@@ -271,9 +268,9 @@ const playClickSound = () => {
       ))}
     </div>
   );
- 
+
   const renderRoulette = () => (
- 
+   
     <div className="roulette-container">
       <h2>🎰 Рулетка</h2>
       <div className="wheel" onClick={spin}>
@@ -288,7 +285,7 @@ const playClickSound = () => {
   const renderTop = () => (
     <TopTab coins={coins} />
   );
- 
+
   const renderWithdraw = () => (
     <div className="withdraw-tab">
       <h2>💸 Вывод</h2>
@@ -346,5 +343,5 @@ const playClickSound = () => {
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
- 
+}
 export default App;
