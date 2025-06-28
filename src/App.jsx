@@ -178,7 +178,7 @@ const playClickSound = () => {
       { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
       { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticusVPN', requiresPayment: true }
     ];
- 
+  }
     return (
       <div className="tasks-tab">
         <h2>📋 Задания</h2>
