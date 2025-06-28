@@ -309,8 +309,7 @@ const playClickSound = () => {
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
-}
- 
+} 
 export default App;
  
 
