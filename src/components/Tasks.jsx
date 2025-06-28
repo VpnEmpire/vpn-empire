@@ -3,20 +3,20 @@ import React, { useEffect, useState } from 'react';
 import './Tasks.css';
 
 const defaultTasks = [
-  { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
-      { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
-      { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200, requiresReferralCount: 3 },
-      { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300, requiresReferralCount: 4 },
-      { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400, requiresReferralCount: 5 },
-      { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500, requiresReferralCount: 6 },
-      { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600, requiresReferralCount: 7 },
-      { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, link: 'https://t.me/OrdoHereticusVPN', requiresSubscription: true },
-      { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
-      { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
-      { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
-      { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
-      { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
-      { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticus_bot', requiresPayment: true }
+  { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1, type: 'referral' },
+  { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2, type: 'referral' },
+  { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200, requiresReferralCount: 3, type: 'referral' },
+  { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300, requiresReferralCount: 4, type: 'referral' },
+  { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400, requiresReferralCount: 5, type: 'referral' },
+  { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500, requiresReferralCount: 6, type: 'referral' },
+  { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600, requiresReferralCount: 7, type: 'referral' },
+  { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, link: 'https://t.me/OrdoHereticusVPN', requiresSubscription: true, type: 'subscribe' },
+  { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==', type: 'subscribe' },
+  { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
+  { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
+  { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
+  { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
+  { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticus_bot', requiresPayment: true, type: 'vpn' }
 ];
 
 const TasksTab = ({ coins, setCoins }) => {
@@ -29,6 +29,9 @@ const TasksTab = ({ coins, setCoins }) => {
   const [referrals, setReferrals] = useState(0);
   const [vpnActivated, setVpnActivated] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
+  const [completedTasks, setCompletedTasks] = useState(() => {
+    return JSON.parse(localStorage.getItem('completedTasks')) || {};
+  });
 
   useEffect(() => {
     const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
@@ -48,62 +51,59 @@ const TasksTab = ({ coins, setCoins }) => {
         .then(data => setVpnActivated(data.success));
     }
   }, []);
-  
+
   useEffect(() => {
-  const today = new Date().toDateString();
-  const lastDate = localStorage.getItem('dailyTaskDate');
+    const today = new Date().toDateString();
+    const lastDate = localStorage.getItem('dailyTaskDate');
 
-  if (lastDate !== today) {
-    const storedTasks = JSON.parse(localStorage.getItem('completedTasks')) || {};
+    if (lastDate !== today) {
+      const storedTasks = JSON.parse(localStorage.getItem('completedTasks')) || {};
+      delete storedTasks['dailyVpn'];
+      localStorage.setItem('completedTasks', JSON.stringify(storedTasks));
+      localStorage.setItem('dailyTaskDate', today);
+      setCompletedTasks(storedTasks);
+    }
+  }, []);
 
-    // Удаляем только dailyVpn
-    delete storedTasks['dailyVpn'];
+const completeTask = async (task) => {
+    if (completedTasks[task.key]) return;
 
-    localStorage.setItem('completedTasks', JSON.stringify(storedTasks));
-    localStorage.setItem('dailyTaskDate', today);
-    setCompletedTasks(storedTasks);
-  }
-}, []);
-  
+    if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
+      alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
+      return;
+    }
+
+    if (task.requiresSubscription && !subscribed) {
+      alert('Подпишись на Telegram-канал');
+      return;
+    }
+
+    if (task.requiresPayment) {
+      const res = await fetch(`/api/check-payment?user_id=${userId}`);
+      const data = await res.json();
+      if (!data.success) {
+        alert("Сначала активируй VPN через Telegram-бота");
+        return;
+      }
+      setVpnActivated(true);
+    }
+
+    const updatedCompleted = { ...completedTasks, [task.key]: true };
+    setCompletedTasks(updatedCompleted);
+    localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
+    setCoins(prev => prev + task.reward);
+
+    const updated = tasks.map(t => t.key === task.key ? { ...t, done: true } : t);
+    setTasks(updated);
+    localStorage.setItem('tasks', JSON.stringify(updated));
+  };
+    
  const isCompleted = (task) => {
     if (task.type === 'referral') return referrals >= task.count;
     if (task.type === 'subscribe') return subscribed;
     if (task.type === 'vpn') return vpnActivated;
     return false;
   };
-
-  const completeTask = async (task) => {
-  if (completedTasks[task.key]) return;
-
-  if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
-    alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
-    return;
-  }
-
-  if (task.requiresSubscription && !subscribed) {
-    alert('Подпишись на Telegram-канал');
-    return;
-  }
-
- if (task.requiresPayment) {
-  const res = await fetch(`/api/check-payment?user_id=${userId}`);
-  const data = await res.json();
-  if (!data.success) {
-    alert("Сначала активируй VPN через Telegram-бота");
-    return;
-  }
-  // ✅ Сохраняем, что VPN активирован
-  setVpnActivated(true);
-}
-
-  // ✅ Отмечаем задание как выполненное
-  const updatedCompleted = { ...completedTasks, [task.key]: true };
-  setCompletedTasks(updatedCompleted);
-  localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
-
-  // ✅ Начисляем монеты
-  setCoins(prev => prev + task.reward);
-};
   
   const updatedCompleted = { ...completedTasks, [task.key]: true };
 setCompletedTasks(updatedCompleted);
