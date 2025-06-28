@@ -151,9 +151,19 @@ function App() {
     }
 
     if (task.type === 'subscribe' || task.type === 'vpn') {
-      if (task.link) window.open(task.link, '_blank');
+      if (task.link) {
+        window.open(task.link, '_blank');
+        setTimeout(() => {
+        if (task.type === 'subscribe') {
+          alert('Подпишись на Telegram-канал, чтобы получить награду');
+        }
+        if (task.type === 'vpn') {
+          alert('Активируй VPN через Telegram-бота');
+        }
+      }, 300); 
     }
-  };
+  }
+};
 
   const renderTasks = () => (
     <div className="tasks-tab">
