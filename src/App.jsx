@@ -16,9 +16,7 @@ function App() {
 
   const [flashes, setFlashes] = useState([]);
   const [userId, setUserId] = useState(null);
-  const [referrals, setReferrals] = useState(0);
-  const [vpnActivated, setVpnActivated] = useState(false);
-  const [subscribed, setSubscribed] = useState(false);
+  
   const [isWithdrawApproved, setIsWithdrawApproved] = useState(() =>
     localStorage.getItem('isWithdrawApproved') === 'true'
   );
