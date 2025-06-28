@@ -119,7 +119,8 @@ function App() {
     setTimeout(() => document.body.removeChild(flash), 300);
   };
 
-  const completeTask = (task) => {
+  const completeTask = async (task) => {
+  if (task.done) return;
   if (completedTasks[task.key]) return;
 
   if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
@@ -135,13 +136,15 @@ function App() {
  if (task.requiresPayment) {
   const res = await fetch(`/api/check-payment?user_id=${userId}`);
   const data = await res.json();
-  if (!data.success) {
-    alert("Сначала активируй VPN через Telegram-бота");
-    return;
-  }
-  // ✅ Сохраняем, что VPN активирован
-  setVpnActivated(true);
-}
+  if (task.requiresPayment) {
+    const res = await fetch(`/api/check-payment?user_id=${userId}`);
+    const data = await res.json();
+    if (!data.success) {
+      alert("Сначала активируй VPN через Telegram-бота");
+      return;
+    }
+    setVpnActivated(true);
+  }}
 
   // ✅ Отмечаем задание как выполненное
   const updatedCompleted = { ...completedTasks, [task.key]: true };
