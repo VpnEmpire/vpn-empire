@@ -181,41 +181,38 @@ const playClickSound = () => {
       { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticusVPN', requiresPayment: true }
     ];
  
-    return (
-      <div className="tasks-tab">
-        <h2>📋 Задания</h2>
-        {tasks.map(task => (
-          <div key={task.key} className="task-card">
-            <span>
-              {task.link ? (
-                <a href={task.link} target="_blank" rel="noopener noreferrer">{task.label}</a>
-              ) : (
-                task.label
-              )} — 🪙 {task.reward} монет {task.requiresPayment && ' + x2 кликов'}
-            </span>
-            {completedTasks[task.key] ? (
-              <span className="done">✅</span>
-            ) : (
-              <button
-                onClick={() =>
-                  handleComplete(task.key, task.reward, {
-                    requiresSubscription: task.requiresSubscription,
-                    requiresReferralCount: task.requiresReferralCount,
-                    requiresPayment: task.requiresPayment
-                  })
-                }
-              >
-                Выполнить
-              </button>
-            )}
-          </div>
-        ))}
-        <div className="task-card disabled-task">
-          <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
+      return (
+    <div className="tasks-tab">
+      <h2>📋 Задания</h2>
+      {tasks.map(task => (
+        <div
+          key={task.id}
+          className={`task-card ${task.done ? 'completed' : ''}`}
+          onClick={() => handleTaskClick(task)}
+        >
+          <h3>{task.title}</h3>
+          {task.type === 'referral' && (
+            <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount} друзей</p>
+          )}
+          <p>🪙 Награда: {task.reward} монет</p>
+          {task.done ? (
+            <span className="done">✅ Выполнено</span>
+          ) : (
+            <button onClick={(e) => { e.stopPropagation(); completeTask(task); }}>Выполнить</button>
+          )}
         </div>
+      ))}
+{task.requiresReferralCount && (
+  <div className="task-progress">
+    Приглашено: {referrals}/{task.requiresReferralCount}
+  </div>
+)}
+      <div className="task-card disabled-task">
+        <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
       </div>
-    );
-  };
+    </div>
+  );
+};
  
   const renderHome = () => (
     <div className="main-content">
