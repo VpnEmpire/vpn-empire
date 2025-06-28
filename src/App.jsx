@@ -178,7 +178,8 @@ const playClickSound = () => {
       return;
     }
   }
-    const updated = tasks.map(t => {t.id === task.id ? { ...t, done: true } : t);
+    const updated = tasks.map(t => {
+     return t.id === task.id ? { ...t, done: true } : t);
     setTasks(updated);
     localStorage.setItem('tasks', JSON.stringify(updated));
     setCoins(prev => prev + task.reward);
