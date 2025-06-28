@@ -48,6 +48,13 @@ const TasksTab = ({ coins, setCoins }) => {
         .then(data => setVpnActivated(data.success));
     }
   }, []);
+  
+ const isCompleted = (task) => {
+    if (task.type === 'referral') return referrals >= task.count;
+    if (task.type === 'subscribe') return subscribed;
+    if (task.type === 'vpn') return vpnActivated;
+    return false;
+  };
 
   const completeTask = (task) => {
     if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
@@ -70,23 +77,39 @@ const TasksTab = ({ coins, setCoins }) => {
     localStorage.setItem('tasks', JSON.stringify(updated));
     setCoins(prev => prev + task.reward);
   };
+  
+ const handleTaskClick = (task) => {
+    if (isCompleted(task)) return;
 
-  return (
+    if (task.type === 'referral') {
+      const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+      navigator.clipboard.writeText(link);
+      alert(`Твоя реферальная ссылка скопирована:\n${link}`);
+    }
+
+    if (task.type === 'subscribe' || task.type === 'vpn') {
+      if (task.link) window.open(task.link, '_blank');
+    }
+  };
+  
+   return (
     <div className="tasks-tab">
       <h2>📋 Задания</h2>
       {tasks.map(task => (
-        <div key={task.id} className={`task-card ${task.done ? 'done-task' : ''}`}>
-          <span>
-            {task.link ? (
-              <a href={task.link} target="_blank" rel="noopener noreferrer">{task.title}</a>
-            ) : (
-              task.title
-            )} — 🪙 {task.reward} монет {task.requiresPayment ? ' + x2 кликов' : ''}
-          </span>
+        <div
+          key={task.id}
+          className={`task-card ${task.done ? 'completed' : ''}`}
+          onClick={() => handleTaskClick(task)}
+        >
+          <h3>{task.title}</h3>
+          {task.type === 'referral' && (
+            <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount} друзей</p>
+          )}
+          <p>🪙 Награда: {task.reward} монет</p>
           {task.done ? (
-            <span className="done">✅</span>
+            <span className="done">✅ Выполнено</span>
           ) : (
-            <button onClick={() => completeTask(task)}>Выполнить</button>
+            <button onClick={(e) => { e.stopPropagation(); completeTask(task); }}>Выполнить</button>
           )}
         </div>
       ))}
