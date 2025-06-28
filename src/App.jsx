@@ -57,34 +57,38 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-  const initTelegram = () => {
-    if (window.Telegram?.WebApp) {
-      try {
-        window.Telegram.WebApp.ready();
-        const user = window.Telegram.WebApp.initDataUnsafe?.user;
-        if (user?.id) {
-          setUserId(user.id);
-          localStorage.setItem('user_id', user.id);
-        } else {
-          alert('❌ Ошибка: user_id не получен.');
-        }
-      } catch (e) {
-        console.error("Ошибка Telegram WebApp:", e);
-        alert('❌ Telegram WebApp API не работает.');
+ useEffect(() => {
+  const init = () => {
+    try {
+      const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+      if (user?.id) {
+        setUserId(user.id);
+        localStorage.setItem('user_id', user.id);
+      } else {
+        console.error("User not found in initDataUnsafe");
+        alert('❌ Не удалось получить user_id из Telegram.');
       }
-    } else {
-      alert('❌ Пожалуйста, открой мини-приложение через Telegram.');
+    } catch (err) {
+      console.error("Telegram WebApp init error:", err);
+      alert('❌ Ошибка инициализации Telegram.');
     }
   };
 
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    initTelegram();
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.ready(); // обязательно
+    init();
   } else {
-    window.addEventListener('DOMContentLoaded', initTelegram);
+    // Ожидаем появления Telegram WebApp, если загрузился медленно
+    const interval = setInterval(() => {
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.ready();
+        init();
+        clearInterval(interval);
+      }
+    }, 200);
+    // Через 5 секунд останавливаем попытки
+    setTimeout(() => clearInterval(interval), 5000);
   }
-
-  return () => window.removeEventListener('DOMContentLoaded', initTelegram);
 }, []);
 
   const updateRank = (totalCoins) => {
