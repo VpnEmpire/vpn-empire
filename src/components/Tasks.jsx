@@ -49,6 +49,22 @@ const TasksTab = ({ coins, setCoins }) => {
     }
   }, []);
   
+  useEffect(() => {
+  const today = new Date().toDateString();
+  const lastDate = localStorage.getItem('dailyTaskDate');
+
+  if (lastDate !== today) {
+    const storedTasks = JSON.parse(localStorage.getItem('completedTasks')) || {};
+
+    // Удаляем только dailyVpn
+    delete storedTasks['dailyVpn'];
+
+    localStorage.setItem('completedTasks', JSON.stringify(storedTasks));
+    localStorage.setItem('dailyTaskDate', today);
+    setCompletedTasks(storedTasks);
+  }
+}, []);
+  
  const isCompleted = (task) => {
     if (task.type === 'referral') return referrals >= task.count;
     if (task.type === 'subscribe') return subscribed;
