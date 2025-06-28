@@ -72,7 +72,7 @@ const TasksTab = ({ coins, setCoins }) => {
     return false;
   };
 
-  const completeTask = (task) => {
+  const completeTask = async (task) => {
   if (completedTasks[task.key]) return;
 
   if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
