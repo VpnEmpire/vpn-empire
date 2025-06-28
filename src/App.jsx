@@ -310,7 +310,7 @@ const playClickSound = () => {
   const renderTab = () => {
     switch (activeTab) {
       case 'home': return renderHome();
-      case 'tasks': return renderTasks();
+      case 'tasks': return <TasksTab coins={coins} {setCoins} />;
       case 'roulette': return renderRoulette();
       case 'top': return renderTop();
       case 'withdraw': return renderWithdraw();
