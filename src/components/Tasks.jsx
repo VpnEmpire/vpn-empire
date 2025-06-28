@@ -71,7 +71,9 @@ const TasksTab = ({ coins, setCoins }) => {
       alert('Активируй VPN через Telegram-бота');
       return;
     }
-
+  setCompletedTasks(prev => ({ ...prev, [task.key]: true }));
+  setCoins(prev => prev + task.reward);
+};
     const updated = tasks.map(t => t.id === task.id ? { ...t, done: true } : t);
     setTasks(updated);
     localStorage.setItem('tasks', JSON.stringify(updated));
