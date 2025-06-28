@@ -219,34 +219,7 @@ const playClickSound = () => {
       { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
       { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticusVPN', requiresPayment: true }
     ];
- useEffect(() => {
-    if (!tasks.length) {
-      const initialized = defaultTasks.map(t => ({ ...t, done: false }));
-      setTasks(initialized);
-      localStorage.setItem('tasks', JSON.stringify(initialized));
-    }
-  }, [referrals]);
 
-  const completeTask = (task) => {
-    if (task.type === 'referral' && referrals < task.count) {
-      alert(`Пригласи хотя бы ${task.count} друзей`);
-      return;
-    }
-    if (task.type === 'subscribe' && !subscribed) {
-      alert('Подпишись на Telegram-канал');
-      return;
-    }
-    if (task.type === 'vpn' && !vpnActivated) {
-      alert('Активируй VPN в Telegram-боте');
-      return;
-    }
-
-    const updated = tasks.map(t => t.id === task.id ? { ...t, done: true } : t);
-    setTasks(updated);
-    localStorage.setItem('tasks', JSON.stringify(updated));
-    setCoins(prev => prev + task.reward);
-  };
-   
     return (
       <div className="tasks-tab">
         <h2>📋 Задания</h2>
