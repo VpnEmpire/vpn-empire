@@ -85,10 +85,16 @@ const TasksTab = ({ coins, setCoins }) => {
     return;
   }
 
-  if (task.requiresPayment && !vpnActivated) {
-    alert('Активируй VPN через Telegram-бота');
+ if (task.requiresPayment) {
+  const res = await fetch(`/api/check-payment?user_id=${userId}`);
+  const data = await res.json();
+  if (!data.success) {
+    alert("Сначала активируй VPN через Telegram-бота");
     return;
   }
+  // ✅ Сохраняем, что VPN активирован
+  setVpnActivated(true);
+}
 
   // ✅ Отмечаем задание как выполненное
   const updatedCompleted = { ...completedTasks, [task.key]: true };
@@ -98,6 +104,12 @@ const TasksTab = ({ coins, setCoins }) => {
   // ✅ Начисляем монеты
   setCoins(prev => prev + task.reward);
 };
+  
+  const updatedCompleted = { ...completedTasks, [task.key]: true };
+setCompletedTasks(updatedCompleted);
+localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
+setCoins(prev => prev + task.reward);
+  
     const updated = tasks.map(t => t.id === task.id ? { ...t, done: true } : t);
     setTasks(updated);
     localStorage.setItem('tasks', JSON.stringify(updated));
