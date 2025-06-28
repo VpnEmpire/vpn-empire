@@ -197,7 +197,6 @@ const playClickSound = () => {
   });
 
   const [referrals, setReferrals] = useState(0);
-  const [userId, setUserId] = useState(localStorage.getItem('user_id') || null);
   const [subscribed, setSubscribed] = useState(false);
   const [vpnActivated, setVpnActivated] = useState(false);
 
