@@ -113,7 +113,11 @@ const TasksTab = ({ coins, setCoins }) => {
           )}
         </div>
       ))}
-
+{task.requiresReferralCount && (
+  <div className="task-progress">
+    Приглашено: {referrals}/{task.requiresReferralCount}
+  </div>
+)}
       <div className="task-card disabled-task">
         <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
       </div>
