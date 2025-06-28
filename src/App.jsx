@@ -194,7 +194,79 @@ const playClickSound = () => {
       { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
       { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticusVPN', requiresPayment: true }
     ];
+const TasksTab = ({ coins, setCoins }) => {
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem('tasks');
+    return saved ? JSON.parse(saved) : defaultTasks.map(t => ({ ...t, done: false }));
+  });
 
+  const [userId, setUserId] = useState(null);
+  const [referrals, setReferrals] = useState(0);
+  const [vpnActivated, setVpnActivated] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+
+  useEffect(() => {
+    const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (tgUserId) {
+      setUserId(tgUserId);
+
+      fetch(`/api/check-referrals?user_id=${tgUserId}`)
+        .then(res => res.json())
+        .then(data => setReferrals(data.referrals || 0));
+
+      fetch(`/api/check-subscription?user_id=${tgUserId}`)
+        .then(res => res.json())
+        .then(data => setSubscribed(data.subscribed));
+
+      fetch(`/api/check-payment?user_id=${tgUserId}`)
+        .then(res => res.json())
+        .then(data => setVpnActivated(data.success));
+    }
+  }, []);
+  
+ const isCompleted = (task) => {
+    if (task.type === 'referral') return referrals >= task.count;
+    if (task.type === 'subscribe') return subscribed;
+    if (task.type === 'vpn') return vpnActivated;
+    return false;
+  };
+
+  const completeTask = (task) => {
+    if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
+      alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
+      return;
+    }
+
+    if (task.requiresSubscription && !subscribed) {
+      alert('Подпишись на Telegram-канал');
+      return;
+    }
+
+    if (task.requiresPayment && !vpnActivated) {
+      alert('Активируй VPN через Telegram-бота');
+      return;
+    }
+
+    const updated = tasks.map(t => t.id === task.id ? { ...t, done: true } : t);
+    setTasks(updated);
+    localStorage.setItem('tasks', JSON.stringify(updated));
+    setCoins(prev => prev + task.reward);
+  };
+  
+ const handleTaskClick = (task) => {
+    if (isCompleted(task)) return;
+
+    if (task.type === 'referral') {
+      const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+      navigator.clipboard.writeText(link);
+      alert(`Твоя реферальная ссылка скопирована:\n${link}`);
+    }
+
+    if (task.type === 'subscribe' || task.type === 'vpn') {
+      if (task.link) window.open(task.link, '_blank');
+    }
+  };
+  
     return (
       <div className="tasks-tab">
         <h2>📋 Задания</h2>
