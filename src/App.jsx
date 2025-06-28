@@ -164,7 +164,6 @@ setCoins(prev => prev + task.reward);
     setTasks(updated);
     localStorage.setItem('tasks', JSON.stringify(updated));
     setCoins(prev => prev + task.reward);
-  };
 
   const handleTaskClick = (task) => {
   if (task.done) return;
