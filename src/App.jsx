@@ -16,6 +16,29 @@ function App() {
   const [completedTasks, setCompletedTasks] = useState(() => JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [flashes, setFlashes] = useState([]);
   const [userId, setUserId] = useState(null);
+ const [referrals, setReferrals] = useState(0);
+  const [vpnActivated, setVpnActivated] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
+
+  useEffect(() => {
+    const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (tgUserId) {
+      setUserId(tgUserId);
+
+      fetch(`/api/check-referrals?user_id=${tgUserId}`)
+        .then(res => res.json())
+        .then(data => setReferrals(data.referrals || 0));
+
+      fetch(`/api/check-subscription?user_id=${tgUserId}`)
+        .then(res => res.json())
+        .then(data => setSubscribed(data.subscribed));
+
+      fetch(`/api/check-payment?user_id=${tgUserId}`)
+        .then(res => res.json())
+        .then(data => setVpnActivated(data.success));
+    }
+  }, []);
+  
   const [isWithdrawApproved, setIsWithdrawApproved] = useState(() =>
     localStorage.getItem('isWithdrawApproved') === 'true'
   );
