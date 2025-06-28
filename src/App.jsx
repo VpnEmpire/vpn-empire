@@ -71,18 +71,18 @@ function App() {
 
   useEffect(() => {
     const today = new Date().toDateString();
-    if (localStorage.getItem('lastClickDate') !== today) {
-      setClicksToday(0);
-      localStorage.setItem('lastClickDate', today);
-    }
-    if (localStorage.getItem('dailyTaskDate') !== today) {
-      setCompletedTasks({});
-      localStorage.setItem('dailyTaskDate', today);
-    }
-    if (localStorage.getItem('lastSpinDate') === today) {
-      setCanSpin(false);
-    }
-  }, []);
+    const lastDate = localStorage.getItem('dailyTaskDate');
+    if (lastDate !== today) {
+    const storedTasks = JSON.parse(localStorage.getItem('completedTasks')) || {};
+
+    // Удаляем только dailyVpn
+    delete storedTasks['dailyVpn'];
+
+    localStorage.setItem('completedTasks', JSON.stringify(storedTasks));
+    localStorage.setItem('dailyTaskDate', today);
+    setCompletedTasks(storedTasks);
+  }
+}, []);
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
@@ -120,20 +120,42 @@ function App() {
   };
 
   const completeTask = (task) => {
-    if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
-      alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
-      return;
-    }
+  if (completedTasks[task.key]) return;
 
-    if (task.requiresSubscription && !subscribed) {
-      alert('Подпишись на Telegram-канал');
-      return;
-    }
+  if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
+    alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
+    return;
+  }
 
-    if (task.requiresPayment && !vpnActivated) {
-      alert('Активируй VPN через Telegram-бота');
-      return;
-    }
+  if (task.requiresSubscription && !subscribed) {
+    alert('Подпишись на Telegram-канал');
+    return;
+  }
+
+ if (task.requiresPayment) {
+  const res = await fetch(`/api/check-payment?user_id=${userId}`);
+  const data = await res.json();
+  if (!data.success) {
+    alert("Сначала активируй VPN через Telegram-бота");
+    return;
+  }
+  // ✅ Сохраняем, что VPN активирован
+  setVpnActivated(true);
+}
+
+  // ✅ Отмечаем задание как выполненное
+  const updatedCompleted = { ...completedTasks, [task.key]: true };
+  setCompletedTasks(updatedCompleted);
+  localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
+
+  // ✅ Начисляем монеты
+  setCoins(prev => prev + task.reward);
+};
+  
+  const updatedCompleted = { ...completedTasks, [task.key]: true };
+setCompletedTasks(updatedCompleted);
+localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
+setCoins(prev => prev + task.reward);
 
     const updated = tasks.map(t => t.key === task.key ? { ...t, done: true } : t);
     setTasks(updated);
