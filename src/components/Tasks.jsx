@@ -3,20 +3,20 @@ import React, { useEffect, useState } from 'react';
 import './Tasks.css';
 
 const defaultTasks = [
-  { id: 1, title: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
-  { id: 2, title: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
-  { id: 3, title: 'Пригласи 3 друзей', reward: 200, requiresReferralCount: 3 },
-  { id: 4, title: 'Пригласи 4 друзей', reward: 300, requiresReferralCount: 4 },
-  { id: 5, title: 'Пригласи 5 друзей', reward: 400, requiresReferralCount: 5 },
-  { id: 6, title: 'Пригласи 6 друзей', reward: 500, requiresReferralCount: 6 },
-  { id: 7, title: 'Пригласи 7 друзей', reward: 600, requiresReferralCount: 7 },
-  { id: 8, title: '📨 Подписаться на Telegram', reward: 100, requiresSubscription: true, link: 'https://t.me/OrdoHereticusVPN' },
-  { id: 9, title: '📸 Подписаться на Instagram', reward: 100, link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
-  { id: 10, title: '📢 Расскажи о нас в соцсетях', reward: 100 },
-  { id: 11, title: '💬 Комментировать пост', reward: 100 },
-  { id: 12, title: '❤️ Поставить реакцию', reward: 100 },
-  { id: 13, title: '🛡 Зайти в VPN сегодня', reward: 100 },
-  { id: 14, title: '🚀 Активировать VPN', reward: 1000, requiresPayment: true, link: 'https://t.me/OrdoHereticusVPN' }
+  { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, requiresReferralCount: 1 },
+      { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, requiresReferralCount: 2 },
+      { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200, requiresReferralCount: 3 },
+      { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300, requiresReferralCount: 4 },
+      { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400, requiresReferralCount: 5 },
+      { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500, requiresReferralCount: 6 },
+      { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600, requiresReferralCount: 7 },
+      { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, link: 'https://t.me/OrdoHereticusVPN', requiresSubscription: true },
+      { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, link: 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
+      { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
+      { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
+      { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
+      { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
+      { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, link: 'https://t.me/OrdoHereticusVPN', requiresPayment: true }
 ];
 
 const TasksTab = ({ coins, setCoins }) => {
