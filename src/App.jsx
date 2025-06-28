@@ -144,6 +144,8 @@ function App() {
   const handleTaskClick = (task) => {
   if (task.done) return;
 
+  console.log('Нажали на задание:', task);
+
   if (task.type === 'referral') {
     const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
     navigator.clipboard.writeText(link);
@@ -151,20 +153,30 @@ function App() {
   }
 
   if ((task.type === 'subscribe' || task.type === 'vpn') && task.link) {
-    if (window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
-      window.Telegram.WebApp.openTelegramLink(task.link);
-    } else {
-      window.open(task.link, '_blank'); // fallback на случай, если WebApp не доступен
+    console.log('Открываем ссылку:', task.link);
+
+    try {
+      if (window?.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(task.link);
+        console.log('Ссылка открыта через openTelegramLink');
+      } else {
+        window.open(task.link, '_blank');
+        console.log('Ссылка открыта через window.open');
+      }
+    } catch (error) {
+      console.error('Ошибка при открытии ссылки:', error);
+      alert('Не удалось открыть ссылку. Попробуй позже.');
     }
 
     if (task.type === 'subscribe') {
-      alert('Подпишись на Telegram-канал, чтобы получить награду');
+      alert('Подпишись на канал, чтобы получить награду');
     }
     if (task.type === 'vpn') {
       alert('Активируй VPN через Telegram-бота');
     }
   }
 };
+
 
   const renderTasks = () => (
     <div className="tasks-tab">
