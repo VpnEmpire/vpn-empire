@@ -158,9 +158,47 @@ const playClickSound = () => {
       localStorage.setItem('clickBoost', 'true');
     }
  
-    const updated = { ...completedTasks, [key]: true };
-    setCoins(prev => prev + reward);
-    setCompletedTasks(updated);
+ const isCompleted = (task) => {
+    if (task.type === 'referral') return referrals >= task.count;
+    if (task.type === 'subscribe') return subscribed;
+    if (task.type === 'vpn') return vpnActivated;
+    return false;
+  };
+
+  const completeTask = (task) => {
+    if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
+      alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
+      return;
+    }
+
+    if (task.requiresSubscription && !subscribed) {
+      alert('Подпишись на Telegram-канал');
+      return;
+    }
+
+    if (task.requiresPayment && !vpnActivated) {
+      alert('Активируй VPN через Telegram-бота');
+      return;
+    }
+
+    const updated = tasks.map(t => t.id === task.id ? { ...t, done: true } : t);
+    setTasks(updated);
+    localStorage.setItem('tasks', JSON.stringify(updated));
+    setCoins(prev => prev + task.reward);
+  };
+  
+ const handleTaskClick = (task) => {
+    if (isCompleted(task)) return;
+
+    if (task.type === 'referral') {
+      const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+      navigator.clipboard.writeText(link);
+      alert(`Твоя реферальная ссылка скопирована:\n${link}`);
+    }
+
+    if (task.type === 'subscribe' || task.type === 'vpn') {
+      if (task.link) window.open(task.link, '_blank');
+    }
   };
  
   const renderTasks = () => {
