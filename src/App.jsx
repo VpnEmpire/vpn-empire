@@ -128,57 +128,7 @@ setTimeout(() => {
     }, 300);
   };
   
-const checkVpnPayment = async () => {
-  try {
-    const response = await fetch('https://vpnempire.vercel.app/api/checkUserPayment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
-    });
 
-    const result = await response.json();
-
-    if (result.success) {
-      alert('Оплата подтверждена. Награда выдана!');
-      // здесь обнови localStorage или состояние completedTasks
-      const updated = { ...completedTasks, vpnPayment: true };
-      setCompletedTasks(updated);
-      localStorage.setItem('completedTasks', JSON.stringify(updated));
-      setCoins(coins + 1000);
-    } else {
-      alert('Оплата не найдена. Убедись, что оплатил в Telegram-боте.');
-    }
-  } catch (err) {
-    console.error(err);
-    alert('Ошибка при проверке оплаты.');
-  }
-};
-
-  const handlePaymentCheck = async (taskKey) => {
-  try {
-    const response = await fetch('https://vpnempire.vercel.app/api/checkUserPayment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-      const updated = { ...completedTasks, [taskKey]: true };
-      setCompletedTasks(updated);
-      localStorage.setItem('completedTasks', JSON.stringify(updated));
-      setCoins(coins + 1000);
-      alert('Оплата подтверждена! Награда выдана.');
-    } else {
-      alert('Оплата не найдена. Убедись, что оплатил VPN в Telegram-боте.');
-    }
-  } catch (error) {
-    console.error('Ошибка при проверке оплаты:', error);
-    alert('Ошибка при проверке. Попробуй позже.');
-  }
-};
-  
   const completeTask = (task) => {
   if (completedTasks[task.key]) return;
 
