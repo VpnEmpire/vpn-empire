@@ -283,10 +283,9 @@ const botPaymentLink = 'https://t.me/OrdoHereticus_bot';
     }
 
     return;
-  }
+  };
 
   // ... остальная логика handleTaskClick
-};
 
 
   // 4 Подписка инстаграм
