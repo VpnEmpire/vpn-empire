@@ -190,126 +190,109 @@ if (task.key === 'instagramFollow') {
 const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) return;
 
+  // 1. Реферальные задания
+  if (task.type === 'referral' && task.requiresReferralCount) {
     const referralLink = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
-
-  // Копирование ссылки
-  try {
-    if (window.Telegram?.WebApp?.clipboard?.writeText) {
-      await window.Telegram.WebApp.clipboard.writeText(referralLink);
-    } else {
-      await navigator.clipboard.writeText(referralLink);
+    try {
+      if (window.Telegram?.WebApp?.clipboard?.writeText) {
+        await window.Telegram.WebApp.clipboard.writeText(referralLink);
+      } else {
+        await navigator.clipboard.writeText(referralLink);
+      }
+      alert(`🔗 Реферальная ссылка скопирована:\n${referralLink}`);
+    } catch {
+      alert(`Скопируй вручную:\n${referralLink}`);
     }
-    alert(`🔗 Реферальная ссылка скопирована:\n${referralLink}`);
-  } catch {
-    alert(`Скопируй вручную:\n${referralLink}`);
-  }
 
-  // Проверка количества приглашенных
-  try {
-    const res = await fetch(`/api/check-referrals?user_id=${userId}`);
-    const data = await res.json();
-    const count = data.referrals || 0;
-    setReferrals(count);
+    try {
+      const res = await fetch(`/api/check-referrals?user_id=${userId}`);
+      const data = await res.json();
+      const count = data.referrals || 0;
+      setReferrals(count);
 
-    if (count >= task.requiresReferralCount) {
-      completeTask(task);
-    } else {
-      alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
+      if (count >= task.requiresReferralCount) {
+        completeTask(task);
+      } else {
+        alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
+      }
+    } catch (err) {
+      alert('Ошибка при проверке приглашений.');
+      console.error(err);
     }
-  } catch (err) {
-    alert('Ошибка при проверке приглашений.');
-    console.error(err);
-  };
-
-
-const botPaymentLink = 'https://t.me/OrdoHereticus_bot';
-  // Переход в бота
-  try {
-    if (window.Telegram?.WebApp?.openTelegramLink) {
-      window.Telegram.WebApp.openTelegramLink(botPaymentLink);
-    } else {
-      window.open(botPaymentLink, '_blank');
-    }
-    alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-  } catch (error) {
-    console.error('Ошибка перехода к боту:', error);
-    alert('Не удалось открыть Telegram-бота. Попробуйте вручную.');
     return;
   }
 
-  // Проверка оплаты
-  try {
-    const res = await fetch(`/api/check-payment?user_id=${userId}`);
-    const data = await res.json();
-    if (data.success) {
-      setVpnActivated(true);
-      setClickMultiplier(2); // Включаем x2 кликов
-      completeTask(task);
-      alert('🎉 VPN оплачен. x2 кликов активирован!');
-    } else {
-      alert('⛔️ Оплата не найдена. Попробуй позже.');
-    }
-  } catch (err) {
-    console.error('Ошибка проверки оплаты:', err);
-    alert('⚠️ Ошибка при проверке оплаты.');
-  }
-};
+  // 2. Оплата VPN
+  if (task.type === 'vpn' && task.requiresPayment) {
+    try {
+      if (window.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(task.link);
+      } else {
+        window.open(task.link, '_blank');
+      }
+      alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
 
- //3 Если задание — подписка на канал
+      const res = await fetch(`/api/check-payment?user_id=${userId}`);
+      const data = await res.json();
+      if (data.success) {
+        setVpnActivated(true);
+        setClickMultiplier(2);
+        completeTask(task);
+        alert('🎉 VPN оплачен. x2 кликов активирован!');
+      } else {
+        alert('⛔️ Оплата не найдена. Попробуй позже.');
+      }
+    } catch (err) {
+      console.error('Ошибка оплаты:', err);
+      alert('Ошибка при проверке оплаты.');
+    }
+    return;
+  }
+
+  // 3. Подписка на Telegram
   if (task.requiresSubscription) {
     try {
-      // Открываем Telegram-ссылку
-      if (window?.Telegram?.WebApp?.openTelegramLink) {
+      if (window.Telegram?.WebApp?.openTelegramLink) {
         window.Telegram.WebApp.openTelegramLink(task.link);
       } else {
         window.open(task.link, '_blank');
       }
 
-      // Через секунду проверяем подписку
       setTimeout(async () => {
         const res = await fetch(`/api/check-subscription?user_id=${userId}`);
         const data = await res.json();
-
         if (data.subscribed) {
           setSubscribed(true);
           completeTask(task);
         } else {
           alert('Подпишись на канал, чтобы получить награду');
         }
-      }, 1500); // можно увеличить до 3000мс при необходимости
+      }, 2000);
     } catch (error) {
-      console.error('Ошибка проверки подписки:', error);
-      alert('Ошибка при проверке подписки. Попробуй позже.');
+      alert('Ошибка при проверке подписки');
+      console.error(error);
     }
-
     return;
-  };
-
-  // ... остальная логика handleTaskClick
-
-
-  // 4 Подписка инстаграм
-if (task.key === 'instagram' && task.link) {
-  try {
-    if (window.Telegram?.WebApp?.openTelegramLink) {
-      window.Telegram.WebApp.openTelegramLink(task.link);
-    } else {
-      window.open(task.link, '_blank');
-    }
-  } catch (err) {
-    alert('Не удалось открыть ссылку на Instagram.');
   }
-};
 
-
-  // 6. Без условий — сразу выполнять
-  if (
-    !task.requiresSubscription &&
-    !task.requiresPayment &&
-    !(task.type === 'referral' && task.requiresReferralCount)
-  ) {
+  // 4. Подписка на Instagram
+  if (task.key === 'subscribeInstagram' && task.link) {
+    try {
+      if (window.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(task.link);
+      } else {
+        window.open(task.link, '_blank');
+      }
+    } catch {
+      alert('Не удалось открыть Instagram');
+    }
     completeTask(task);
-  };
+    return;
+  }
+
+  // 5. Прочие задания (соцсети, реакция, комментарий и т.п.)
+  completeTask(task);
+};
   
 const renderTasks = () => (
   <div className="tasks-tab">
@@ -317,15 +300,13 @@ const renderTasks = () => (
     {tasks.map(task => (
       <div
         key={task.key}
-        className={`task-card ${task.done ? 'completed' : ''}`}
-        onClick={() => handleTaskClick(task)}
-      >
+        className={`task-card ${completedTasks [task.key] ? 'completed' : ''}`}>
         <h3>{task.label}</h3>
         {task.requiresReferralCount && (
           <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount} друзей</p>
         )}
         <p>🪙 Награда: {task.reward} монет</p>
-        {task.done ? (
+        {completedTasks [task.key] ? (
           <span className="done">✅ Выполнено</span>
         ) : (
           <button onClick={(e) => {
