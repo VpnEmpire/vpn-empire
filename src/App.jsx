@@ -278,8 +278,7 @@ const handleTaskClick = async (task) => {
     !(task.type === 'referral' && task.requiresReferralCount)
   ) {
     completeTask(task);
-  }
-};
+  };
   
 const renderTasks = () => (
   <div className="tasks-tab">
