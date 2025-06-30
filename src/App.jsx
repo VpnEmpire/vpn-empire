@@ -186,7 +186,6 @@ if (task.key === 'instagramFollow') {
     localStorage.setItem('coins', newCoins);
     return newCoins;
   });
-};
  
 const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) return;
