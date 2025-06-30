@@ -156,6 +156,13 @@ const handleTaskClick = (task) => {
   if (completedTasks[task.key]) return;
 
   console.log('Нажали на задание:', task);
+    // Показываем реферальную ссылку для всех заданий с type 'referral'
+  if (task.type === 'referral') {
+    const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+    navigator.clipboard.writeText(link);
+    alert(`Твоя реферальная ссылка скопирована:\n${link}`);
+  }
+  
 // Открываем ссылку, если она есть
   if (task.link) {
     try {
