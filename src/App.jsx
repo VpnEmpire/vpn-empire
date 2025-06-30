@@ -146,6 +146,7 @@ setTimeout(() => {
     setVpnActivated(true);
     localStorage.setItem('vpnActivated', 'true');
     localStorage.setItem('clickMultiplier', '2');
+    setClickMultipliner(2);
   }
 
   // Начисляем монеты
@@ -159,41 +160,24 @@ setTimeout(() => {
  const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) return;
 
-  console.log('handleTaskClick вызван для:', task);
-  console.log('userId:', userId);
-
-  // === 1. Показываем и копируем реферальную ссылку
-  if (task.type === 'referral') {
-    const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
-    try {
-      if (window.Telegram?.WebApp?.clipboard?.writeText) {
-        await window.Telegram.WebApp.clipboard.writeText(link);
-      } else {
-        await navigator.clipboard.writeText(link);
+  try {
+    // 1. Копирование реф-ссылки
+    if (task.type === 'referral') {
+      const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+      try {
+        if (window.Telegram?.WebApp?.clipboard?.writeText) {
+          await window.Telegram.WebApp.clipboard.writeText(link);
+        } else {
+          await navigator.clipboard.writeText(link);
+        }
+        alert(`Реферальная ссылка скопирована:\n${link}`);
+      } catch {
+        alert(`Скопируй свою реферальную ссылку:\n${link}`);
       }
-      alert(`Твоя реферальная ссылка скопирована:\n${link}`);
-    } catch {
-      alert(`Скопируй вручную:\n${link}`);
     }
-  }
 
-  // === 2. Открываем ссылку, если она есть (например, Telegram или Instagram)
-  if (task.link) {
-    try {
-      if (window.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-      } else {
-        window.open(task.link, '_blank');
-      }
-    } catch (error) {
-      console.error('Ошибка при открытии ссылки:', error);
-      alert('Не удалось открыть ссылку. Попробуй позже.');
-    }
-  }
-
-  // === 3. Проверка рефералов
-  if (task.type === 'referral' && task.requiresReferralCount) {
-    try {
+ // 2. Проверка рефералов
+    if (task.type === 'referral' && task.requiresReferralCount) {
       const res = await fetch(`/api/check-referrals?user_id=${userId}`);
       const data = await res.json();
       const count = data.referrals || 0;
@@ -203,56 +187,79 @@ setTimeout(() => {
       } else {
         alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
       }
-    } catch (err) {
-      console.error('Ошибка проверки рефералов:', err);
-      alert('Ошибка при проверке приглашённых друзей.');
+      return;
     }
-    return;
-  }
-
-  // === 4. Проверка подписки
-  if (task.requiresSubscription) {
-    try {
+    
+    // 3. Переход по ссылке, если есть
+    if (task.link) {
+      try {
+        if (window.Telegram?.WebApp?.openTelegramLink) {
+          window.Telegram.WebApp.openTelegramLink(task.link);
+        } else {
+          window.open(task.link, '_blank');
+        }
+      } catch {
+        alert('Не удалось открыть ссылку. Попробуй позже.');
+      }
+    }
+   
+    // 4. Проверка подписки
+    if (task.requiresSubscription) {
       const res = await fetch(`/api/check-subscription?user_id=${userId}`);
       const data = await res.json();
       setSubscribed(data.subscribed);
       if (data.subscribed) {
         completeTask(task);
       } else {
-        alert('Подпишись на наш Telegram-канал');
+        alert('Подпишись на Telegram-канал');
       }
-    } catch (err) {
-      console.error('Ошибка проверки подписки:', err);
-      alert('Ошибка при проверке подписки.');
+      return;
     }
-    return;
+
+   // 5. Проверка оплаты
+if (task.requiresPayment) {
+  const botLink = 'https://t.me/OrdoHereticus_bot';
+
+  // Переход в Telegram-бота
+  if (window.Telegram?.WebApp?.openTelegramLink) {
+    window.Telegram.WebApp.openTelegramLink(botLink);
+  } else {
+    window.open(botLink, '_blank');
   }
 
-  // === 5. Проверка оплаты
-  if (task.requiresPayment) {
+  // Проверка оплаты через секунду
+  setTimeout(async () => {
     try {
       const res = await fetch(`/api/check-payment?user_id=${userId}`);
       const data = await res.json();
-      setVpnActivated(data.success);
       if (data.success) {
-        completeTask(task);
+        completeTask(task); // Выполняем задание
+        setClickMultiplier(2); // x2 клика
+        localStorage.setItem('clickMultiplier', 2);
+        alert('VPN успешно активирован! Награда получена и x2 кликов включено.');
       } else {
-        alert('Оплати VPN в Telegram-боте');
+        alert('Оплата не найдена. Попробуй позже.');
       }
-    } catch (err) {
-      console.error('Ошибка проверки оплаты:', err);
-      alert('Ошибка при проверке оплаты.');
+    } catch {
+      alert('Ошибка при проверке оплаты. Попробуй позже.');
     }
-    return;
-  }
+  }, 1000);
 
-  // === 6. Если условий нет — просто выполняем
-  if (
-    !task.requiresSubscription &&
-    !task.requiresPayment &&
-    !(task.type === 'referral' && task.requiresReferralCount)
-  ) {
-    completeTask(task);
+  return;
+}
+
+    // 6. Если нет условий — выполнить сразу
+    if (
+      !task.requiresSubscription &&
+      !task.requiresPayment &&
+      !(task.type === 'referral' && task.requiresReferralCount)
+    ) {
+      completeTask(task);
+    }
+
+  } catch (error) {
+    alert('Ошибка при выполнении задания. Попробуй позже.');
+    console.error(error);
   }
 };
   
