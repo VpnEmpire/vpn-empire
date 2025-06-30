@@ -274,7 +274,7 @@ const renderTasks = () => (
         ) : (
           <button onClick={(e) => {
             e.stopPropagation();
-            completeTask(task);
+           handleTaskClick (task);
           }}>Выполнить</button>
         )}
       </div>
