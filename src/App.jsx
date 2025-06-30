@@ -17,7 +17,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [userId, setUserId] = useState(null);
   const [referrals, setReferrals] = useState(0);
   const [vpnActivated, setVpnActivated] = useState(false);
-  const [clickMultiplier? setClickMultiplier] = useState (1);
+  const [clickMultiplier, setClickMultiplier] = useState (1);
   const [subscribed, setSubscribed] = useState(false);
   const [isWithdrawApproved, setIsWithdrawApproved] = useState(() => localStorage.getItem('isWithdrawApproved') === 'true');
   const [tasks, setTasks] = useState([
