@@ -127,7 +127,58 @@ setTimeout(() => {
       document.body.removeChild(flash);
     }, 300);
   };
+  
+const checkVpnPayment = async () => {
+  try {
+    const response = await fetch('https://vpnempire.vercel.app/api/checkUserPayment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId }),
+    });
 
+    const result = await response.json();
+
+    if (result.success) {
+      alert('Оплата подтверждена. Награда выдана!');
+      // здесь обнови localStorage или состояние completedTasks
+      const updated = { ...completedTasks, vpnPayment: true };
+      setCompletedTasks(updated);
+      localStorage.setItem('completedTasks', JSON.stringify(updated));
+      setCoins(coins + 1000);
+    } else {
+      alert('Оплата не найдена. Убедись, что оплатил в Telegram-боте.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Ошибка при проверке оплаты.');
+  }
+};
+
+  const handlePaymentCheck = async (taskKey) => {
+  try {
+    const response = await fetch('https://vpnempire.vercel.app/api/checkUserPayment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      const updated = { ...completedTasks, [taskKey]: true };
+      setCompletedTasks(updated);
+      localStorage.setItem('completedTasks', JSON.stringify(updated));
+      setCoins(coins + 1000);
+      alert('Оплата подтверждена! Награда выдана.');
+    } else {
+      alert('Оплата не найдена. Убедись, что оплатил VPN в Telegram-боте.');
+    }
+  } catch (error) {
+    console.error('Ошибка при проверке оплаты:', error);
+    alert('Ошибка при проверке. Попробуй позже.');
+  }
+};
+  
   const completeTask = (task) => {
   if (completedTasks[task.key]) return;
 
@@ -262,40 +313,67 @@ return;
   completeTask(task);
 };
   
-const renderTasks = () => (
-  <div className="tasks-tab">
-    <h2>📋 Задания</h2>
-    {tasks.map(task => (
-      <div
-        key={task.key}
-        className={`task-card ${completedTasks [task.key] ? 'completed' : ''}`}>
-        <h3>{task.label}</h3>
-        {task.requiresReferralCount && (
-          <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount} друзей</p>
-        )}
-        <p>🪙 Награда: {task.reward} монет</p>
-        {completedTasks [task.key] ? (
-          <span className="done">✅ Выполнено</span>
-        ) : (
-          <button onClick={() => handleTaskClick (task)}>Выполнить</button>
-        )}
+const renderTasks = () => {
+  return (
+    <div className="tasks-tab">
+      <h2>📝 Задания</h2>
+
+      {taskList.map((task) => {
+        const isDisabled =
+          (task.requiresReferralCount && referrals < task.requiresReferralCount) ||
+          (task.disabled && !completedTasks[task.key]);
+
+        return (
+          <div key={task.key} className={`task-card ${completedTasks[task.key] ? 'completed' : ''}`}>
+            <h3>{task.label}</h3>
+
+            {task.requiresReferralCount && (
+              <p>👥 Приглашено: {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
+            )}
+
+            <p>🎯 Награда: {task.reward} монет</p>
+
+            {task.link && (
+              <a href={task.link} target="_blank" rel="noopener noreferrer">
+                <button className="task-button">Перейти</button>
+              </a>
+            )}
+
+            {completedTasks[task.key] ? (
+              <span className="done">✅ Выполнено</span>
+            ) : (
+              <button
+                onClick={() =>
+                  task.requiresPayment
+                    ? handlePaymentCheck(task.key)
+                    : completeTask(task.key, task.reward)
+                }
+                disabled={isDisabled}
+              >
+                Выполнить
+              </button>
+            )}
+          </div>
+        );
+      })}
+
+      {/* Заглушка нового задания */}
+      <div className="task-card disabled-task">
+        <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
       </div>
-    ))}
-    {/* Заглушка внизу */}
-    <div className="task-card disabled-task">
-      <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
-    </div>
-    <button
+
+      <button
         style={{ marginTop: 20 }}
         onClick={() => {
           localStorage.clear();
           window.location.reload();
         }}
       >
-        🔁 Сбросить данные (тест)
+        🔄 Сбросить данные (тест)
       </button>
     </div>
   );
+};
 
   const renderHome = () => (
     <div className="main-content">
