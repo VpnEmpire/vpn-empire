@@ -282,7 +282,7 @@ setTimeout(() => {
       </div>
     </div>
   );
-
+  
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
@@ -353,3 +353,4 @@ const renderWithdraw = () => (
 }
 
 export default App;
+
