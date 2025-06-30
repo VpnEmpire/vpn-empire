@@ -195,7 +195,7 @@ const handleTaskClick = async (task) => {
       }
       alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
       return;
-    }catch (error) {
+    } catch (error) {
       console.error ( 'Ошибка перехода к боту:', error);
       alert ( 'Не удалось открыть Telegram-бота. Попробуй вручную.');
 return;
@@ -215,7 +215,6 @@ return;
       alert('Ошибка при проверке оплаты.');
     }
     return;
-  }
 
   // 3. Подписка на Telegram
   if (task.requiresSubscription) {
