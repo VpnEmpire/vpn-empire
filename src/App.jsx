@@ -76,8 +76,12 @@ useEffect(() => {
       localStorage.setItem('lastClickDate', today);
     }
     if (localStorage.getItem('dailyTaskDate') !== today) {
-      setCompletedTasks({});
-localStorage.setItem('dailyTaskDate', today);
+      const updatedTasks = tasks.map(task =>
+        task.key === 'dailyVPN' ? { ...task, done: false } : task
+      );
+      setTasks(updatedTasks);
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+      localStorage.setItem('dailyTaskDate', today);
     }
     if (localStorage.getItem('lastSpinDate') === today) {
       setCanSpin(false);
@@ -96,6 +100,74 @@ localStorage.setItem('dailyTaskDate', today);
 const audio = new Audio('/click.mp3');
     audio.play().catch((e) => console.log('Ошибка воспроизведения звука:', e));
   };
+
+  
+    let isValid = true;
+
+  const applyTaskCompletion = () => {
+    const updated = tasks.map(t =>
+      t.key === task.key ? { ...t, done: true } : t
+    );
+
+    setTasks(updated);
+    localStorage.setItem('tasks', JSON.stringify(updated));
+
+    const updatedCompleted = { ...completedTasks, [task.key]: true };
+    setCompletedTasks(updatedCompleted);
+    localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
+
+    if (task.key === 'activateVpn') {
+      setVpnActivated(true);
+      localStorage.setItem('vpnActivated', 'true');
+    }
+
+    setCoins(prev => {
+      const newCoins = prev + task.reward;
+      localStorage.setItem('coins', newCoins);
+      return newCoins;
+    });
+  };
+
+  if (task.type === 'referral') {
+    fetch(`/api/check-referrals?user_id=${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        setReferrals(data.referrals || 0);
+        isValid = data.referrals >= task.requiresReferralCount;
+        if (isValid) applyTaskCompletion();
+        else alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
+      })
+      .catch(err => console.error('Ошибка проверки рефералов:', err));
+    return;
+  }
+
+  if (task.requiresSubscription) {
+    fetch(`/api/check-subscription?user_id=${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        setSubscribed(data.subscribed);
+        if (data.subscribed) applyTaskCompletion();
+        else alert('Подпишись на Telegram-канал');
+      })
+      .catch(err => console.error('Ошибка проверки подписки:', err));
+    return;
+  }
+
+  if (task.requiresPayment) {
+    fetch(`/api/check-payment?user_id=${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        setVpnActivated(data.success);
+        if (data.success) applyTaskCompletion();
+        else alert('Активируй VPN через Telegram-бота');
+      })
+      .catch(err => console.error('Ошибка проверки оплаты:', err));
+    return;
+  }
+
+  applyTaskCompletion(); // если нет условий
+};
+
 
   const handleClick = (e) => {
     if (clicksToday < maxClicksPerDay) {
@@ -141,7 +213,7 @@ setTimeout(() => {
     setCoins(prev => prev + task.reward);
   };
 
-  const handleTaskClick = (task) => {
+const handleTaskClick = (task) => {
   if (task.done) return;
 
   console.log('Нажали на задание:', task);
@@ -154,14 +226,13 @@ setTimeout(() => {
 
   if ((task.type === 'subscribe' || task.type === 'vpn') && task.link) {
     console.log('Открываем ссылку:', task.link);
-
     try {
       if (window?.Telegram?.WebApp?.openTelegramLink) {
         window.Telegram.WebApp.openTelegramLink(task.link);
         console.log('Ссылка открыта через openTelegramLink');
       } else {
         window.open(task.link, '_blank');
-        console.log('Ссылка открыта через window.open');
+        console.log('Ссылка открыта через window.open'); 
       }
     } catch (error) {
       console.error('Ошибка при открытии ссылки:', error);
@@ -170,13 +241,13 @@ setTimeout(() => {
 
     if (task.type === 'subscribe') {
       alert('Подпишись на канал, чтобы получить награду');
-    }
+   }
     if (task.type === 'vpn') {
       alert('Активируй VPN через Telegram-бота');
     }
   }
 };
-  
+ 
   const renderTasks = () => (
     <div className="tasks-tab">
       <h2>📋 Задания</h2>
