@@ -179,12 +179,15 @@ const handleTaskClick = (task) => {
         const count = data.referrals || 0;
         setReferrals(count);
         if (count >= task.requiresReferralCount) {
-          completeTask(task); // ← ⬅️ используем твою функцию
+          completeTask(task);
         } else {
           alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
         }
       })
-      .catch(err => console.error('Ошибка проверки рефералов:', err));
+      .catch(err => {
+        console.error('Ошибка проверки рефералов:', err);
+        alert('Ошибка при проверке приглашённых друзей. Попробуйте позже.');
+      });
     return;
   }
 
@@ -200,7 +203,10 @@ const handleTaskClick = (task) => {
           alert('Подпишись на Telegram-канал');
         }
       })
-      .catch(err => console.error('Ошибка проверки подписки:', err));
+      .catch(err => {
+        console.error('Ошибка проверки подписки:', err);
+        alert('Ошибка при проверке подписки. Попробуйте позже.');
+      });
     return;
   }
 
@@ -216,12 +222,21 @@ const handleTaskClick = (task) => {
           alert('Активируй VPN через Telegram-бота');
         }
       })
-      .catch(err => console.error('Ошибка проверки оплаты:', err));
+      .catch(err => {
+        console.error('Ошибка проверки оплаты:', err);
+        alert('Ошибка при проверке оплаты. Попробуйте позже.');
+      });
     return;
   }
 
-  // === 4. Без условий — сразу выполняем
-  completeTask(task);
+   // === 4. Если нет условий — сразу выполняем
+  if (
+    !task.requiresSubscription &&
+    !task.requiresPayment &&
+    !(task.type === 'referral' && task.requiresReferralCount)
+  ) {
+    completeTask(task);
+  }
 };
  
   const renderTasks = () => (
