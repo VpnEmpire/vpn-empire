@@ -131,7 +131,7 @@ setTimeout(() => {
     if (completedTasks[task.key]) {
        console.log('Задание уже выполнено:', task.key);
      return;
-      
+    } 
    const updatedTasks = tasks.map(t =>
       t.key === task.key ? { ...t, done: true } : t
     );
