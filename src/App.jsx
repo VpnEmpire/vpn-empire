@@ -290,7 +290,7 @@ const handleTaskClick = async (task) => {
           )}
           {task.done && <span className="done">✅ Выполнено</span>}
         </div>
-      ))}
+      )}
       <div className="task-card disabled-task">
         <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
       </div>
