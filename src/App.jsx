@@ -101,37 +101,6 @@ const audio = new Audio('/click.mp3');
     audio.play().catch((e) => console.log('Ошибка воспроизведения звука:', e));
   };
 
-
-  
-
-  if (task.requiresSubscription) {
-    fetch(`/api/check-subscription?user_id=${userId}`)
-      .then(res => res.json())
-      .then(data => {
-        setSubscribed(data.subscribed);
-        if (data.subscribed) applyTaskCompletion();
-        else alert('Подпишись на Telegram-канал');
-      })
-      .catch(err => console.error('Ошибка проверки подписки:', err));
-    return;
-  }
-
-  if (task.requiresPayment) {
-    fetch(`/api/check-payment?user_id=${userId}`)
-      .then(res => res.json())
-      .then(data => {
-        setVpnActivated(data.success);
-        if (data.success) applyTaskCompletion();
-        else alert('Активируй VPN через Telegram-бота');
-      })
-      .catch(err => console.error('Ошибка проверки оплаты:', err));
-    return;
-  }
-
-  applyTaskCompletion(); // если нет условий
-};
-
-
   const handleClick = (e) => {
     if (clicksToday < maxClicksPerDay) {
       const multiplier = Number(localStorage.getItem('clickMultiplier')) || 1;
