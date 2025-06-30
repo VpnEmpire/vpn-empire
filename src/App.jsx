@@ -159,40 +159,41 @@ setTimeout(() => {
  
 const handleTaskClick = (task) => {
   if (completedTasks[task.key]) return;
-  
-   const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
-  
-    // Показываем реферальную ссылку для всех заданий с type 'referral'
+
+  console.log('Нажали на задание:', task);
+  console.log('userId:', userId);
+
+  // === 1. Показываем реферальную ссылку
   if (task.type === 'referral') {
     const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
-     if (window.Telegram?.WebApp?.clipboard?.writeText) {
-      window.Telegram.WebApp.clipboard.writeText(link);
-       alert(`Реферальная ссылка скопирована:\n${link}`);
-           } else {
     try {
-    navigator.clipboard.writeText(link);
-    alert(`Hеферальная ссылка скопирована:\n${link}`);
+      if (window.Telegram?.WebApp?.clipboard?.writeText) {
+        window.Telegram.WebApp.clipboard.writeText(link);
+        alert(`Реферальная ссылка скопирована:\n${link}`);
+      } else {
+        navigator.clipboard.writeText(link);
+        alert(`Реферальная ссылка скопирована:\n${link}`);
+      }
     } catch (error) {
       alert(`Скопируй свою реферальную ссылку:\n${link}`);
     }
-}
   }
-// Открываем ссылку, если она есть
-  if (task.link) {
-    try {
-      if (window?.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-        console.log('Ссылка открыта через openTelegramLink:', task.link);
-      } else {
-        window.open(task.link, '_blank');
-        console.log('Ссылка открыта через window.open:', task.link);
-      }
-    } catch (error) {
-      console.error('Ошибка при открытии ссылки:', error);
-      alert('Не удалось открыть ссылку. Попробуй позже.');
-    }
-  }
- // Проверяем рефералов, если нужно
+
+  // === 2. Открываем ссылку, если есть
+  if (task.link) {
+    try {
+      if (window.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(task.link);
+      } else {
+        window.open(task.link, '_blank');
+      }
+    } catch (error) {
+      console.error('Ошибка при открытии ссылки:', error);
+      alert('Не удалось открыть ссылку. Попробуй позже.');
+    }
+  }
+
+  // === 3. Проверка рефералов
   if (task.type === 'referral' && task.requiresReferralCount) {
     fetch(`/api/check-referrals?user_id=${userId}`)
       .then(res => res.json())
@@ -207,12 +208,12 @@ const handleTaskClick = (task) => {
       })
       .catch(err => {
         console.error('Ошибка проверки рефералов:', err);
-        alert('Ошибка при проверке приглашённых друзей. Попробуйте позже.');
+        alert('Ошибка при проверке друзей. Попробуй позже.');
       });
     return;
   }
 
-  // Проверяем подписку, если нужно
+  // === 4. Проверка подписки
   if (task.requiresSubscription) {
     fetch(`/api/check-subscription?user_id=${userId}`)
       .then(res => res.json())
@@ -226,12 +227,12 @@ const handleTaskClick = (task) => {
       })
       .catch(err => {
         console.error('Ошибка проверки подписки:', err);
-        alert('Ошибка при проверке подписки. Попробуйте позже.');
+        alert('Ошибка при проверке подписки. Попробуй позже.');
       });
     return;
   }
 
-  // Проверяем оплату, если нужно
+  // === 5. Проверка оплаты
   if (task.requiresPayment) {
     fetch(`/api/check-payment?user_id=${userId}`)
       .then(res => res.json())
@@ -240,17 +241,17 @@ const handleTaskClick = (task) => {
         if (data.success) {
           completeTask(task);
         } else {
-          alert('Активируй VPN через Telegram-бота');
+          alert('Оплати VPN через бота для завершения задания');
         }
       })
       .catch(err => {
         console.error('Ошибка проверки оплаты:', err);
-        alert('Ошибка при проверке оплаты. Попробуйте позже.');
+        alert('Ошибка при проверке оплаты. Попробуй позже.');
       });
     return;
   }
 
-  // Если нет условий — сразу начисляем монеты
+  // === 6. Если нет условий — сразу выполнение
   if (
     !task.requiresSubscription &&
     !task.requiresPayment &&
