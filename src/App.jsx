@@ -317,22 +317,22 @@ const renderTasks = () => {
   return (
     <div className="tasks-tab">
       <h2>📝 Задания</h2>
-
       {taskList.map((task) => {
         const isDisabled =
           (task.requiresReferralCount && referrals < task.requiresReferralCount) ||
           (task.disabled && !completedTasks[task.key]);
-
         return (
-          <div key={task.key} className={`task-card ${completedTasks[task.key] ? 'completed' : ''}`}>
+          <div 
+            key={task.key}
+            className={`task-card ${completedTasks[task.key] ? 'completed' : ''}`}
+            >
             <h3>{task.label}</h3>
-
             {task.requiresReferralCount && (
               <p>👥 Приглашено: {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
             )}
-
+            
             <p>🎯 Награда: {task.reward} монет</p>
-
+            
             {task.link && (
               <a href={task.link} target="_blank" rel="noopener noreferrer">
                 <button className="task-button">Перейти</button>
@@ -343,12 +343,13 @@ const renderTasks = () => {
               <span className="done">✅ Выполнено</span>
             ) : (
               <button
+                className="task-button"
+                disabled={isDisabled}
                 onClick={() =>
                   task.requiresPayment
                     ? handlePaymentCheck(task.key)
                     : completeTask(task.key, task.reward)
                 }
-                disabled={isDisabled}
               >
                 Выполнить
               </button>
