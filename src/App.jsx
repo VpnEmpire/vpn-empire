@@ -128,12 +128,31 @@ setTimeout(() => {
   };
 
 const completeTask = (task) => {
+  if (completedTasks[task.key]) return;
   const updatedTasks = tasks.map(t =>
     t.key === task.key ? { ...t, done: true } : t
   );
-  setTasks(updatedTasks);
-  localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+  setCompletedTasks(updatedTasks);
+  localStorage.setItem('completedTasks', JSON.stringify(updatedTasks));
+// Проверка: если ВСЕ задания по приглашению выполнены — сбрасываем их
+  const allReferralDone = referralKeys.every(key => updatedTasks[key]);
+  if (allReferralDone) {
+    const reset = { ...updatedTasks };
+    referralKeys.forEach(key => {
+      reset[key] = false;
+    });
+    setTimeout(() => {
+      setCompletedTasks(reset);
+      localStorage.setItem('completedTasks', JSON.stringify(reset));
+      alert('🎉 Задания по приглашениям обновлены! Начни заново');
+    }, 1000);
+  }
 
+  // Награда (можно тут добавить setCoins)
+  alert(`🎁 Ты получил ${task.reward} монет!`);
+};
+
+  
   const updatedCompleted = { ...completedTasks, [task.key]: true };
   setCompletedTasks(updatedCompleted);
   localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
@@ -154,37 +173,39 @@ const completeTask = (task) => {
 const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) return;
 
-  console.log('handleTaskClick вызван для:', task);
+    const referralLink = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
 
-  // 1. Реферальная ссылка (всегда показывается)
-  if (task.type === 'referral') {
-    const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
-    try {
-      if (window?.Telegram?.WebApp?.clipboard?.writeText) {
-        await window.Telegram.WebApp.clipboard.writeText(link);
-      } else {
-        await navigator.clipboard.writeText(link);
-      }
-      alert(`Реферальная ссылка скопирована:\n${link}`);
-    } catch {
-      alert(`Скопируй свою реферальную ссылку:\n${link}`);
+  // Копирование ссылки
+  try {
+    if (window.Telegram?.WebApp?.clipboard?.writeText) {
+      await window.Telegram.WebApp.clipboard.writeText(referralLink);
+    } else {
+      await navigator.clipboard.writeText(referralLink);
     }
+    alert(`🔗 Реферальная ссылка скопирована:\n${referralLink}`);
+  } catch {
+    alert(`Скопируй вручную:\n${referralLink}`);
   }
 
-  // 2. Ссылка — открываем при наличии
-  if (task.link) {
-    try {
-      if (window?.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-      } else {
-        window.open(task.link, '_blank');
-      }
-    } catch (error) {
-      console.error('Ошибка открытия ссылки:', error);
-      alert('Не удалось открыть ссылку. Попробуй позже.');
-    }
-  }
+  // Проверка количества приглашенных
+  try {
+    const res = await fetch(`/api/check-referrals?user_id=${userId}`);
+    const data = await res.json();
+    const count = data.referrals || 0;
+    setReferrals(count);
 
+    if (count >= task.requiresReferralCount) {
+      completeTask(task);
+    } else {
+      alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
+    }
+  } catch (err) {
+    alert('Ошибка при проверке приглашений.');
+    console.error(err);
+  }
+};
+
+  
   // 3. Проверка рефералов
   if (task.type === 'referral' && task.requiresReferralCount) {
     try {
