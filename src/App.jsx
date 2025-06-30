@@ -271,7 +271,7 @@ const handleTaskClick = (task) => {
           {task.done ? (
             <span className="done">✅ Выполнено</span>
           ) : (
-            <button onClick={(e) => { e.stopPropagation(); completeTask(task); }}>Выполнить</button>
+            <button onClick={(e) => { e.stopPropagation(); handleTaskClick(task); }}>Выполнить</button>
           )}
         </div>
       ))}
