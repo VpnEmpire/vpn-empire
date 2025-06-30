@@ -200,6 +200,7 @@ const handleTaskClick = async (task) => {
       alert ( 'Не удалось открыть Telegram-бота. Попробуй вручную.');
 return;
     }
+  }
       const res = await fetch(`/api/check-payment?user_id=${userId}`);
       const data = await res.json();
       if (data.success) {
