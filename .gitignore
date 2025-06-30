@@ -18,4 +18,4 @@ yarn-error.log*
 # 📦 Vercel, Netlify и другие CI/CD директории (по желанию)
 .vercel/
 .netlify/
-
+firebase-secret.json
