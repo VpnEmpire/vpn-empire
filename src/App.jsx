@@ -270,17 +270,22 @@ setTimeout(() => {
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount} друзей</p>
           )}
           <p>🪙 Награда: {task.reward} монет</p>
-          {task.done ? (
-            <span className="done">✅ Выполнено</span>
-          ) : (
-            <button onClick={(e) => { e.stopPropagation(); completeTask(task); }}>Выполнить</button>
+          {!task.done && (
+            <button
+              onClick={ (e) => { e.stopPropagation();
+                                handleTaskClickn(task);
+                               }}
+              > 
+              Выполнить 
+            </button>
           )}
+          {task.done && <span className="done">✅ Выполнено</span>}
         </div>
       ))}
       <div className="task-card disabled-task">
         <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
       </div>
-    </div>
+       </div>
   );
   
   const renderHome = () => (
