@@ -194,7 +194,12 @@ const handleTaskClick = async (task) => {
         window.open(task.link, '_blank');
       }
       alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-
+      return;
+    }catch (error) {
+      console.error ( 'Ошибка перехода к боту:', error);
+      alert ( 'Не удалось открыть Telegram-бота. Попробуй вручную.');
+return;
+    }
       const res = await fetch(`/api/check-payment?user_id=${userId}`);
       const data = await res.json();
       if (data.success) {
