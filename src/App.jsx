@@ -272,14 +272,10 @@ const renderTasks = () => (
         {completedTasks [task.key] ? (
           <span className="done">✅ Выполнено</span>
         ) : (
-          <button onClick={(e) => {
-            e.stopPropagation();
-           handleTaskClick (task);
-          }}>Выполнить</button>
+          <button onClick={() => handleTaskClick (task)}>Выполнить</button>
         )}
       </div>
     ))}
-
     {/* Заглушка внизу */}
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
