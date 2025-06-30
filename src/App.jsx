@@ -128,64 +128,27 @@ setTimeout(() => {
     }, 300);
   };
 
-const completeTask = (task) => {
+  const completeTask = (task) => {
   if (completedTasks[task.key]) return;
-  setCompletedTasks(prev => ({ ...prev, [task.key]: true }));
-  setCoins(prev => prev + task.reward);
-  
-if (task.key === 'instagramFollow') {
-  setCompletedTasks(prev => ({ ...prev, [task.key]: true }));
-  setCoins(prev => prev + task.reward);}
-  
-  const updatedTasks = tasks.map(t =>
-    t.key === task.key ? { ...t, done: true } : t
-  );
-  setCompletedTasks(updatedTasks);
-  localStorage.setItem('completedTasks', JSON.stringify(updatedTasks));
-//1 Проверка: если ВСЕ задания по приглашению выполнены — сбрасываем их
-  const allReferralDone = referralKeys.every(key => updatedTasks[key]);
-  if (allReferralDone) {
-    const reset = { ...updatedTasks };
-    referralKeys.forEach(key => {
-      reset[key] = false;
-    });
-    setTimeout(() => {
-      setCompletedTasks(reset);
-      localStorage.setItem('completedTasks', JSON.stringify(reset));
-      alert('🎉 Задания по приглашениям обновлены! Начни заново');
-    }, 1000);
-  }
 
-  // Награда (можно тут добавить setCoins)
-  alert(`🎁 Ты получил ${task.reward} монет!`);
-};
-  
- //2 Отмечаем выполнение
-  setCompletedTasks(prev => ({ ...prev, [task.key]: true }));
-
-  // Начисляем монеты
-  setCoins(prev => prev + task.reward);
-
-  // Если это задание на оплату VPN — включаем x2 кликов
-  if (task.type === 'payment') {
-    setVpnActivated(true);
-    setClickMultiplier(2); // включаем множитель
-  }
-
-  // Обновляем localStorage
   const updated = {
     ...completedTasks,
     [task.key]: true
   };
+  setCompletedTasks(updated);
   localStorage.setItem('completedTasks', JSON.stringify(updated));
-  localStorage.setItem('coins', coins + task.reward);
+
+  const newCoins = coins + task.reward;
+  setCoins(newCoins);
+  localStorage.setItem('coins', newCoins);
+
+  if (task.type === 'vpn') {
+    setClickMultiplier(2);
+  }
+
+  alert(`🎁 Ты получил ${task.reward} монет!`);
 };
 
-  setCoins(prev => {
-    const newCoins = prev + task.reward;
-    localStorage.setItem('coins', newCoins);
-    return newCoins;
-  });
  
 const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) return;
