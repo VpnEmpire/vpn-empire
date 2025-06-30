@@ -342,7 +342,7 @@ const renderWithdraw = () => (
       >
         ✅ Одобрить вывод
       </button>
-    </div>
+     </div>
   );
 
   const renderTab = () => {
