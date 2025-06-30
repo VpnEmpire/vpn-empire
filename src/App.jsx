@@ -156,7 +156,7 @@ setTimeout(() => {
     });
   console.log(`Задание "${task.key}" выполнено, добавлено ${task.reward} монет`);
 };
-  }
+ 
 const handleTaskClick = (task) => {
   if (completedTasks[task.key]) return;
 
