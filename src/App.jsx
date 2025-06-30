@@ -229,7 +229,7 @@ const handleTaskClick = (task) => {
     return;
   }
 
-   // === 4. Если нет условий — сразу выполняем
+   // Задания без условий — сразу засчитываем и монеты начисляем
   if (
     !task.requiresSubscription &&
     !task.requiresPayment &&
