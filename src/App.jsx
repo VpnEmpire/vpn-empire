@@ -101,45 +101,8 @@ const audio = new Audio('/click.mp3');
     audio.play().catch((e) => console.log('Ошибка воспроизведения звука:', e));
   };
 
+
   
-    let isValid = true;
-
-  const applyTaskCompletion = () => {
-    const updated = tasks.map(t =>
-      t.key === task.key ? { ...t, done: true } : t
-    );
-
-    setTasks(updated);
-    localStorage.setItem('tasks', JSON.stringify(updated));
-
-    const updatedCompleted = { ...completedTasks, [task.key]: true };
-    setCompletedTasks(updatedCompleted);
-    localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
-
-    if (task.key === 'activateVpn') {
-      setVpnActivated(true);
-      localStorage.setItem('vpnActivated', 'true');
-    }
-
-    setCoins(prev => {
-      const newCoins = prev + task.reward;
-      localStorage.setItem('coins', newCoins);
-      return newCoins;
-    });
-  };
-
-  if (task.type === 'referral') {
-    fetch(`/api/check-referrals?user_id=${userId}`)
-      .then(res => res.json())
-      .then(data => {
-        setReferrals(data.referrals || 0);
-        isValid = data.referrals >= task.requiresReferralCount;
-        if (isValid) applyTaskCompletion();
-        else alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
-      })
-      .catch(err => console.error('Ошибка проверки рефералов:', err));
-    return;
-  }
 
   if (task.requiresSubscription) {
     fetch(`/api/check-subscription?user_id=${userId}`)
@@ -186,66 +149,110 @@ setTimeout(() => {
 
   const triggerAnimation = () => {
     const flash = document.createElement('div');
-    flash.className = 'flash';
+    flash.className = 'flash'; 
+    flash.style.left = `${Math.random() * window.innerWidth}px`;
+    flash.style.top = `${Math.random() * window.innerHeight}px`;
     document.body.appendChild(flash);
-    setTimeout(() => document.body.removeChild(flash), 300);
+    setTimeout(() => {
+      document.body.removeChild(flash);
+    }, 300);
   };
 
   const completeTask = (task) => {
-    if (task.requiresReferralCount && referrals < task.requiresReferralCount) {
-      alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
-      return;
-    }
+   const updated = tasks.map(t =>
+      t.key === task.key ? { ...t, done: true } : t
+    );
 
-    if (task.requiresSubscription && !subscribed) {
-      alert('Подпишись на Telegram-канал');
-      return;
-    }
-
-    if (task.requiresPayment && !vpnActivated) {
-      alert('Активируй VPN через Telegram-бота');
-      return;
-    }
-
-    const updated = tasks.map(t => t.key === task.key ? { ...t, done: true } : t);
     setTasks(updated);
     localStorage.setItem('tasks', JSON.stringify(updated));
-    setCoins(prev => prev + task.reward);
+
+    const updatedCompleted = { ...completedTasks, [task.key]: true };
+    setCompletedTasks(updatedCompleted);
+    localStorage.setItem('completedTasks', JSON.stringify(updatedCompleted));
+    
+    if (task.key === 'activateVpn') {
+      setVpnActivated(true);
+      localStorage.setItem('vpnActivated', 'true');
+      localStorage.setItem('clickMultiplier', '2');
+    }
+
+    setCoins(prev => {
+      const newCoins = prev + task.reward;
+      localStorage.setItem('coins', newCoins);
+      return newCoins;
+    });
   };
 
 const handleTaskClick = (task) => {
-  if (task.done) return;
+  if (completedTasks[task.key]) return;
 
   console.log('Нажали на задание:', task);
-
-  if (task.type === 'referral') {
-    const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
-    navigator.clipboard.writeText(link);
-    alert(`Твоя реферальная ссылка скопирована:\n${link}`);
+// Открываем ссылку, если она есть
+  if (task.link) {
+    try {
+      if (window?.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(task.link);
+        console.log('Ссылка открыта через openTelegramLink:', task.link);
+      } else {
+        window.open(task.link, '_blank');
+        console.log('Ссылка открыта через window.open:', task.link);
+      }
+    } catch (error) {
+      console.error('Ошибка при открытии ссылки:', error);
+      alert('Не удалось открыть ссылку. Попробуй позже.');
+    }
+  }
+ // === 1. Проверка рефералов
+  if (task.type === 'referral' && task.requiresReferralCount) {
+    fetch(`/api/check-referrals?user_id=${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        const count = data.referrals || 0;
+        setReferrals(count);
+        if (count >= task.requiresReferralCount) {
+          completeTask(task); // ← ⬅️ используем твою функцию
+        } else {
+          alert(`Пригласи хотя бы ${task.requiresReferralCount} друзей`);
+        }
+      })
+      .catch(err => console.error('Ошибка проверки рефералов:', err));
+    return;
   }
 
-  if ((task.type === 'subscribe' || task.type === 'vpn') && task.link) {
-    console.log('Открываем ссылку:', task.link);
-    try {
-      if (window?.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-        console.log('Ссылка открыта через openTelegramLink');
-      } else {
-        window.open(task.link, '_blank');
-        console.log('Ссылка открыта через window.open'); 
-      }
-    } catch (error) {
-      console.error('Ошибка при открытии ссылки:', error);
-      alert('Не удалось открыть ссылку. Попробуй позже.');
-    }
-
-    if (task.type === 'subscribe') {
-      alert('Подпишись на канал, чтобы получить награду');
-   }
-    if (task.type === 'vpn') {
-      alert('Активируй VPN через Telegram-бота');
-    }
+  // === 2. Проверка подписки
+  if (task.requiresSubscription) {
+    fetch(`/api/check-subscription?user_id=${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        setSubscribed(data.subscribed);
+        if (data.subscribed) {
+          completeTask(task);
+        } else {
+          alert('Подпишись на Telegram-канал');
+        }
+      })
+      .catch(err => console.error('Ошибка проверки подписки:', err));
+    return;
   }
+
+  // === 3. Проверка оплаты
+  if (task.requiresPayment) {
+    fetch(`/api/check-payment?user_id=${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        setVpnActivated(data.success);
+        if (data.success) {
+          completeTask(task);
+        } else {
+          alert('Активируй VPN через Telegram-бота');
+        }
+      })
+      .catch(err => console.error('Ошибка проверки оплаты:', err));
+    return;
+  }
+
+  // === 4. Без условий — сразу выполняем
+  completeTask(task);
 };
  
   const renderTasks = () => (
@@ -320,7 +327,7 @@ const renderWithdraw = () => (
         }}
         style={{ marginTop: '20px', backgroundColor: 'green', color: 'white' }}
       >
-        ✅ Одобрить вывод (видишь только ты)
+        ✅ Одобрить вывод
       </button>
     </div>
   );
