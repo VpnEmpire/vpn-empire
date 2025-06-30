@@ -342,7 +342,6 @@ const renderTasks = () => (
               <button className="task-button">Перейти</button>
             </a>
           )}
-
           {completedTasks[task.key] ? (
             <span className="done">✅ Выполнено</span>
           ) : (
@@ -364,7 +363,7 @@ const renderTasks = () => (
             >
               Выполнить
             </button>
-          )}
+          )
         </div>
       );
     })}
