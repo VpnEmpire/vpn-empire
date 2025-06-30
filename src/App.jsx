@@ -160,10 +160,8 @@ setTimeout(() => {
 const handleTaskClick = (task) => {
   if (completedTasks[task.key]) return;
   
-  console.log('handleTaskClick вызван для:', task);
-  console.log('userId:', userId);
-
-  console.log('Нажали на задание:', task);
+   const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+  
     // Показываем реферальную ссылку для всех заданий с type 'referral'
   if (task.type === 'referral') {
     const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
