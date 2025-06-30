@@ -328,7 +328,6 @@ const renderTasks = () => (
           className={`task-card ${completedTasks[task.key] ? "completed" : ""}`}
         >
           <h3>{task.label}</h3>
-
           {task.requiresReferralCount && (
             <p>
               👥 {Math.min(referrals, task.requiresReferralCount)}/
@@ -347,8 +346,16 @@ const renderTasks = () => (
           {completedTasks[task.key] ? (
             <span className="done">✅ Выполнено</span>
           ) : (
+          task.isReferralTask ? (
+           <button
+            onClick={() => handlReferralClick (task)}
+             disabled={isDisabled}
+             >
+             Выполнить
+             </button>
+            ):(
             <button
-              onClick={() =>
+              onClick={() => 
                 task.requiresPayment
                   ? handlePaymentCheck(task.key)
                   : completeTask(task.key, task.reward)
