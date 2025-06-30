@@ -236,39 +236,40 @@ const handleTaskClick = async (task) => {
     return;
   }
 
-  // 2. Оплата VPN
-  if (task.type === 'vpn' && task.requiresPayment) {
-    try {
-      if (window.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-      } else {
-        window.open(task.link, '_blank');
-      }
-      alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-      return;
-    } catch (error) {
-      console.error ( 'Ошибка перехода к боту:', error);
-      alert ( 'Не удалось открыть Telegram-бота. Попробуй вручную.');
-return;
+ // 2. Оплата VPN
+if (task.type === 'vpn' && task.requiresPayment) {
+  try {
+    if (window.Telegram?.WebApp?.openTelegramLink) {
+      window.Telegram.WebApp.openTelegramLink(task.link);
+    } else {
+      window.open(task.link, '_blank');
     }
-  }
-  try{
-      const res = await fetch(`/api/check-payment?user_id=${userId}`);
-      const data = await res.json();
-      if (data.success) {
-        setVpnActivated(true);
-        setClickMultiplier(2);
-        completeTask(task);
-        alert('🎉 VPN оплачен. x2 кликов активирован!');
-      } else {
-        alert('⛔️ Оплата не найдена. Попробуй позже.');
-      }
-    } catch (err) {
-      console.error('Ошибка оплаты:', err);
-      alert('Ошибка при проверке оплаты.');
+    alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+
+    // Ждём 3 секунды, чтобы дать время оплатить
+    await new Promise(r => setTimeout(r, 3000));
+
+    // Проверяем оплату
+    const res = await fetch(`/api/check-payment?user_id=${userId}`);
+    const data = await res.json();
+
+    if (data.success) {
+      setVpnActivated(true);
+      setClickMultiplier(2);   // Включаем множитель
+      completeTask(task);
+      alert('🎉 VPN оплачен. x2 кликов активирован!');
+    } else {
+      alert('⛔️ Оплата не найдена. Попробуй позже.');
     }
 
-  // 3. Подписка на Telegram
+  } catch (err) {
+    console.error('Ошибка оплаты:', err);
+    alert('Ошибка при проверке оплаты.');
+  }
+  return; // чтобы дальше не выполнять общую логику
+}
+
+ // 3. Подписка на Telegram или Instagram
   if (task.requiresSubscription) {
     try {
       if (window.Telegram?.WebApp?.openTelegramLink) {
@@ -276,58 +277,48 @@ return;
       } else {
         window.open(task.link, '_blank');
       }
-
-      setTimeout(async () => {
-        const res = await fetch(`/api/check-subscription?user_id=${userId}`);
-        const data = await res.json();
-        if (data.subscribed) {
-          setSubscribed(true);
-          completeTask(task);
-        } else {
-          alert('Подпишись на канал, чтобы получить награду');
-        }
-      }, 2000);
     } catch (error) {
-      alert('Ошибка при проверке подписки');
+      alert('Не удалось открыть ссылку подписки');
       console.error(error);
+      return;
     }
-    return;
-  }
 
-  // 4. Подписка на Instagram
-  if (task.key === 'subscribeInstagram' && task.link) {
-  try {
-    if (window.Telegram?.WebApp?.openTelegramLink) {
-      window.Telegram.WebApp.openTelegramLink(task.link);
+    // Особенная проверка для Instagram
+    if (task.key === 'subscribeInstagram') {
+      setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/check-instagram-subscription?user_id=${userId}`);
+          const data = await res.json();
+          if (data.subscribed) {
+            completeTask(task);
+          } else {
+            alert('Пожалуйста, подпишитесь на Instagram для получения награды');
+          }
+        } catch {
+          alert('Ошибка при проверке подписки Instagram. Попробуйте позже.');
+        }
+      }, 3000);
     } else {
-      window.open(task.link, '_blank');
+      // Для остальных подписок (Telegram и др.)
+      setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/check-subscription?user_id=${userId}&task=${task.key}`);
+          const data = await res.json();
+          if (data.subscribed) {
+            completeTask(task);
+          } else {
+            alert('Пожалуйста, подпишитесь на канал для получения награды');
+          }
+        } catch {
+          alert('Ошибка при проверке подписки. Попробуйте позже.');
+        }
+      }, 3000);
     }
-  } catch {
-    alert('Не удалось открыть Instagram');
+
     return;
   }
-
-  // Подождать 3 секунды и проверить подписку через API
-  setTimeout(async () => {
-    try {
-      const res = await fetch(`/api/check-instagram-subscription?user_id=${userId}`);
-      const data = await res.json();
-
-      if (data.subscribed) {
-        completeTask(task);
-      } else {
-        alert('Пожалуйста, подпишитесь на Instagram, чтобы получить награду');
-      }
-    } catch {
-      alert('Ошибка при проверке подписки. Попробуйте позже');
-    }
-  }, 3000);
-
-  return;
-}
-
-  // 5. Прочие задания (соцсети, реакция, комментарий и т.п.)
-  completeTask(task);
+  // 4. Прочие простые задания (лайк, комментарий, рассказ в соцсетях)
+  completeTask(task);
 };
   
 const renderTasks = () => (
