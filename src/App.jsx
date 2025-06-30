@@ -219,8 +219,7 @@ const handleTaskClick = async (task) => {
   } catch (err) {
     alert('Ошибка при проверке приглашений.');
     console.error(err);
-  }
-};
+  };
 
 
 const botPaymentLink = 'https://t.me/OrdoHereticus_bot';
