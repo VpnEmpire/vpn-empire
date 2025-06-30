@@ -364,6 +364,7 @@ const renderTasks = () => (
               Выполнить
             </button>
           )
+          )}
         </div>
       );
     })}
