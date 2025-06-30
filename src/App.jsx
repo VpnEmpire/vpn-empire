@@ -179,28 +179,27 @@ setTimeout(() => {
   }
 };
   
-
   const completeTask = (task) => {
   if (completedTasks[task.key]) return;
 
-  const updated = {
-    ...completedTasks,
-    [task.key]: true
-  };
-  setCompletedTasks(updated);
-  localStorage.setItem('completedTasks', JSON.stringify(updated));
+  setCompletedTasks(prev => {
+    const updated = { ...prev, [task.key]: true };
+    localStorage.setItem('completedTasks', JSON.stringify(updated));
+    return updated;
+  });
 
-  const newCoins = coins + task.reward;
-  setCoins(newCoins);
-  localStorage.setItem('coins', newCoins);
+  setCoins(prev => {
+    const newCoins = prev + (task.reward || 0);
+    localStorage.setItem('coins', newCoins);
+    return newCoins;
+  });
 
   if (task.type === 'vpn') {
     setClickMultiplier(2);
   }
 
-  alert(`🎁 Ты получил ${task.reward} монет!`);
+  alert(`🎁 Ты получил ${task.reward || 0} монет!`);
 };
-
  
 const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) return;
@@ -297,18 +296,35 @@ return;
 
   // 4. Подписка на Instagram
   if (task.key === 'subscribeInstagram' && task.link) {
-    try {
-      if (window.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-      } else {
-        window.open(task.link, '_blank');
-      }
-    } catch {
-      alert('Не удалось открыть Instagram');
+  try {
+    if (window.Telegram?.WebApp?.openTelegramLink) {
+      window.Telegram.WebApp.openTelegramLink(task.link);
+    } else {
+      window.open(task.link, '_blank');
     }
-    completeTask(task);
+  } catch {
+    alert('Не удалось открыть Instagram');
     return;
   }
+
+  // Подождать 3 секунды и проверить подписку через API
+  setTimeout(async () => {
+    try {
+      const res = await fetch(`/api/check-instagram-subscription?user_id=${userId}`);
+      const data = await res.json();
+
+      if (data.subscribed) {
+        completeTask(task);
+      } else {
+        alert('Пожалуйста, подпишитесь на Instagram, чтобы получить награду');
+      }
+    } catch {
+      alert('Ошибка при проверке подписки. Попробуйте позже');
+    }
+  }, 3000);
+
+  return;
+}
 
   // 5. Прочие задания (соцсети, реакция, комментарий и т.п.)
   completeTask(task);
