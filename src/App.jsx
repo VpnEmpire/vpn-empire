@@ -201,6 +201,7 @@ const handleTaskClick = async (task) => {
 return;
     }
   }
+  try{
       const res = await fetch(`/api/check-payment?user_id=${userId}`);
       const data = await res.json();
       if (data.success) {
@@ -215,7 +216,6 @@ return;
       console.error('Ошибка оплаты:', err);
       alert('Ошибка при проверке оплаты.');
     }
-    return;
 
   // 3. Подписка на Telegram
   if (task.requiresSubscription) {
