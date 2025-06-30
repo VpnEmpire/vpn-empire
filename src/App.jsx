@@ -161,7 +161,9 @@ const handleTaskClick = (task) => {
     const link = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
     navigator.clipboard.writeText(link);
     alert(`Твоя реферальная ссылка скопирована:\n${link}`);
-  }
+    } catch {
+      alert(`Скопируй свою реферальную ссылку:\n${link}`);
+    }
   
 // Открываем ссылку, если она есть
   if (task.link) {
@@ -178,7 +180,7 @@ const handleTaskClick = (task) => {
       alert('Не удалось открыть ссылку. Попробуй позже.');
     }
   }
- // === 1. Проверка рефералов
+ // Проверяем рефералов, если нужно
   if (task.type === 'referral' && task.requiresReferralCount) {
     fetch(`/api/check-referrals?user_id=${userId}`)
       .then(res => res.json())
@@ -198,7 +200,7 @@ const handleTaskClick = (task) => {
     return;
   }
 
-  // === 2. Проверка подписки
+  // Проверяем подписку, если нужно
   if (task.requiresSubscription) {
     fetch(`/api/check-subscription?user_id=${userId}`)
       .then(res => res.json())
@@ -217,7 +219,7 @@ const handleTaskClick = (task) => {
     return;
   }
 
-  // === 3. Проверка оплаты
+  // Проверяем оплату, если нужно
   if (task.requiresPayment) {
     fetch(`/api/check-payment?user_id=${userId}`)
       .then(res => res.json())
@@ -236,7 +238,7 @@ const handleTaskClick = (task) => {
     return;
   }
 
-   // Задания без условий — сразу засчитываем и монеты начисляем
+  // Если нет условий — сразу начисляем монеты
   if (
     !task.requiresSubscription &&
     !task.requiresPayment &&
