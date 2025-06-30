@@ -1,48 +1,45 @@
 // /api/yookassa-webhook.js
+import admin from 'firebase-admin';
+import { buffer } from 'micro';
 
-import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import serviceAccount from '../../firebase-secret.json'; // путь к твоему ключу
+const serviceAccount = JSON.parse(process.env.FIREBASE_SECRET_JSON);
 
-// Инициализация Firebase Admin SDK
-const app = initializeApp({
-  credential: cert(serviceAccount),
-});
-const db = getFirestore(app);
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
+
+const db = admin.firestore();
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).end('Method Not Allowed');
   }
 
-  try {
-    const event = req.body;
+  const rawBody = await buffer(req);
+  const json = JSON.parse(rawBody.toString());
 
-    if (
-      event.event === 'payment.succeeded' &&
-      event.object &&
-      event.object.status === 'succeeded'
-    ) {
-      const userId = event.object.metadata?.user_id;
+  if (json.event === 'payment.succeeded') {
+    const userId = json.object.metadata?.user_id;
+    const amount = json.object.amount?.value;
 
-      if (!userId) {
-        return res.status(400).json({ success: false, error: 'user_id missing in metadata' });
-      }
-
-      // Записываем в Firestore, что пользователь оплатил
-      await db.collection('payments').doc(userId).set({
+    if (userId) {
+      await db.collection('users').doc(userId).set({
         paid: true,
-        amount: event.object.amount.value,
-        currency: event.object.amount.currency,
-        timestamp: new Date(),
-      });
+        amount: Number(amount),
+        timestamp: Date.now(),
+      }, { merge: true });
 
-      return res.status(200).json({ success: true });
-    } else {
-      return res.status(400).json({ success: false, message: 'Invalid event data' });
+      return res.status(200).send('OK');
     }
-  } catch (error) {
-    console.error('Webhook error:', error);
-    return res.status(500).json({ success: false, error: error.message });
   }
+
+  return res.status(400).send('Invalid payload');
 }
