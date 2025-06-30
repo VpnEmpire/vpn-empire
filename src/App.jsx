@@ -361,9 +361,9 @@ const renderTasks = () => (
           {completedTasks[task.key] ? (
             <span className="done">✅ Выполнено</span>
           ) : (
-          task.isReferralTask ? (
+          task.type === 'referral' ? (
            <button
-            onClick={() => handlReferralClick (task)}
+            onClick={() => handleReferralClick (task)}
              disabled={isDisabled}
              >
              Выполнить
