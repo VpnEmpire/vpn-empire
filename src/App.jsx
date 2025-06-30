@@ -363,7 +363,7 @@ const renderTasks = () => (
           ) : (
           task.type === 'referral' ? (
            <button
-            onClick={() => handleReferralClick (task)}
+            onClick={() => handleTaskClick (task)}
              disabled={isDisabled}
              >
              Выполнить
