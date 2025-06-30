@@ -128,7 +128,11 @@ setTimeout(() => {
   };
 
   const completeTask = (task) => {
-   const updated = tasks.map(t =>
+    if (completedTasks[task.key]) {
+       console.log('Задание уже выполнено:', task.key);
+     return;
+      
+   const updatedTasks = tasks.map(t =>
       t.key === task.key ? { ...t, done: true } : t
     );
 
@@ -150,7 +154,8 @@ setTimeout(() => {
       localStorage.setItem('coins', newCoins);
       return newCoins;
     });
-  };
+  console.log(`Задание "${task.key}" выполнено, добавлено ${task.reward} монет`);
+};
 
 const handleTaskClick = (task) => {
   if (completedTasks[task.key]) return;
