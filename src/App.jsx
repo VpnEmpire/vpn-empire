@@ -381,8 +381,7 @@ const renderTasks = () => (
       <h3>✅ Реферальная ссылка скопирована</h3>
       <p>Отправь её другу — и получи награду!</p>
       <button className="task-button" onClick={() => setShowReferralModal(false)}>Закрыть</button>
-    </div>
-  </div>
+  </a>
 )}
           {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
         </div>
