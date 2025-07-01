@@ -355,22 +355,10 @@ const renderTasks = () => (
  {task.type === 'subscribe' && task.link ? (
   <a href={task.link} target="_blank" rel="noopener noreferrer">
     <button className="task-button">Перейти</button>
-  </a>
-) : (
-  !completedTasks[task.key] && (
-    <button
-      onClick={() => handleTaskClick(task)}
-      disabled={isDisabled}
-      className="task-button"
-    >
-      Выполнить
-    </button>
-  )
-)}
-            
-          {!completedTasks[task.key] && (
+  </a>  
+          !completedTasks[task.key] && (
             <button
-              onClick={() => handleTaskClick(task)}
+              { onClick={() => handleTaskClick(task)}
               disabled={isDisabled}
               className="task-button"
             >
