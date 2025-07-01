@@ -365,22 +365,19 @@ const renderTasks = () => (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
           
-          {task.type === 'vpn' && (
-  <div className="task-buttons-vertical">
-    <button
-      className="task-button"
-      onClick={() => {
-        if (window.Telegram?.WebApp?.openTelegramLink) {
-          window.Telegram.WebApp.openTelegramLink('https://t.me/OrdoHereticus_bot');
-        } else {
-          window.open('https://t.me/OrdoHereticus_bot', '_blank');
-        }
-      }}
-    >
-      Перейти
-    </button>
-  </div>
-)}
+      {/* Кнопки для задания оплаты VPN */}
+          {task.type === 'payment' && (
+            <div className="task-buttons-vertical">
+              <a
+                href="https://t.me/OrdoHereticus_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="task-button">Перейти</button>
+              </a>
+            </div>
+          )}
+          
         {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
