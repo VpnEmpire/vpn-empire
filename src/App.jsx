@@ -213,7 +213,7 @@ const handleTaskClick = async (task) => {
         await navigator.clipboard.writeText(referralLink);
       }
       alert(`🔗 Реферальная ссылка скопирована:\n${referralLink}`);
-    } catch {
+    } catch (e) {
       alert(`Скопируй вручную:\n${referralLink}`);
     }
       const res = await fetch(`/api/check-referrals?user_id=${userId}`);
