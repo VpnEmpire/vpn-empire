@@ -390,6 +390,7 @@ const renderTasks = () => (
               >
                 {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
                  </button>
+                 </div>
               )}
               
           {!completedTasks[task.key] && (
