@@ -350,13 +350,6 @@ const renderTasks = () => (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
           
-   {task.type === 'referral' && userId && (
-          <p>
-            Реферальная ссылка: <br />
-            <code>{`https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`}</code>
-          </p>
-        )}
-          
           <p>🎯 Награда: {task.reward} монет</p>
 
           {task.link && (
