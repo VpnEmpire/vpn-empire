@@ -383,8 +383,8 @@ const renderTasks = ({ tasks, referrals, completeTask }) => {
       🔄 Сбросить данные (тест)
     </button>
   </div>
-);
-}
+};
+
  
 
   const renderHome = () => (
