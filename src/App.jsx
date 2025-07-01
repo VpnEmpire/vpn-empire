@@ -333,8 +333,22 @@ const renderTasks = () => (
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
+          
+   {task.type === 'referral' && userId && (
+          <p>
+            Реферальная ссылка: <br />
+            <code>{`https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`}</code>
+          </p>
+        )}
+          
           <p>🎯 Награда: {task.reward} монет</p>
 
+          {task.link && (
+          <a href={task.link} target="_blank" rel="noopener noreferrer">
+            <button className="task-button">Перейти</button>
+          </a>
+        )}
+          
           {!completedTasks[task.key] && (
             <button
               onClick={() => handleTaskClick(task)}
