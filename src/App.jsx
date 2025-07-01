@@ -365,7 +365,7 @@ const renderTasks = () => (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
           
-{task.type === 'payment' && (
+{task.type === 'vpn' && (
       <div className="task-buttons-vertical">
         <p>💎 Бонус: +1000 монет и x2 кликов</p>
         <a
