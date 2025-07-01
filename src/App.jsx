@@ -348,7 +348,7 @@ const renderTasks = () => (
       const isDisabled =
         (task.requiresReferralCount && referrals < task.requiresReferralCount) ||
         (task.disabled && !completedTasks[task.key]);
- 
+
       return (
         <div
           key={task.key}
@@ -358,37 +358,37 @@ const renderTasks = () => (
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
-         
           <p>🎯 Награда: {task.reward} монет</p>
 
           {task.type === 'subscribe' && task.link && (
-  <a href={task.link} target="_blank" rel="noopener noreferrer">
-    <button className="task-button">Перейти</button>
-  </a>
-)}
-    
-{task.type === 'referral' && (
-    <div className="task-button-vertical">
-      <button
-      className={`task-button copy-button ${copiedLink === task.key ? 'copied' : ''}`}
-    onClick={async () => {
-      const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
-      try {
-        if (window.Telegram?.WebApp?.clipboard?.writeText) {
-          await window.Telegram.WebApp.clipboard.writeText(refLink);
-        } else {
-          await navigator.clipboard.writeText(refLink);
-        }
-        setCopiedLink(task.key);
-        setTimeout(() => setCopiedLink(null), 2000);
-      } catch (e) {
-        alert(`Скопируй вручную:\n${refLink}`);
-      }
-    }}
-  >
-    {copiedLink === task.key ? '✅ Скопировано' : '🔗Скопировать'}
-  </button>
+            <a href={task.link} target="_blank" rel="noopener noreferrer">
+              <button className="task-button">Перейти</button>
+            </a>
+          )}
 
+          {task.type === 'referral' && (
+            <div className="task-buttons-vertical">
+              <button
+                className={
+                  'task-button copy-button' + (copiedLink === task.key ? ' copied' : '')
+                }
+                onClick={async () => {
+                  const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+                  try {
+                    if (window.Telegram?.WebApp?.clipboard?.writeText) {
+                      await window.Telegram.WebApp.clipboard.writeText(refLink);
+                    } else {
+                      await navigator.clipboard.writeText(refLink);
+                    }
+                    setCopiedLink(task.key);
+                    setTimeout(() => setCopiedLink(null), 2000);
+                  } catch (e) {
+                    alert(`Скопируй вручную:\n${refLink}`);
+                  }
+                }}
+              >
+                {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
+              </button>
       {!completedTasks[task.key] && (
             <button
               onClick={() => handleTaskClick(task)}
