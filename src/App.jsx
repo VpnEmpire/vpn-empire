@@ -78,14 +78,13 @@ useEffect(() => {
       setClicksToday(0);
       localStorage.setItem('lastClickDate', today);
     }
-    if (localStorage.getItem('dailyTaskDate') !== today) {
-      const updatedTasks = tasks.map(task =>
-        task.key === 'dailyVPN' ? { ...task, done: false } : task
-      );
-      setTasks(updatedTasks);
-      localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-      localStorage.setItem('dailyTaskDate', today);
-    }
+   if (localStorage.getItem('dailyVpnResetDate') !== today) {
+  const updated = { ...completedTasks };
+  delete updated['dailyVpn'];
+  setCompletedTasks(updated);
+  localStorage.setItem('completedTasks', JSON.stringify(updated));
+  localStorage.setItem('dailyVpnResetDate', today);
+}
     if (localStorage.getItem('lastSpinDate') === today) {
       setCanSpin(false);
     }
