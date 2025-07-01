@@ -356,7 +356,7 @@ const renderTasks = () => (
   <a href={task.link} target="_blank" rel="noopener noreferrer">
     <button className="task-button">Перейти</button>
   </a>  
-          !completedTasks[task.key] && (
+          {!completedTasks[task.key] && (
             <button
               { onClick={() => handleTaskClick(task)}
               disabled={isDisabled}
