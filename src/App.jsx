@@ -360,6 +360,7 @@ const renderTasks = () => (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
           <p>🎯 Награда: {task.reward} монет</p>
+          
   {task.type === 'subscribe' && task.link && (
           <div className="task-buttons-vertical">
   <a href={task.link} target="_blank" rel="noopener noreferrer">
@@ -372,7 +373,7 @@ const renderTasks = () => (
             <div className="task-buttons-vertical">
               <button
                 className={
-                  `task-button copy-button + ${copiedLink === task.key ? 'copied' : ''}`}
+                  `task-button copy-button ${copiedLink === task.key ? 'copied' : ''}`}
             
                 onClick={async () => {
                   const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
@@ -406,6 +407,7 @@ const renderTasks = () => (
    
           {completedTasks[task.key] && (<span className="done">✅ Выполнено</span>)}
           </div>
+        );
     })}
 
     <div className="task-card disabled-task">
