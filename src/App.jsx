@@ -352,26 +352,20 @@ const renderTasks = () => (
           
           <p>🎯 Награда: {task.reward} монет</p>
           
-  {completedTasks[task.key] ? (
-  task.type === 'referral' ? (
-    <button
-      onClick={() => handleTaskClick(task)}
-      disabled={isDisabled}
-    >
-      Выполнить
-    </button>
-  ) : (
-    <button
-      onClick={() =>
-        task.requiresPayment
-          ? handlePaymentCheck(task.key)
-          : completeTask(task.key, task.reward)
-      }
-      disabled={isDisabled}
-    >
-      Выполнить
-    </button>
-  )
+ {task.type === 'subscribe' && task.link ? (
+  <a href={task.link} target="_blank" rel="noopener noreferrer">
+    <button className="task-button">Перейти</button>
+  </a>
+) : (
+  !completedTasks[task.key] && (
+    <button
+      onClick={() => handleTaskClick(task)}
+      disabled={isDisabled}
+      className="task-button"
+    >
+      Выполнить
+    </button>
+  )
 )}
             
           {!completedTasks[task.key] && (
