@@ -331,7 +331,7 @@ setTimeout(() => {
     completeTask(task);
 };
   
-const renderTasks = () => (
+const renderTasks = ({ tasks, referrals, completeTask }) => {
   <div className="tasks-tab">
     <h2>📋 Задания</h2>
     {tasks.map(task => {
@@ -371,7 +371,8 @@ const renderTasks = () => (
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
-  })}
+  })} 
+
     <button
       style={{ marginTop: 20 }}
       onClick={() => {
@@ -383,7 +384,7 @@ const renderTasks = () => (
     </button>
   </div>
 );
-
+}
  
 
   const renderHome = () => (
