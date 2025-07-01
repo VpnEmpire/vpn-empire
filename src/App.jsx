@@ -362,19 +362,7 @@ const renderTasks = () => (
     >
       Выполнить
     </button>
-  ) : (
-    <button
-      onClick={() =>
-        task.requiresPayment
-          ? handlePaymentCheck(task.key)
-          : completeTask(task.key, task.reward)
-      }
-      disabled={isDisabled}
-    >
-      Выполнить
-    </button>
-  )
-)}
+  )}
           {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
         </div>
       );
