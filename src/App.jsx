@@ -330,11 +330,6 @@ setTimeout(() => {
 
     // 4. Прочие простые задания (лайк, комментарий, рассказ в соцсетях)
     completeTask(task);
-
-  } catch (error) {
-    console.error('Ошибка в handleTaskClick:', error);
-    alert('Произошла ошибка. Попробуйте позже.');
-  }
 };
   
 const renderTasks = () => (
