@@ -375,12 +375,14 @@ const renderTasks = () => (
         >
           <button className="task-button">Перейти в Telegram-бота</button>
         </a>
-           <button className="task-button">
-             Выполнить
-           </button>
-         </div>
-    )}
-          
+         <button
+      className="task-button"
+      onClick={() => handleTaskClick(task)}
+    >
+      Выполнить
+    </button>
+  </div>
+)}
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
