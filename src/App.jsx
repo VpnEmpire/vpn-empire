@@ -250,8 +250,7 @@ setTimeout(() => {
     } catch (error) {
       alert('Ошибка при проверке приглашений.');
       console.error(err);
-    }
-  };
+    };
 
     // 2. Оплата VPN
     if (task.type === 'vpn' && task.requiresPayment) {
@@ -329,7 +328,7 @@ setTimeout(() => {
       }
       return;
     }
-
+ };
     // 4. Прочие простые задания (лайк, комментарий, рассказ в соцсетях)
     completeTask(task);
 };
