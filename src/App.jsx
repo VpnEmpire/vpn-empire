@@ -349,32 +349,38 @@ const renderTasks = () => (
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
-          
+
           <p>🎯 Награда: {task.reward} монет</p>
-          
- {task.type === 'subscribe' && task.link ? (
-  <a href={task.link} target="_blank" rel="noopener noreferrer">
-    <button className="task-button">Перейти</button>
-  </a>
-) : (
-  !completedTasks[task.key] && (
-    <button
-      onClick={() => handleTaskClick(task)}
-      disabled={isDisabled}
-      className="task-button"
-    >
-      Выполнить
-    </button>
-  )
-)}
-          {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
+
+          {task.type === 'subscribe' && task.link ? (
+            <a href={task.link} target="_blank" rel="noopener noreferrer">
+              <button className="task-button">Перейти</button>
+            </a>
+          ) : !completedTasks[task.key] ? (
+            <button
+              onClick={() =>
+                task.requiresPayment
+                  ? handlePaymentCheck(task.key)
+                  : handleTaskClick(task)
+              }
+              disabled={isDisabled}
+              className="task-button"
+            >
+              Выполнить
+            </button>
+          ) : (
+            <span className="done">✅ Выполнено</span>
+          )}
         </div>
       );
     })}
+    
+    {/* Заглушка нового задания */}
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
 
+    {/* Кнопка сброса данных */}
     <button
       style={{ marginTop: 20 }}
       onClick={() => {
@@ -386,6 +392,7 @@ const renderTasks = () => (
     </button>
   </div>
 );
+
 
   const renderHome = () => (
     <div className="main-content">
