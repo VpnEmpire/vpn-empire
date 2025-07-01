@@ -348,7 +348,10 @@ const renderTasks = () => (
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
-          {!completedTasks[task.key] ?
+         
+          <p>🎯 Награда: {task.reward} монет</p>
+
+          {task.requiresReferralCount[task.key] ?
             <span className="done"> ✅ Выполнено</span>(
               ):(
             <button
@@ -358,9 +361,7 @@ const renderTasks = () => (
             >
               Выполнить
             </button>
-          )}
-          <p>🎯 Награда: {task.reward} монет</p>
-          
+          )} 
 {task.type === 'subscribe' && task.link && (
   <a href={task.link} target="_blank" rel="noopener noreferrer">
     <button className="task-button">Перейти</button>
