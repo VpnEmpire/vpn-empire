@@ -403,10 +403,7 @@ const renderTasks = () => (
           )}
    
           {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
-          )}
             </div>
-          )}
-        </div>
       );
     })}
 
