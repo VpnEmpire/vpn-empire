@@ -353,12 +353,12 @@ const renderTasks = () => (
           <p>🎯 Награда: {task.reward} монет</p>
 
           {completedTasks[task.key] ? (
-  <span className="done">✅ Выполнено</span>
+          <span className="done">✅ Выполнено</span>
 ) : (
-  task.type === 'referral' ? (
     <button
       onClick={() => handleTaskClick(task)}
       disabled={isDisabled}
+      className= "task-button"
     >
       Выполнить
     </button>
@@ -375,16 +375,6 @@ const renderTasks = () => (
     </button>
   )
 )}
-          {!completedTasks[task.key] && (
-            <button
-              onClick={() => handleTaskClick(task)}
-              disabled={isDisabled}
-              className="task-button"
-            >
-              Выполнить
-            </button>
-          )}
-
           {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
         </div>
       );
