@@ -194,7 +194,7 @@ setTimeout(() => {
     return newCoins;
   });
 
-  if (task.type === 'vpn') {
+  if (task.requiresPayment) {
     setClickMultiplier(2);
   }
 
@@ -207,7 +207,6 @@ const handleTaskClick = async (task) => {
   // 1. Реферальные задания
   if (task.type === 'referral' && task.requiresReferralCount) {
     const referralLink = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
-    try {
       if (window.Telegram?.WebApp?.clipboard?.writeText) {
         await window.Telegram.WebApp.clipboard.writeText(referralLink);
       } else {
@@ -217,8 +216,6 @@ const handleTaskClick = async (task) => {
     } catch {
       alert(`Скопируй вручную:\n${referralLink}`);
     }
-
-    try {
       const res = await fetch(`/api/check-referrals?user_id=${userId}`);
       const data = await res.json();
       const count = data.referrals || 0;
@@ -229,16 +226,11 @@ const handleTaskClick = async (task) => {
       } else {
         alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
       }
-    } catch (err) {
-      alert('Ошибка при проверке приглашений.');
-      console.error(err);
-    }
     return;
   }
 
  // 2. Оплата VPN
 if (task.type === 'vpn' && task.requiresPayment) {
-  try {
     if (window.Telegram?.WebApp?.openTelegramLink) {
       window.Telegram.WebApp.openTelegramLink(task.link);
     } else {
@@ -261,28 +253,17 @@ if (task.type === 'vpn' && task.requiresPayment) {
     } else {
       alert('⛔️ Оплата не найдена. Попробуй позже.');
     }
-
-  } catch (err) {
-    console.error('Ошибка оплаты:', err);
-    alert('Ошибка при проверке оплаты.');
-  }
-  return; // чтобы дальше не выполнять общую логику
+return;
 }
 
  // 3. Подписка на Telegram или Instagram
   if (task.requiresSubscription) {
-    try {
       if (window.Telegram?.WebApp?.openTelegramLink) {
         window.Telegram.WebApp.openTelegramLink(task.link);
       } else {
         window.open(task.link, '_blank');
       }
-    } catch (error) {
-      alert('Не удалось открыть ссылку подписки');
-      console.error(error);
-      return;
-    }
-
+    
     // Особенная проверка для Instagram
     if (task.key === 'subscribeInstagram') {
       setTimeout(async () => {
@@ -314,9 +295,9 @@ if (task.type === 'vpn' && task.requiresPayment) {
         }
       }, 3000);
     }
-
     return;
   }
+
   // 4. Прочие простые задания (лайк, комментарий, рассказ в соцсетях)
   completeTask(task);
 };
