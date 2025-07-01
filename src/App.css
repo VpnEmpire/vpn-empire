@@ -274,16 +274,24 @@ body, html {
   cursor: pointer;
   font-size: 14px;
 }
-.task-buttons-column {
+.task-buttons-vertical {
   display: flex;
   flex-direction: column;
-  gap: 8px;
   align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
 }
-.task-button.small-button {
+
+.copy-button {
+  width: 140px;
   font-size: 14px;
   padding: 8px 12px;
-  min-width: 140px;
+}
+
+.task-button {
+  width: 140px;
+  font-size: 14px;
+  padding: 8px 12px;
 }
 .copied-text {
   color: #5efb8f;
