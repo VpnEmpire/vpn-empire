@@ -361,59 +361,29 @@ const renderTasks = () => (
           )}
           <p>🎯 Награда: {task.reward} монет</p>
           
-          {task.type === 'subscribe' && task.link && (
-            <a href={task.link} target="_blank" rel="noopener noreferrer">
-              <button className="task-button">Перейти</button>
-            </a>
+         {task.type === 'subscribe' && task.link && (
+  <a href={task.link} target="_blank" rel="noopener noreferrer">
+    <button className="task-button">Перейти</button>
+  </a>
+)}
+          {!completedTasks[task.key] && (
+            <button
+              onClick={() => handleTaskClick(task)}
+              disabled={isDisabled}
+              className="task-button"
+            >
+              Выполнить
+            </button>
           )}
-
-          {task.type === 'referral' && (
-            <div className="task-buttons-vertical">
-              <button
-                className={
-                  'task-button copy-button' + (copiedLink === task.key ? ' copied' : '')
-                }
-                onClick={async () => {
-                  const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
-                  try {
-                    if (window.Telegram?.WebApp?.clipboard?.writeText) {
-                      await window.Telegram.WebApp.clipboard.writeText(refLink);
-                    } else {
-                      await navigator.clipboard.writeText(refLink);
-                    }
-                    setCopiedLink(task.key);
-                    setTimeout(() => setCopiedLink(null), 2000);
-                  } catch (e) {
-                    alert(`Скопируй вручную:\n${refLink}`);
-                  }
-                }}
-              >
-                {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
-              </button>
-
-              {!completedTasks[task.key] && (
-                <button
-                  onClick={() => handleTaskClick(task)}
-                  disabled={isDisabled}
-                  className="task-button"
-                >
-                  Выполнить
-                </button>
-              )}
-
-              {completedTasks[task.key] && (
-                <span className="done">✅ Выполнено</span>
-              )}
-            </div>
-          )}
+   
+          {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
         </div>
       );
-    })}
-
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
-
+  })} 
+ 
     <button
       style={{ marginTop: 20 }}
       onClick={() => {
@@ -425,7 +395,6 @@ const renderTasks = () => (
     </button>
   </div>
 );
-
  
 
   const renderHome = () => (
