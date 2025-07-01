@@ -365,19 +365,6 @@ const renderTasks = () => (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
           
-      {/* Кнопки для задания оплаты VPN */}
-          {task.type === 'payment' && (
-            <div className="task-buttons-vertical">
-              <a
-                href="https://t.me/OrdoHereticus_bot"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <button className="task-button">Перейти</button>
-              </a>
-            </div>
-          )}
-          
         {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
