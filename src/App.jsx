@@ -37,7 +37,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
     { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
     { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
     { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
-    { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, type: 'vpn', link: 'https://t.me/OrdoHereticus_bot', requiresPayment: true }
+    { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, type: 'vpn', link: 'https://t.me/OrdoHereticus_bot', bonus: 'x2 кликов', requiresPayment: true }
   ]);
 
   const maxClicksPerDay = 100;
@@ -359,7 +359,7 @@ const renderTasks = () => (
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
-          <p>🎯 Награда: {task.reward} монет</p>
+          <p>🎯 Награда: {task.reward} монет{task.bonus ? ` + ${task.bonus} ` : ''}</p>
 
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
