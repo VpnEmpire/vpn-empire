@@ -352,7 +352,7 @@ const renderTasks = () => (
           
           <p>🎯 Награда: {task.reward} монет</p>
 
-           {completedTasks[task.key] ? (
+          {completedTasks[task.key] ? (
             <span className="done">✅ Выполнено</span>
           ) : (
             <button
@@ -366,6 +366,8 @@ const renderTasks = () => (
               Выполнить
             </button>
           )}
+
+ 
  
           {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
         </div>
@@ -373,7 +375,7 @@ const renderTasks = () => (
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
- 
+  })}
     <button
       style={{ marginTop: 20 }}
       onClick={() => {
@@ -385,6 +387,7 @@ const renderTasks = () => (
     </button>
   </div>
 );
+
  
 
   const renderHome = () => (
