@@ -275,14 +275,12 @@ body, html {
   font-size: 14px;
 }
 .task-button.small-button {
-  padding: 6px 10px;
-  font-size: 12px;
-  width: 110px;
-  min-width: 100px;
-  margin-right: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  min-width: 120px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: center;
+  transition: background 0.3s ease;
 }
 .copied-text {
   color: #5efb8f;
