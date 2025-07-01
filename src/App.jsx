@@ -367,15 +367,6 @@ const renderTasks = () => (
             </button>
           )}
           
-{task.type === 'referral' ? (
-  <button
-    onClick={() => handleTaskClick(task)}
-    disabled={isDisabled}
-    className="task-button"
-  >
-    Выполнить
-  </button>
-) : (
   // для других типов заданий — своя логика
   <button
     onClick={() =>
