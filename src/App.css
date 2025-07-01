@@ -274,3 +274,14 @@ body, html {
   cursor: pointer;
   font-size: 14px;
 }
+.task-button.small-button {
+  padding: 6px 10px;
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.copied-text {
+  color: #5efb8f;
+  font-size: 13px;
+  margin-left: 5px;
+}
