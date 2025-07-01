@@ -374,9 +374,11 @@ const renderTasks = () => (
           rel="noopener noreferrer"
         >
           <button className="task-button">Оплатить VPN</button>
+             <button className="task-button">Перейти</button>
         </a>
-      </div>
+         </div>
     )}
+          
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
