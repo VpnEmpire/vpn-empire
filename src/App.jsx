@@ -365,8 +365,7 @@ const renderTasks = () => (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
 
-          {/* Кнопка "Перейти" */}
-          {(task.type === 'subscribe' || task.type === 'vpn') && task.link && (
+          {(task.type === 'vpn') && task.link && (
             <a href={task.link} target="_blank" rel="noopener noreferrer">
               <button className="task-button">Перейти</button>
             </a>
