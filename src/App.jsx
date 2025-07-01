@@ -204,22 +204,53 @@ setTimeout(() => {
  const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) return;
  // 1. Реферальные задания
-  try {
-  if (window.Telegram?.WebApp?.clipboard?.writeText) {
-    await window.Telegram.WebApp.clipboard.writeText(referralLink);
-    console.log('Копирование через Telegram WebApp.clipboard прошло успешно');
-  } else if (navigator.clipboard) {
-    await navigator.clipboard.writeText(referralLink);
-    console.log('Копирование через navigator.clipboard прошло успешно');
-  } else {
-    alert(`Скопируй вручную:\n${referralLink}`);
-  }
-  alert(`🔗 Реферальная ссылка скопирована:\n${referralLink}`);
-} catch (e) {
-  console.error('Ошибка копирования:', e);
-  alert(`Скопируй вручную:\n${referralLink}`);
-}
+   try {
+     if (task.type === 'referral' && task.requiresReferralCount) {
+    const referralLink = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
+    try {
+      if (window.Telegram?.WebApp?.clipboard?.writeText) {
+        await window.Telegram.WebApp.clipboard.writeText(referralLink);
+      } else {
+        await navigator.clipboard.writeText(referralLink);
+      }
+      alert(`🔗 Реферальная ссылка скопирована:\n${referralLink}`);
+    } catch (e) {
+      alert(`Скопируй вручную:\n${referralLink}`);
+    }
 
+      const res = await fetch(`/api/check-referrals?user_id=${userId}`);
+      const data = await res.json();
+      const count = data.referrals || 0;
+      setReferrals(count);
+
+      if (count >= task.requiresReferralCount) {
+        completeTask(task);
+ } else {
+        alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
+      }
+       return;
+     }
+        // Проверяем, выполнены ли все реферальные задания
+        const allReferralDone = tasks
+          .filter(t => t.type === 'referral')
+          .every(t => completedTasks[t.key] || t.key === task.key);
+
+        if (allReferralDone) {
+          // Сбрасываем отметки всех реферальных заданий
+          const resetCompleted = { ...completedTasks };
+          tasks.forEach(t => {
+            if (t.type === 'referral') delete resetCompleted[t.key];
+          });
+          setCompletedTasks(resetCompleted);
+          localStorage.setItem('completedTasks', JSON.stringify(resetCompleted));
+          alert('Все реферальные задания выполнены — они сброшены и доступны снова!');
+        }
+      
+    } catch (error) {
+      alert('Ошибка при проверке приглашений.');
+      console.error(err);
+    };
+   
     // 2. Оплата VPN
     if (task.type === 'vpn' && task.requiresPayment) {
       try {
@@ -317,7 +348,17 @@ const renderTasks = () => (
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
-          
+          {!completedTasks[task.key] ?
+            <span className="done"> ✅ Выполнено</span>(
+              ):(
+            <button
+              onClick={() => handleTaskClick(task)}
+              disabled={isDisabled}
+              className="task-button"
+            >
+              Выполнить
+            </button>
+          )}
           <p>🎯 Награда: {task.reward} монет</p>
           
 {task.type === 'subscribe' && task.link && (
