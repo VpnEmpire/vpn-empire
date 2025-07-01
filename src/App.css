@@ -274,27 +274,32 @@ body, html {
   cursor: pointer;
   font-size: 14px;
 }
-.task-buttons-vertical {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  margin-top: 8px;
-}
-
 .copy-button {
   width: 140px;
   font-size: 14px;
   padding: 8px 12px;
 }
 
+.task-buttons-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  align-items: center;
+}
 .task-button {
-  width: 100%;
-  max-width: 160px;
-  margin: 5px auto;
-  display: block;
+  width: 90%;
+  max-width: 200px;
   font-size: 14px;
   padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background-color: #00c2b2;
+  color: white;
+  cursor: pointer;
+}
+.task-button:hover {
+  background-color: #009f94;
 }
 .copied-text {
   color: #5efb8f;
