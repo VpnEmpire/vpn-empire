@@ -359,8 +359,19 @@ const renderTasks = () => (
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
-          <p>🎯 Награда: {task.reward} монет{task.bonus ? ` + ${task.bonus} ` : ''}</p>
+          <p>🎯 Награда: {task.reward} монет</p>
+          {/* Бонус x2 для VPN */}
+          {task.type === 'vpn' && (
+            <p>🎁 Бонус: x2 кликов после оплаты</p>
+          )}
 
+          {/* Кнопка "Перейти" */}
+          {(task.type === 'subscribe' || task.type === 'vpn') && task.link && (
+            <a href={task.link} target="_blank" rel="noopener noreferrer">
+              <button className="task-button">Перейти</button>
+            </a>
+          )}
+          
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
