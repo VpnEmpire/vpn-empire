@@ -365,7 +365,7 @@ const renderTasks = () => (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
           
-{task.type === 'vpn' && (
+{task.type === 'payment' && (
   <div className="task-buttons-vertical">
     {!completedTasks[task.key] && (
       <>
@@ -378,12 +378,14 @@ const renderTasks = () => (
         </a>
         <button
           className="task-button"
-          onClick={() => handleTaskClick(task)} // тут происходит автоматическая проверка на backend
+          onClick={() => handleTaskClick(task)}
         >
           Выполнить
         </button>
       </>
     )}
+  </div>
+)}
 
         {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
