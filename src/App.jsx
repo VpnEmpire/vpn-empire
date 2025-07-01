@@ -351,7 +351,12 @@ const renderTasks = () => (
           )}
           
           <p>🎯 Награда: {task.reward} монет</p>
-
+          
+{task.type === 'subscribe' && task.link && (
+  <a href={task.link} target="_blank" rel="noopener noreferrer">
+    <button className="task-button">Перейти</button>
+  </a>
+)}
           {!completedTasks[task.key] && (
             <button
               onClick={() => handleTaskClick(task)}
