@@ -373,9 +373,11 @@ const renderTasks = () => (
           target="_blank"
           rel="noopener noreferrer"
         >
-          <button className="task-button">Оплатить VPN</button>
-             <button className="task-button">Перейти</button>
+          <button className="task-button">Перейти в Telegram-бота</button>
         </a>
+           <button className="task-button">
+             Выполнить
+           </button>
          </div>
     )}
           
