@@ -365,7 +365,7 @@ const renderTasks = () => (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
           
-{task.type === 'vpn' && !completedTasks[task.key] && (
+{task.type === 'vpn' && (
   <div className="task-buttons-vertical">
     <a href="https://t.me/OrdoHereticus_bot" target="_blank" rel="noopener noreferrer">
       <button className="task-button">Перейти</button>
