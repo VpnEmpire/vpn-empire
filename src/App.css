@@ -289,7 +289,10 @@ body, html {
 }
 
 .task-button {
-  width: 140px;
+  width: 100%;
+  max-width: 160px;
+  margin: 5px auto;
+  display: block;
   font-size: 14px;
   padding: 8px 12px;
 }
