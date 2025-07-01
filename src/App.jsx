@@ -367,33 +367,27 @@ const renderTasks = () => (
   </a>
 )}
     
- {task.type === 'referral' && (
-  <>
-    <button
-      className="task-button small-button"
-      onClick={async () => {
-        const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
-        try {
-          if (window.Telegram?.WebApp?.clipboard?.writeText) {
-            await window.Telegram.WebApp.clipboard.writeText(refLink);
-          } else {
-            await navigator.clipboard.writeText(refLink);
-          }
-          setCopiedLink(refLink);
-          setShowCopied(true);
-          setTimeout(() => setShowCopied(false), 2000);
-        } catch (e) {
-          alert(`Скопируй вручную:\n${refLink}`);
+{task.type === 'referral' && (
+  <button
+    className="task-button small-button"
+    onClick={async () => {
+      const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+      try {
+        if (window.Telegram?.WebApp?.clipboard?.writeText) {
+          await window.Telegram.WebApp.clipboard.writeText(refLink);
+        } else {
+          await navigator.clipboard.writeText(refLink);
         }
-      }}
-    >
-      🔗
-    </button>
-    {showCopied && copiedLink.includes(userId) && (
-      <span className="copied-text">✅ Ссылка скопирована</span>
-    )}
-  </>
-)}    
+        setCopiedLink(task.key);
+        setTimeout(() => setCopiedLink(null), 2000);
+      } catch (e) {
+        alert(`Скопируй вручную:\n${refLink}`);
+      }
+    }}
+  >
+    {copiedLink === task.key ? '✅ Скопировано' : '🔗'}
+  </button>
+)}
       {!completedTasks[task.key] && (
             <button
               onClick={() => handleTaskClick(task)}
