@@ -370,7 +370,7 @@ const renderTasks = () => (
 {task.type === 'referral' && (
     <div className="task-button-vertical">
       <button
-      className={'task-button copy-button ${copiedLink === task.key ? 'copied' : ''}'}
+      className={`task-button copy-button ${copiedLink === task.key ? 'copied' : ''}`}
     onClick={async () => {
       const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
       try {
@@ -388,7 +388,7 @@ const renderTasks = () => (
   >
     {copiedLink === task.key ? '✅ Скопировано' : '🔗Скопировать'}
   </button>
-)}
+
       {!completedTasks[task.key] && (
             <button
               onClick={() => handleTaskClick(task)}
