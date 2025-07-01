@@ -367,17 +367,16 @@ const renderTasks = () => (
           
 {task.type === 'vpn' && (
   <div className="task-buttons-vertical">
-    <a href="https://t.me/OrdoHereticus_bot" target="_blank" rel="noopener noreferrer">
+    <a
+      href="https://t.me/OrdoHereticus_bot"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <button className="task-button">Перейти</button>
     </a>
-    <button
-      className="task-button"
-      onClick={() => handleTaskClick(task)}
-    >
-      Выполнить
-    </button>
   </div>
 )}
+
         {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
