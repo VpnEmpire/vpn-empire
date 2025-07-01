@@ -331,7 +331,7 @@ setTimeout(() => {
     completeTask(task);
 };
   
-const renderTasks = ({ tasks, referrals, completeTask }) => {
+const renderTasks = () => (
   <div className="tasks-tab">
     <h2>📋 Задания</h2>
     {tasks.map(task => {
@@ -383,7 +383,7 @@ const renderTasks = ({ tasks, referrals, completeTask }) => {
       🔄 Сбросить данные (тест)
     </button>
   </div>
-};
+);
 
  
 
