@@ -205,7 +205,7 @@ setTimeout(() => {
   if (completedTasks[task.key]) return;
  // 1. Реферальные задания
   
-   tru {
+   try {
      if (task.type === 'referral' && task.requiresReferralCount) {
     const referralLink = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
     try {
