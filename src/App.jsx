@@ -366,24 +366,26 @@ const renderTasks = () => (
           )}
           
 {task.type === 'vpn' && (
-      <div className="task-buttons-vertical">
-        <p>💎 Бонус: +1000 монет и x2 кликов</p>
+  <div className="task-buttons-vertical">
+    {!completedTasks[task.key] && (
+      <>
         <a
           href="https://t.me/OrdoHereticus_bot"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <button className="task-button">Перейти в Telegram-бота</button>
+          <button className="task-button">Перейти</button>
         </a>
-         <button
-      className="task-button"
-      onClick={() => handleTaskClick(task)}
-    >
-      Выполнить
-    </button>
-  </div>
-)}
-          {(task.type === 'referral' || task.type === 'subscribe') && (
+        <button
+          className="task-button"
+          onClick={() => handleTaskClick(task)} // тут происходит автоматическая проверка на backend
+        >
+          Выполнить
+        </button>
+      </>
+    )}
+
+        {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
                 <button
