@@ -203,7 +203,6 @@ setTimeout(() => {
  
 const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) return;
-
   try {
     // 1. Реферальные задания
     if (task.type === 'referral' && task.requiresReferralCount) {
@@ -215,10 +214,9 @@ const handleTaskClick = async (task) => {
           await navigator.clipboard.writeText(referralLink);
         }
         alert(`🔗 Реферальная ссылка скопирована:\n${referralLink}`);
-      } catch (e) {
+      } catch {
         alert(`Скопируй вручную:\n${referralLink}`);
       }
-
       const res = await fetch(`/api/check-referrals?user_id=${userId}`);
       const data = await res.json();
       const count = data.referrals || 0;
@@ -234,23 +232,26 @@ const handleTaskClick = async (task) => {
 
     // 2. Оплата VPN
     if (task.type === 'vpn' && task.requiresPayment) {
-      if (window.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-      } else {
-        window.open(task.link, '_blank');
+      try {
+        if (window.Telegram?.WebApp?.openTelegramLink) {
+          window.Telegram.WebApp.openTelegramLink(task.link);
+        } else {
+          window.open(task.link, '_blank');
+        }
+        alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+      } catch (error) {
+        alert('Не удалось открыть Telegram-бота. Попробуй вручную.');
+        return;
       }
-      alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
 
-      // Ждём 3 секунды, чтобы дать время оплатить
-      await new Promise(r => setTimeout(r, 3000));
+      await new Promise(r => setTimeout(r, 3000)); // Ждем 3 секунды
 
-      // Проверяем оплату
       const res = await fetch(`/api/check-payment?user_id=${userId}`);
       const data = await res.json();
 
       if (data.success) {
         setVpnActivated(true);
-        setClickMultiplier(2);   // Включаем множитель
+        setClickMultiplier(2);
         completeTask(task);
         alert('🎉 VPN оплачен. x2 кликов активирован!');
       } else {
@@ -269,7 +270,6 @@ const handleTaskClick = async (task) => {
         }
       } catch (error) {
         alert('Не удалось открыть ссылку подписки');
-        console.error(error);
         return;
       }
 
@@ -319,7 +319,7 @@ const handleTaskClick = async (task) => {
 const renderTasks = () => (
   <div className="tasks-tab">
     <h2>📋 Задания</h2>
-    {tasks.map((task) => {
+    {tasks.map(task => {
       const isDisabled =
         (task.requiresReferralCount && referrals < task.requiresReferralCount) ||
         (task.disabled && !completedTasks[task.key]);
@@ -331,52 +331,29 @@ const renderTasks = () => (
         >
           <h3>{task.label}</h3>
           {task.requiresReferralCount && (
-            <p>
-              👥 {Math.min(referrals, task.requiresReferralCount)}/
-              {task.requiresReferralCount}
-            </p>
+            <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
-
           <p>🎯 Награда: {task.reward} монет</p>
 
-          {task.link && (
-            <a href={task.link} target="_blank" rel="noopener noreferrer">
-              <button className="task-button">Перейти</button>
-            </a>
-          )}
-          {completedTasks[task.key] ? (
-            <span className="done">✅ Выполнено</span>
-          ) : (
-          task.type === 'referral' ? (
-           <button
-            onClick={() => handleTaskClick (task)}
-             disabled={isDisabled}
-             >
-             Выполнить
-             </button>
-            ):(
+          {!completedTasks[task.key] && (
             <button
-              onClick={() => 
-                task.requiresPayment
-                  ? handlePaymentCheck(task.key)
-                  : completeTask(task.key, task.reward)
-              }
+              onClick={() => handleTaskClick(task)}
               disabled={isDisabled}
+              className="task-button"
             >
               Выполнить
             </button>
-          )
           )}
+
+          {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
         </div>
       );
     })}
 
-    {/* Заглушка нового задания */}
     <div className="task-card disabled-task">
-      <span>🔒 <strong>Скоро новое задание</strong> —  🔜 Ожидай обновлений</span>
+      <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
 
-    {/* Кнопка сброса данных для тестов */}
     <button
       style={{ marginTop: 20 }}
       onClick={() => {
