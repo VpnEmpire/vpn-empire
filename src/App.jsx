@@ -402,7 +402,7 @@ const renderTasks = () => (
             </button>
           )}
    
-          {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
+          {completedTasks[task.key] && (<span className="done">✅ Выполнено</span>)}
             </div>
             </div>
       );
