@@ -365,28 +365,24 @@ const renderTasks = () => (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
           
-{task.type === 'payment' && (
+{task.type === 'payment' && !completedTasks[task.key] && (
   <div className="task-buttons-vertical">
-    {!completedTasks[task.key] && (
-      <>
-        <a
-          href="https://t.me/OrdoHereticus_bot"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <button className="task-button">Перейти</button>
-        </a>
-        <button
-          className="task-button"
-          onClick={() => handleTaskClick(task)}
-        >
-          Выполнить
-        </button>
-      </>
-    )}
+    <button
+      className="task-button"
+      onClick={() => {
+        window.open('https://t.me/OrdoHereticus_bot', '_blank');
+      }}
+    >
+      Перейти
+    </button>
+    <button
+      className="task-button"
+      onClick={() => handleTaskClick(task)}
+    >
+      Выполнить
+    </button>
   </div>
 )}
-
         {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
