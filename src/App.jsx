@@ -389,25 +389,29 @@ const renderTasks = () => (
               >
                 {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
               </button>
-      {!completedTasks[task.key] && (
-            <button
-              onClick={() => handleTaskClick(task)}
-              disabled={isDisabled}
-              className="task-button"
-            >
-              Выполнить
-            </button>
+
+              {!completedTasks[task.key] && (
+                <button
+                  onClick={() => handleTaskClick(task)}
+                  disabled={isDisabled}
+                  className="task-button"
+                >
+                  Выполнить
+                </button>
+              )}
+
+              {completedTasks[task.key] && (
+                <span className="done">✅ Выполнено</span>
+              )}
+            </div>
           )}
-   
-          {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
-      )}
         </div>
-      )}
-   
+      );
+    })}
+
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
-  })} 
 
     <button
       style={{ marginTop: 20 }}
