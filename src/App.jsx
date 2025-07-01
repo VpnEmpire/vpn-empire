@@ -361,12 +361,36 @@ const renderTasks = () => (
          
           <p>🎯 Награда: {task.reward} монет</p>
 
-{task.type === 'subscribe' && task.link && (
+          {task.type === 'subscribe' && task.link && (
   <a href={task.link} target="_blank" rel="noopener noreferrer">
     <button className="task-button">Перейти</button>
   </a>
 )}
-          {!completedTasks[task.key] && (
+    
+ {/* Кнопка копирования ссылки */}
+          {task.type === 'referral' && (
+            <button
+              className="task-button"
+              onClick={async () => {
+                const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+                try {
+                  if (window.Telegram?.WebApp?.clipboard?.writeText) {
+                    await window.Telegram.WebApp.clipboard.writeText(refLink);
+                  } else {
+                    await navigator.clipboard.writeText(refLink);
+                  }
+                  setCopiedLink(refLink);
+                  setShowReferralModal(true);
+                } catch (e) {
+                  alert(`Скопируй вручную:\n${refLink}`);
+                }
+              }}
+            >
+              🔗 Скопировать ссылку
+            </button>
+          )}
+          
+      {!completedTasks[task.key] && (
             <button
               onClick={() => handleTaskClick(task)}
               disabled={isDisabled}
@@ -375,14 +399,7 @@ const renderTasks = () => (
               Выполнить
             </button>
           )}
-          {showReferralModal && (
-  <div className="modal-overlay">
-    <div className="modal">
-      <h3>✅ Реферальная ссылка скопирована</h3>
-      <p>Отправь её другу — и получи награду!</p>
-      <button className="task-button" onClick={() => setShowReferralModal(false)}>Закрыть</button>
-  </a>
-)}
+   
           {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
         </div>
       );
