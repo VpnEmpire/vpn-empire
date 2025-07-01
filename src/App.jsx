@@ -368,8 +368,9 @@ const renderTasks = () => (
 )}
     
 {task.type === 'referral' && (
-  <button
-    className="task-button small-button"
+    <div className="task-button-vertical">
+      <button
+      className={'task-button copy-button ${copiedLink === task.key ? 'copied' : ''}'}
     onClick={async () => {
       const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
       try {
