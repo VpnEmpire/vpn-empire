@@ -360,7 +360,12 @@ const renderTasks = () => (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
           <p>🎯 Награда: {task.reward} монет</p>
-
+  {task.type === 'subscribe' && task.link && (
+          <div className="task-buttons-vertical">
+  <a href={task.link} target="_blank" rel="noopener noreferrer">
+    <button className="task-button">Перейти</button>
+  </a>
+)}
 
              {task.type === 'referral' && (
             <div className="task-buttons-vertical">
@@ -384,14 +389,9 @@ const renderTasks = () => (
                 }}
               >
                 {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
-              </button>
+                 </button>
               
-         {task.type === 'subscribe' && task.link && (
-          <div className="task-buttons-vertical">
-  <a href={task.link} target="_blank" rel="noopener noreferrer">
-    <button className="task-button">Перейти</button>
-  </a>
-)}
+              
           {!completedTasks[task.key] && (
             <button
               onClick={() => handleTaskClick(task)}
