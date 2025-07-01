@@ -355,11 +355,12 @@ const renderTasks = () => (
           className={`task-card ${completedTasks[task.key] ? "completed" : ""}`}
         >
           <h3>{task.label}</h3>
+
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
           <p>🎯 Награда: {task.reward} монет</p>
-
+          
           {task.type === 'subscribe' && task.link && (
             <a href={task.link} target="_blank" rel="noopener noreferrer">
               <button className="task-button">Перейти</button>
