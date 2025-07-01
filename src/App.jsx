@@ -360,8 +360,34 @@ const renderTasks = () => (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
           <p>🎯 Награда: {task.reward} монет</p>
-          
+
+
+             {task.type === 'referral' && (
+            <div className="task-buttons-vertical">
+              <button
+                className={
+                  'task-button copy-button' + (copiedLink === task.key ? ' copied' : '')
+                }
+                onClick={async () => {
+                  const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+                  try {
+                    if (window.Telegram?.WebApp?.clipboard?.writeText) {
+                      await window.Telegram.WebApp.clipboard.writeText(refLink);
+                    } else {
+                      await navigator.clipboard.writeText(refLink);
+                    }
+                    setCopiedLink(task.key);
+                    setTimeout(() => setCopiedLink(null), 2000);
+                  } catch (e) {
+                    alert(`Скопируй вручную:\n${refLink}`);
+                  }
+                }}
+              >
+                {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
+              </button>
+              
          {task.type === 'subscribe' && task.link && (
+          <div className="task-buttons-vertical">
   <a href={task.link} target="_blank" rel="noopener noreferrer">
     <button className="task-button">Перейти</button>
   </a>
