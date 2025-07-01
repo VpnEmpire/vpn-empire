@@ -365,6 +365,7 @@ const renderTasks = () => (
   <a href={task.link} target="_blank" rel="noopener noreferrer">
     <button className="task-button">Перейти</button>
   </a>
+  </div>            
 )}
 
              {task.type === 'referral' && (
@@ -404,8 +405,7 @@ const renderTasks = () => (
           )}
    
           {completedTasks[task.key] && (<span className="done">✅ Выполнено</span>)}
-            </div>
-      );
+          </div>
     })}
 
     <div className="task-card disabled-task">
