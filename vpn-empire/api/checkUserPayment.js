@@ -23,7 +23,10 @@ export default async function handler(req, res) {
   try {
     const userRef = db.collection('users').doc(user_id);
     const userDoc = await userRef.get();
-
+    
+   console.log('User ID:', user_id);
+   console.log('User Data:', userDoc.exists ? userDoc.data() : null);
+    
     const data = userDoc.exists ? userDoc.data() : null;
 
     // Уже активировал VPN?
