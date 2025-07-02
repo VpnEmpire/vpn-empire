@@ -24,8 +24,10 @@ export default async function handler(req, res) {
   }
 
   const rawBody = await buffer(req);
+  console.log('Raw webhook body:', rawBody.toString()); 
   const json = JSON.parse(rawBody.toString());
-
+  console.log('Parsed webhook JSON:', json);  
+  
   if (json.event === 'payment.succeeded') {
     const userId = json.object.metadata?.user_id;
     const amount = json.object.amount?.value;
