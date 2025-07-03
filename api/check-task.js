@@ -1,61 +1,45 @@
+import { json } from 'micro';
 import admin from 'firebase-admin';
-
-const serviceAccount = JSON.parse(process.env.FIREBASE_SECRET_JSON);
+import serviceAccount from '../../firebase-secret.json';
 
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://vpn-empire-admin.firebaseio.com',
   });
 }
 
 const db = admin.firestore();
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
-
-  const { user_id, taskKey, taskType, requiredCount } = req.body;
-
-  if (!user_id || !taskKey || !taskType) {
-    return res.status(400).json({ error: 'Missing parameters' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 
   try {
-    const userRef = db.collection('users').doc(user_id);
-    const userDoc = await userRef.get();
+    const body = await json(req);
+    const { user_id } = body;
 
-    if (!userDoc.exists) {
+    if (!user_id) {
+      return res.status(400).json({ success: false, message: 'Missing user_id' });
+    }
+
+    const userRef = db.collection('users').doc(user_id);
+    const doc = await userRef.get();
+
+    if (!doc.exists) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    const userData = userDoc.data();
+    const userData = doc.data();
 
-    let isCompleted = false;
-
-    if (taskType === 'vpn' && userData.paid === true && !userData.vpnActivated) {
-      await userRef.update({
-        coins: (userData.coins || 0) + 1000,
-        vpnActivated: true,
-      });
-      isCompleted = true;
-
-    } else if (taskType === 'subscribe' && userData.subscribed === true) {
-      isCompleted = true;
-
-    } else if (taskType === 'referral' && (userData.referrals || 0) >= requiredCount) {
-      isCompleted = true;
-
-    } else if (taskType === 'daily') {
-      isCompleted = true;
-    }
-
-    if (isCompleted) {
+    if (userData.hasPaidVpn) {
       return res.status(200).json({ success: true });
     } else {
-      return res.status(200).json({ success: false, message: 'Task not completed yet' });
+      return res.status(200).json({ success: false, message: 'Payment not found' });
     }
-
   } catch (err) {
-    console.error('Ошибка в /check-task:', err);
-    return res.status(500).json({ error: 'Server error' });
+    console.error('Error checking task:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 }
