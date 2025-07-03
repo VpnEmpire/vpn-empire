@@ -1,6 +1,12 @@
 import admin from 'firebase-admin';
 import { buffer } from 'micro';
- 
+
+ export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 const serviceAccount = JSON.parse(process.env.FIREBASE_SECRET_JSON);
  
 if (!admin.apps.length) {
@@ -11,23 +17,24 @@ if (!admin.apps.length) {
  
 const db = admin.firestore();
  
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
- 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).end('Method not Allowed');
+    return res.status(405).end('Method Not Allowed');
   }
  
   const rawBody = await buffer(req);
-  console.log('Raw webhook body:', rawBody.toString());
+ console.log('Raw webhook body:', rawBody.toString());
  
   const json = JSON.parse(rawBody.toString());
   console.log('Parsed webhook JSON:', json);
  
+  console.log('📥 Webhook получен:', JSON.stringify(json));
+
+    const event = json.event;
+    const metadata = json.object?.metadata;
+    const description = json.object?.description;
+    const amount = json.object?.amount?.value;
+
   let userId = null;
   if (json.object.metadata?.user_id) {
     userId = json.object.metadata.user_id;
@@ -61,4 +68,4 @@ export default async function handler(req, res) {
 
       console.log(`💰 Оплата подтверждена и монеты начислены для userId ${userId}`);
       return res.status(200).send('OK');
-    }
+}
