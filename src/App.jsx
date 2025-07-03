@@ -391,7 +391,6 @@ const renderTasks = () => (
                       alert('📲 Сверни игру и перейди в бот, чтобы оплатить VPN. Затем вернись и нажми «Выполнить»');
                }
              }}
-              className="task-button"
            >
             Открыть бота
                 </button>
@@ -405,7 +404,6 @@ const renderTasks = () => (
               </div>
             </>
           )}
-
           {task.key !== 'activateVpn' && (
             <div className="task-buttons-vertical">
               {!completedTasks[task.key] && (
@@ -420,11 +418,8 @@ const renderTasks = () => (
               {completedTasks[task.key] && (
                 <span className="done">✅ Выполнено</span>
               )}
-            </div>
-          )}
         </div>
-      );
-    })}
+        )}
           
         {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
