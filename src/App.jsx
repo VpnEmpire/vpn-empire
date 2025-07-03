@@ -424,7 +424,7 @@ const renderTasks = () => (
             </div>
           )}
  
-          {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
+          {!['referral', 'subscribe'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
                 onClick={() => handleTaskClick(task)}
