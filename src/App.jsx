@@ -364,16 +364,6 @@ const renderTasks = () => (
             <>
               <p>🎁 Бонус: x2 кликов после оплаты</p>
               <div className="task-buttons-vertical">
-               
-                {!completedTasks[task.key] && (
-                  <button
-                    onClick={() => handleTaskClick(task)}
-                    disabled={isDisabled}
-                    className="task-button"
-                  >
-                    Выполнить
-                  </button>
-                )}
               </div>
             </>
           )}
