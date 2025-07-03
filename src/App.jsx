@@ -378,9 +378,9 @@ const renderTasks = () => (
               className="task-button"
                onClick={() => {
                 if (window.Telegram?.WebApp?.openTelegramLink) {
-                 window.Telegram.WebApp.openTelegramLink(task.link);
+                 window.Telegram.WebApp.openTelegramLink('https://t.me/OrdoHereticus_bot');
                 } else {
-                 window.open(task.link, '_blank');
+                 window.open('https://t.me/OrdoHereticus_bot', '_blank');
                }
              }}
            >
