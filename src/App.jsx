@@ -363,11 +363,22 @@ const renderTasks = () => (
               {task.type === 'vpn' && (
             <>
               <p>🎁 Бонус: x2 кликов после оплаты</p>
-              <div className="task-buttons-vertical">
-              </div>
+ <div className="task-buttons-vertical">
+    <button
+      className="task-button"
+      onClick={() => {
+        if (window.Telegram?.WebApp?.openTelegramLink) {
+          window.Telegram.WebApp.openTelegramLink(task.link);
+        } else {
+          window.open(task.link, '_blank');
+        }
+      }}
+    >
+      </button>
+             </div>
             </>
           )}
-
+          
         {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
