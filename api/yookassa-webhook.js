@@ -1,12 +1,12 @@
 import admin from 'firebase-admin';
 import { buffer } from 'micro';
-
+ 
  export const config = {
   api: {
     bodyParser: false,
   },
 };
-
+ 
 const serviceAccount = JSON.parse(process.env.FIREBASE_SECRET_JSON);
  
 if (!admin.apps.length) {
@@ -29,14 +29,13 @@ export default async function handler(req, res) {
   console.log('Parsed webhook JSON:', json);
  
   console.log('📥 Webhook получен:', JSON.stringify(json));
-
+ 
     const event = json.event;
     const metadata = json.object?.metadata;
     const description = json.object?.description;
     const amount = json.object?.amount?.value;
-
-  let userId = null;
  
+  let userId = null;
   if (json.object.metadata?.user_id) {
     userId = json.object.metadata.user_id;
   } else if (json.object.description) {
@@ -59,14 +58,14 @@ export default async function handler(req, res) {
   const userRef = db.collection('users').doc(userId);
   const userDoc = await userRef.get();
   const userData = userDoc.exists ? userDoc.data() : {};
-
+ 
       await userRef.set({
         coins: (userData.coins || 0) + 1000,
         paid: true,
-        vpnActivate: true,
+        vpnActivated: true,
         timestamp: Date.now(),
       }, { merge: true });
-
-      console.log(`💰 Оплата подтверждена и монеты начислены, paidVpn = true для userId ${userId}`);
+ 
+      console.log(`💰 Оплата подтверждена и монеты начислены для userId ${userId}`);
       return res.status(200).send('OK');
 }
