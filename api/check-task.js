@@ -1,45 +1,49 @@
-import { json } from 'micro';
-import admin from 'firebase-admin';
-import serviceAccount from '../../firebase-secret.json';
+// /api/check-task.js
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: 'https://vpn-empire-admin.firebaseio.com',
-  });
+import { cert, getApps, initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+
+if (!getApps().length) {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
+  initializeApp({ credential: cert(serviceAccount) });
 }
 
-const db = admin.firestore();
+const db = getFirestore();
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'Method not allowed' });
+    return res.status(405).json({ success: false, error: 'Метод не поддерживается' });
   }
 
   try {
-    const body = await json(req);
-    const { user_id } = body;
+    const { user_id, taskKey, taskType } = req.body;
 
-    if (!user_id) {
-      return res.status(400).json({ success: false, message: 'Missing user_id' });
+    if (!user_id || taskType !== 'vpn') {
+      return res.status(400).json({ success: false, error: 'Неверные данные запроса' });
     }
 
-    const userRef = db.collection('users').doc(user_id);
-    const doc = await userRef.get();
+    const userRef = db.collection('users').doc(user_id.toString());
+    const userSnap = await userRef.get();
 
-    if (!doc.exists) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+    if (!userSnap.exists) {
+      return res.status(404).json({ success: false, error: 'Пользователь не найден' });
     }
 
-    const userData = doc.data();
+    const user = userSnap.data();
 
-    if (userData.hasPaidVpn) {
-      return res.status(200).json({ success: true });
+    if (user.paidVpn) {
+      await userRef.update({
+        coins: (user.coins || 0) + 1000,
+        [`tasks.${taskKey}`]: true,
+      });
+
+      return res.status(200).json({ success: true, message: 'VPN оплачен, монеты начислены' });
     } else {
-      return res.status(200).json({ success: false, message: 'Payment not found' });
+      return res.status(200).json({ success: false, message: 'Оплата не найдена' });
     }
+
   } catch (err) {
-    console.error('Error checking task:', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('Ошибка в check-task:', err);
+    return res.status(500).json({ success: false, error: 'Внутренняя ошибка сервера' });
   }
 }
