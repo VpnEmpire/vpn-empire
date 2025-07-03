@@ -359,33 +359,25 @@ const renderTasks = () => (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
           <p>🎯 Награда: {task.reward} монет</p>
-          {/* Бонус x2 для VPN */}
-          {task.type === 'vpn' && (
-            <p>🎁 Бонус: x2 кликов после оплаты</p>
-          )}
-            {task.type === 'vpn' && !isCompleted && (
-            <div className="task-buttons-vertical">
-              <button
-                className="task-button"
-                onClick={() => {
-                  if (window.Telegram?.WebApp?.openTelegramLink) {
-                    window.Telegram.WebApp.openTelegramLink(task.link);
-                  } else {
-                    window.open(task.link, '_blank');
-                  }
-                  alert('Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-                }}
-              >
-                Перейти в бот
-              </button>
-              <button
-                className="task-button"
-                onClick={() => handleTaskClick(task)}
-                disabled={isDisabled}
-              >
-                Выполнить
-              </button>
-            </div>
+         
+             {task.type === 'vpn' && (
+            <>
+              <p>🎁 Бонус: x2 кликов после оплаты</p>
+              <div className="task-buttons-vertical">
+                <a href={task.link} target="_blank" rel="noopener noreferrer">
+                  <button className="task-button">Перейти в бот</button>
+                </a>
+                {!completedTasks[task.key] && (
+                  <button
+                    onClick={() => handleTaskClick(task)}
+                    disabled={isDisabled}
+                    className="task-button"
+                  >
+                    Выполнить
+                  </button>
+                )}
+              </div>
+            </>
           )}
 
         {(task.type === 'referral' || task.type === 'subscribe') && (
