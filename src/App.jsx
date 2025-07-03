@@ -127,10 +127,10 @@ setTimeout(() => {
   
   const checkVpnPayment = async () => {
   try {
-    const response = await fetch('https://vpnempire.vercel.app/vpn-empire/api/checkUserPayment', {
+    const response = await fetch('/api/check-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
+      body: JSON.stringify({ user_id }),
     });
 
     const result = await response.json();
