@@ -1,49 +1,50 @@
-// /api/check-task.js
-
-import { cert, getApps, initializeApp } from 'firebase-admin/app';
+import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import serviceAccount from './firebase-secret.json'; // убедись, что путь к ключу правильный
 
-if (!getApps().length) {
-  const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
-  initializeApp({ credential: cert(serviceAccount) });
-}
-
-const db = getFirestore();
+const app = initializeApp({
+  credential: cert(serviceAccount),
+});
+const db = getFirestore(app);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Метод не поддерживается' });
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const { user_id, taskKey, taskType } = req.body;
+
+  if (!user_id || taskKey !== 'activatedVpn' || taskType !== 'vpn') {
+    return res.status(400).json({ error: 'Invalid parameters' });
   }
 
   try {
-    const { user_id, taskKey, taskType } = req.body;
+    const userRef = db.collection('users').doc(String(user_id));
+    const userDoc = await userRef.get();
 
-    if (!user_id || taskType !== 'vpn') {
-      return res.status(400).json({ success: false, error: 'Неверные данные запроса' });
+    if (!userDoc.exists) return res.status(404).json({ error: 'User not found' });
+
+    const userData = userDoc.data();
+
+    // Если уже выполнено — не начисляем заново
+    if (userData.tasks?.activatedVpn === true) {
+      return res.status(200).json({ message: 'Task already completed' });
     }
 
-    const userRef = db.collection('users').doc(user_id.toString());
-    const userSnap = await userRef.get();
+    // Проверяем, была ли оплата
+    if (userData.paidVpn === true) {
+      const reward = 1000;
+      const updatedCoins = (userData.coins || 0) + reward;
 
-    if (!userSnap.exists) {
-      return res.status(404).json({ success: false, error: 'Пользователь не найден' });
-    }
-
-    const user = userSnap.data();
-
-    if (user.paidVpn) {
       await userRef.update({
-        coins: (user.coins || 0) + 1000,
-        [`tasks.${taskKey}`]: true,
+        coins: updatedCoins,
+        'tasks.activatedVpn': true,
       });
 
-      return res.status(200).json({ success: true, message: 'VPN оплачен, монеты начислены' });
+      return res.status(200).json({ message: 'Reward granted', coins: updatedCoins });
     } else {
-      return res.status(200).json({ success: false, message: 'Оплата не найдена' });
+      return res.status(400).json({ error: 'VPN not paid yet' });
     }
-
-  } catch (err) {
-    console.error('Ошибка в check-task:', err);
-    return res.status(500).json({ success: false, error: 'Внутренняя ошибка сервера' });
+  } catch (error) {
+    console.error('Error checking task:', error);
+    return res.status(500).json({ error: 'Server error' });
   }
 }
