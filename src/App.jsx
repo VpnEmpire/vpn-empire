@@ -223,7 +223,7 @@ setTimeout(() => {
   }
 
   try {
-    const res = await fetch(`/vpn-empire/api/check-referrals?user_id=${userId}`);
+    const res = await fetch(`/api/check-referrals?user_id=${userId}`);
     const data = await res.json();
     const count = data.referrals || 0;
     setReferrals(count);
@@ -276,7 +276,7 @@ setTimeout(() => {
     
     await new Promise(r => setTimeout(r, 3000));
 
-    const res = await fetch('/vpn-empire/api/check-payment', {
+    const res = await fetch('/api/check-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -313,7 +313,7 @@ setTimeout(() => {
       if (task.key === 'subscribeInstagram') {
         setTimeout(async () => {
           try {
-            const res = await fetch(`/vpn-empire/api/check-instagram-subscription?user_id=${userId}`);
+            const res = await fetch(`/api/check-instagram-subscription?user_id=${userId}`);
             const data = await res.json();
             if (data.subscribed) {
               completeTask(task);
@@ -329,8 +329,8 @@ setTimeout(() => {
         setTimeout(async () => {
           try {
             const url = task.key === 'subscribeInstagram'
-          ? `/vpn-empire/api/check-instagram-subscription?user_id=${userId}`
-          : `/vpn-empire/api/check-subscription?user_id=${userId}&task=${task.key}`;
+          ? `/api/check-instagram-subscription?user_id=${userId}`
+          : `/api/check-subscription?user_id=${userId}&task=${task.key}`;
             
             const res = await fetch(url);
             const data = await res.json();
@@ -391,7 +391,7 @@ const renderTasks = () => (
                     className="task-button"
                     onClick={async () => {
                       try {
-                        const res = await fetch('/vpn-empire/api/check-task', {
+                        const res = await fetch('/api/check-task', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify ({ user_id,
