@@ -10,7 +10,11 @@
   "dependencies": {
     "firebase-admin": "^11.10.1",
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     "micro": "^9.3.4",
+=======
+    "micro": "^10.0.1",
+>>>>>>> Stashed changes
 =======
     "micro": "^10.0.1",
 >>>>>>> Stashed changes
