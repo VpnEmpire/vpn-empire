@@ -20,6 +20,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [copiedLink, setCopiedLink] = useState('');
   const [vpnActivated, setVpnActivated] = useState(false);
   const [clickMultiplier, setClickMultiplier] = useState (1);
+  const [hasVpnBoost, setHasVpnBoost] = useState(() => localStorage.gerItem('hasVpnBoost') === 'true');
   const [subscribed, setSubscribed] = useState(false);
   const [isWithdrawApproved, setIsWithdrawApproved] = useState(() => localStorage.getItem('isWithdrawApproved') === 'true');
   const [tasks, setTasks] = useState([
@@ -101,7 +102,7 @@ const audio = new Audio('/click.mp3');
 
   const handleClick = (e) => {
     if (clicksToday < maxClicksPerDay) {
-      const multiplier = Number(localStorage.getItem('clickMultiplier')) || 1;
+     const reward = hasVpnBoost ? 2 : 1;
       setCoins(prev => prev + 1 * multiplier);
       setClicksToday(prev => prev + 1);
       triggerAnimation();
@@ -276,25 +277,32 @@ setTimeout(() => {
     
     await new Promise(r => setTimeout(r, 3000));
 
-    const res = await fetch('/api/check-payment', {
+    const res = await fetch('/vpn-empire/api/check-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id })
-    });
+      body: JSON.stringify({user_id: userId, taskKey: task.key }),
+    }).then(res => res.json());
 
-    const data = await res.json();
-    console.log('Ответ от check-task:', data);
+    if (res.success) {
+    // ✅ Выполнено
+    const updated = { ...completedTasks, [task.key]: true };
+    setCompletedTasks(updated);
+    localStorage.setItem('completedTasks', JSON.stringify(updated));
 
-    if (data.success) {
-      completeTask(task);
-      setClickMultiplier(2);
-      alert('🎉 VPN оплачен. Награда и бонус x2 выданы!');
-    } else {
-      alert('⛔️ Оплата не найдена. Попробуй позже.');
+    // 👇 x2 кликов
+    setHasVpnBoost(true);
+    localStorage.setItem('hasVpnBoost', 'true');
+
+    // 👇 Обновим монеты
+    setCoins(prev => prev + 1000);
+    localStorage.setItem('coins', coins + 1000);
+      
+   alert('✅ Оплата подтверждена! Награда + x2 кликов активированы.');
+      } else {
+        alert('⛔ Оплата не найдена. Попробуй позже.');
+      }
     }
-    return;
-  }
+  };
 
     // 3. Подписка на Telegram или Instagram
     if (task.requiresSubscription) {
@@ -383,42 +391,40 @@ const renderTasks = () => (
                       alert('📲 Сверни игру и перейди в бот, чтобы оплатить VPN. Затем вернись и нажми «Выполнить»');
                }
              }}
+              className="task-button"
            >
             Открыть бота
                 </button>
-               {!completedTasks[task.key] && (
-                  <button
-                    className="task-button"
-                    onClick={async () => {
-                      try {
-                        const res = await fetch('/api/check-task', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify ({ user_id,
-                          taskKey: 'activateVpn',
-                          taskType: 'vpn'
-                        })
-                        });
-
-                        const result = await res.json();
-                        if (result.success) {
-                          alert('✅ Оплата подтверждена!');
-                         completeTask(task); // функция начисления награды
-                        } else {
-                          alert('❌ Оплата не найдена. Попробуй позже.');
-                        }
-                      } catch (err) {
-                        console.error(err);
-                        alert('Ошибка при проверке оплаты');
-                      }
-                    }}
-                  >
-                    Выполнить
-                  </button>
-                )}
+                <button
+                  className="task-button"
+                  disabled={completedTasks[task.key]}
+                  onClick={() => handleTaskClick(task)}
+                >
+                  {completedTasks[task.key] ? '✅ Выполнено' : 'Выполнить'}
+                </button>
               </div>
             </>
           )}
+
+          {task.key !== 'activateVpn' && (
+            <div className="task-buttons-vertical">
+              {!completedTasks[task.key] && (
+                <button
+                  onClick={() => handleTaskClick(task)}
+                  disabled={isDisabled}
+                  className="task-button"
+                >
+                  Выполнить
+                </button>
+              )}
+              {completedTasks[task.key] && (
+                <span className="done">✅ Выполнено</span>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    })}
           
         {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
@@ -505,8 +511,10 @@ const renderTasks = () => (
     </div>
       <div className="robot-container">
         <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
-        <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
+        <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет
+        {hasVpnBoost && <span className="boost-indicator"> ⚡ x2</span>}
       </div>
+     </div>
       <div className="helper-box">
         🤖 <strong>Я твой помощник!</strong><br />
         Кликай на робота и зарабатывай монеты.
