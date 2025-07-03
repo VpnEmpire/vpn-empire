@@ -276,14 +276,11 @@ setTimeout(() => {
     
     await new Promise(r => setTimeout(r, 3000));
 
-    const res = await fetch('/vpn-empire/api/check-task', {
+    const res = await fetch('/vpn-empire/api/check-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id,
-        taskKey: 'activateVpn',
-        taskType: 'vpn',
-      }),
+        user_id })
     });
 
     const data = await res.json();
