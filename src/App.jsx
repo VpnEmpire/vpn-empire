@@ -46,22 +46,18 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [canSpin, setCanSpin] = useState(true);
   const [spinResult, setSpinResult] = useState(null);
   useEffect(() => {
-    const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-    if (tgUserId) {
-      setUserId(tgUserId);
-      fetch(`vpn-empire/api/check-referrals?user_id=${tgUserId}`)
-        .then(res => res.json())
-        .then(data => setReferrals(data.referrals || 0));
+    const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
+    const storedUserId = localStorage.getItem('userId');
 
-      fetch(`vpn-empire/api/check-subscription?user_id=${tgUserId}`)
-        .then(res => res.json())
-        .then(data => setSubscribed(data.subscribed));
-
-      fetch(`vpn-empire/api/check-payment?user_id=${tgUserId}`)
-        .then(res => res.json())
-        .then(data => setVpnActivated(data.success));
+    if (initDataUnsafe?.user?.id) {
+      const tgId = initDataUnsafe.user.id.toString();
+      setUserId(tgId);
+      localStorage.setItem('userId', tgId);
+    } else if (storedUserId) {
+      setUserId(storedUserId);
     }
   }, []);
+  
 useEffect(() => {
     localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
@@ -203,6 +199,10 @@ setTimeout(() => {
 };
   
  const handleTaskClick = async (task) => {
+   if (!userId){
+     alert ('Ошибка: не получен userId');
+     return;
+   }
    if (task.type === 'referral' && !completedTasks[task.key]) {
   const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
  // 1. Реферальные задания
@@ -219,7 +219,7 @@ setTimeout(() => {
   }
 
   try {
-    const res = await fetch(`vpn-empire/api/check-referrals?user_id=${userId}`);
+    const res = await fetch(`/vpn-empire/api/check-referrals?user_id=${userId}`);
     const data = await res.json();
     const count = data.referrals || 0;
     setReferrals(count);
@@ -256,39 +256,45 @@ setTimeout(() => {
   return;
 }
    
-    // 2. Оплата VPN
-    if (task.type === 'vpn' && task.requiresPayment) {
-      try {
-        if (window.Telegram?.WebApp?.openTelegramLink) {
-          window.Telegram.WebApp.openTelegramLink(task.link);
-        } else {
-          window.open(task.link, '_blank');
-        }
-        alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-      } catch (error) {
-        alert('Не удалось открыть Telegram-бота. Попробуй вручную.');
-        return;
-      }
-
-      await new Promise(r => setTimeout(r, 3000)); // Ждем 3 секунды
-
-    const res = await fetch('https://vpnempire.vercel.app/vpn-empire/api/checkUserPayment', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ user_id: userId }),
-});
-      const data = await res.json();
-
-      if (data.success) {
-        setVpnActivated(true);
-        setClickMultiplier(2);
-        completeTask(task);
-        alert('🎉 VPN оплачен. x2 кликов активирован!');
+    // 2. Оплата VPN — 🔄 ОБНОВЛЕНО
+  if (task.type === 'vpn' && task.requiresPayment) {
+    try {
+      if (window.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(task.link);
       } else {
-        alert('⛔️ Оплата не найдена. Попробуй позже.');
+        window.open(task.link, '_blank');
       }
+      alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+    } catch (error) {
+      alert('Не удалось открыть Telegram-бота. Попробуй вручную.');
       return;
     }
+
+    await new Promise(r => setTimeout(r, 3000));
+
+    const res = await fetch('https://vpnempire.vercel.app/vpn-empire/api/check-task', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        taskKey: task.key,
+        taskType: task.type,
+        requiredCount: 0
+      }),
+    });
+
+    const data = await res.json();
+    console.log('Ответ от check-task:', data);
+
+    if (data.success) {
+      completeTask(task);
+      setClickMultiplier(2);
+      alert('🎉 VPN оплачен. Награда и бонус x2 выданы!');
+    } else {
+      alert('⛔️ Оплата не найдена. Попробуй позже.');
+    }
+    return;
+  }
 
     // 3. Подписка на Telegram или Instagram
     if (task.requiresSubscription) {
@@ -307,7 +313,7 @@ setTimeout(() => {
       if (task.key === 'subscribeInstagram') {
         setTimeout(async () => {
           try {
-            const res = await fetch(`vpn-empire/api/check-instagram-subscription?user_id=${userId}`);
+            const res = await fetch(`/vpn-empire/api/check-instagram-subscription?user_id=${userId}`);
             const data = await res.json();
             if (data.subscribed) {
               completeTask(task);
@@ -322,7 +328,7 @@ setTimeout(() => {
         // Для остальных подписок (Telegram и др.)
         setTimeout(async () => {
           try {
-            const res = await fetch(`vpn-empire/api/check-subscription?user_id=${userId}&task=${task.key}`);
+            const res = await fetch(`/vpn-empire/api/check-subscription?user_id=${userId}&task=${task.key}`);
             const data = await res.json();
             if (data.subscribed) {
               completeTask(task);
@@ -347,21 +353,36 @@ const renderTasks = () => (
       const isDisabled =
         (task.requiresReferralCount && referrals < task.requiresReferralCount) ||
         (task.disabled && !completedTasks[task.key]);
-
+ 
       return (
         <div
           key={task.key}
           className={`task-card ${completedTasks[task.key] ? "completed" : ""}`}
         >
           <h3>{task.label}</h3>
-
+ 
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
           <p>🎯 Награда: {task.reward} монет</p>
-          {/* Бонус x2 для VPN */}
-          {task.type === 'vpn' && (
-            <p>🎁 Бонус: x2 кликов после оплаты</p>
+         
+              {task.type === 'vpn' && (
+            <>
+              <p>🎁 Бонус: x2 кликов после оплаты</p>
+ <div className="task-buttons-vertical">
+    <button
+      className="task-button"
+      onClick={() => {
+        if (window.Telegram?.WebApp?.openTelegramLink) {
+          window.Telegram.WebApp.openTelegramLink(task.link);
+        } else {
+          window.open(task.link, '_blank');
+        }
+      }}
+    >
+      </button>
+             </div>
+            </>
           )}
           
         {(task.type === 'referral' || task.type === 'subscribe') && (
@@ -387,13 +408,13 @@ const renderTasks = () => (
                   {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
                 </button>
               )}
-
+ 
               {task.type === 'subscribe' && task.link && (
                 <a href={task.link} target="_blank" rel="noopener noreferrer">
                   <button className="task-button">Перейти</button>
                 </a>
               )}
-
+ 
               {!completedTasks[task.key] && (
                 <button
                   onClick={() => handleTaskClick(task)}
@@ -405,7 +426,7 @@ const renderTasks = () => (
               )}
             </div>
           )}
-
+ 
           {!['referral', 'subscribe'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
@@ -417,18 +438,18 @@ const renderTasks = () => (
               </button>
             </div>
           )}
-
+ 
           {completedTasks[task.key] && (
             <span className="done">✅ Выполнено</span>
           )}
         </div>
       );
     })}
-
+ 
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
-
+ 
     <button
       style={{ marginTop: 20 }}
       onClick={() => {
@@ -440,7 +461,6 @@ const renderTasks = () => (
     </button>
   </div>
 );
- 
 
   const renderHome = () => (
     <div className="main-content">

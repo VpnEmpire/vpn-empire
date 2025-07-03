@@ -36,6 +36,7 @@ export default async function handler(req, res) {
 
     // Тут должна быть твоя логика проверки оплаты (например, флаг оплаты)
     if (data?.paid === true) {
+      const currentCoins = typeof data.coins === 'number' ? data.coins : 0;
       await userRef.update({
         coins: (data.coins || 0) + 1000,
         vpnActivated: true,
