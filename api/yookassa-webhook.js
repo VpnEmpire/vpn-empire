@@ -36,6 +36,7 @@ export default async function handler(req, res) {
     const amount = json.object?.amount?.value;
 
   let userId = null;
+ 
   if (json.object.metadata?.user_id) {
     userId = json.object.metadata.user_id;
   } else if (json.object.description) {
@@ -62,10 +63,10 @@ export default async function handler(req, res) {
       await userRef.set({
         coins: (userData.coins || 0) + 1000,
         paid: true,
-        vpnActivated: true,
+        vpnActivate: true,
         timestamp: Date.now(),
       }, { merge: true });
 
-      console.log(`💰 Оплата подтверждена и монеты начислены для userId ${userId}`);
+      console.log(`💰 Оплата подтверждена и монеты начислены, paidVpn = true для userId ${userId}`);
       return res.status(200).send('OK');
 }
