@@ -19,7 +19,7 @@ export const config = {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).end('Method Not Allowed');
+    return res.status(405).end('Method not Allowed');
   }
 
   const rawBody = await buffer(req);
@@ -47,6 +47,28 @@ export default async function handler(req, res) {
       timestamp: Date.now(),
     }, { merge: true });
 
+      if (!doc.exists) {
+      // Новый пользователь — создаём запись
+      await userRef.set({
+        coins: 1000,
+        vpnActivated: true,
+        paid: true,
+        amount: Number(amount),
+        timestamp: Date.now(),
+      });
+    } else {
+      const data = doc.data();
+      if (!data.vpnActivated) {
+        // Повторно не выдаём награду
+        await userRef.update({
+          coins: (data.coins || 0) + 1000,
+          vpnActivated: true,
+          paid: true,
+          amount: Number(amount),
+          timestamp: Date.now(),
+        });
+      }
+    }
     return res.status(200).send('OK');
   }
 
