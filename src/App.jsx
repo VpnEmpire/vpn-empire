@@ -360,13 +360,11 @@ const renderTasks = () => (
           )}
           <p>🎯 Награда: {task.reward} монет</p>
          
-             {task.type === 'vpn' && (
+              {task.type === 'vpn' && (
             <>
               <p>🎁 Бонус: x2 кликов после оплаты</p>
               <div className="task-buttons-vertical">
-                <a href={task.link} target="_blank" rel="noopener noreferrer">
-                  <button className="task-button">Перейти в бот</button>
-                </a>
+               
                 {!completedTasks[task.key] && (
                   <button
                     onClick={() => handleTaskClick(task)}
