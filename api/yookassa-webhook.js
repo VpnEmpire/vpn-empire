@@ -46,6 +46,19 @@ export default async function handler(req, res) {
       amount: Number(amount),
       timestamp: Date.now(),
     }, { merge: true });
- 
-    return res.status(200).send('OK');
+  return res.status(200).send('OK');
   }
+  const userRef = db.collection('users').doc(userId);
+  const userDoc = await userRef.get();
+  const userData = userDoc.exists ? userDoc.data() : {};
+
+      await userRef.set({
+        coins: (userData.coins || 0) + 1000,
+        paid: true,
+        vpnActivated: true,
+        timestamp: Date.now(),
+      }, { merge: true });
+
+      console.log(`💰 Оплата подтверждена и монеты начислены для userId ${userId}`);
+      return res.status(200).send('OK');
+    }
