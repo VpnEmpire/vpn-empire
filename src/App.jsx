@@ -394,10 +394,13 @@ const renderTasks = () => (
                     className="task-button"
                     onClick={async () => {
                       try {
-                        const res = await fetch('http://localhost:3000/check-payment', {
+                        const res = await fetch('/vpn-empire/api/check-task', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ user_id: userId })
+                          body: JSON.stringify ({ user_id,
+                          taskKey: 'activateVpn',
+                          taskType: 'vpn'
+                        })
                         });
 
                         const result = await res.json();
