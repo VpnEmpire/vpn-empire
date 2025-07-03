@@ -49,15 +49,15 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
     const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
     if (tgUserId) {
       setUserId(tgUserId);
-      fetch(`vpn-empire/api/check-referrals?user_id=${tgUserId}`)
+      fetch(`/vpn-empire/api/check-referrals?user_id=${tgUserId}`)
         .then(res => res.json())
         .then(data => setReferrals(data.referrals || 0));
 
-      fetch(`vpn-empire/api/check-subscription?user_id=${tgUserId}`)
+      fetch(`/vpn-empire/api/check-subscription?user_id=${tgUserId}`)
         .then(res => res.json())
         .then(data => setSubscribed(data.subscribed));
 
-      fetch(`vpn-empire/api/check-payment?user_id=${tgUserId}`)
+      fetch(`/vpn-empire/api/check-payment?user_id=${tgUserId}`)
         .then(res => res.json())
         .then(data => setVpnActivated(data.success));
     }
@@ -219,7 +219,7 @@ setTimeout(() => {
   }
 
   try {
-    const res = await fetch(`vpn-empire/api/check-referrals?user_id=${userId}`);
+    const res = await fetch(`/vpn-empire/api/check-referrals?user_id=${userId}`);
     const data = await res.json();
     const count = data.referrals || 0;
     setReferrals(count);
@@ -307,7 +307,7 @@ setTimeout(() => {
       if (task.key === 'subscribeInstagram') {
         setTimeout(async () => {
           try {
-            const res = await fetch(`vpn-empire/api/check-instagram-subscription?user_id=${userId}`);
+            const res = await fetch(`/vpn-empire/api/check-instagram-subscription?user_id=${userId}`);
             const data = await res.json();
             if (data.subscribed) {
               completeTask(task);
@@ -322,7 +322,7 @@ setTimeout(() => {
         // Для остальных подписок (Telegram и др.)
         setTimeout(async () => {
           try {
-            const res = await fetch(`vpn-empire/api/check-subscription?user_id=${userId}&task=${task.key}`);
+            const res = await fetch(`/vpn-empire/api/check-subscription?user_id=${userId}&task=${task.key}`);
             const data = await res.json();
             if (data.subscribed) {
               completeTask(task);
