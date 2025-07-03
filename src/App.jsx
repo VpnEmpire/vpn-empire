@@ -46,22 +46,18 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [canSpin, setCanSpin] = useState(true);
   const [spinResult, setSpinResult] = useState(null);
   useEffect(() => {
-    const tgUserId = window?.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-    if (tgUserId) {
-      setUserId(tgUserId);
-      fetch(`/vpn-empire/api/check-referrals?user_id=${tgUserId}`)
-        .then(res => res.json())
-        .then(data => setReferrals(data.referrals || 0));
+    const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
+    const storedUserId = localStorage.getItem('userId');
 
-      fetch(`/vpn-empire/api/check-subscription?user_id=${tgUserId}`)
-        .then(res => res.json())
-        .then(data => setSubscribed(data.subscribed));
-
-      fetch(`/vpn-empire/api/check-payment?user_id=${tgUserId}`)
-        .then(res => res.json())
-        .then(data => setVpnActivated(data.success));
+    if (initDataUnsafe?.user?.id) {
+      const tgId = initDataUnsafe.user.id.toString();
+      setUserId(tgId);
+      localStorage.setItem('userId', tgId);
+    } else if (storedUserId) {
+      setUserId(storedUserId);
     }
   }, []);
+  
 useEffect(() => {
     localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
