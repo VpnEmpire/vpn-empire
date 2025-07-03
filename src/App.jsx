@@ -276,14 +276,13 @@ setTimeout(() => {
     
     await new Promise(r => setTimeout(r, 3000));
 
-    const res = await fetch('https://vpnempire.vercel.app/vpn-empire/api/check-task', {
+    const res = await fetch('/vpn-empire/api/check-task', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: userId,
-        taskKey: task.key,
-        taskType: task.type,
-        requiredCount: 0
+        user_id,
+        taskKey: 'activateVpn',
+        taskType: 'vpn',
       }),
     });
 
