@@ -363,7 +363,7 @@ const renderTasks = () => (
           {task.type === 'vpn' && (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
-{/* Блок кнопок для VPN-оплаты */}
+
           {task.type === 'vpn' && !isCompleted && (
             <div className="task-buttons-vertical">
               <button
