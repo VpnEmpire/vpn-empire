@@ -256,42 +256,45 @@ setTimeout(() => {
   return;
 }
    
-    // 2. Оплата VPN
-    if (task.type === 'vpn' && task.requiresPayment) {
-      try {
-        if (window.Telegram?.WebApp?.openTelegramLink) {
-          window.Telegram.WebApp.openTelegramLink(task.link);
-        } else {
-          window.open(task.link, '_blank');
-        }
-        alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-      } catch (error) {
-        alert('Не удалось открыть Telegram-бота. Попробуй вручную.');
-        return;
-      }
-
-      await new Promise(r => setTimeout(r, 3000)); // Ждем 3 секунды
-
-    const res = await fetch('https://vpnempire.vercel.app/vpn-empire/api/checkUserPayment', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ user_id: userId }),
-});
-      const data = await res.json();
-      
-    console.log('Ответ от checkUserPayment:', data);
-    alert('DEBUG: data.success = ' + data.success);
-      
-      if (data.success) {
-        setVpnActivated(true);
-        setClickMultiplier(2);
-        completeTask(task);
-        alert('🎉 VPN оплачен. x2 кликов активирован!');
+    // 2. Оплата VPN — 🔄 ОБНОВЛЕНО
+  if (task.type === 'vpn' && task.requiresPayment) {
+    try {
+      if (window.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(task.link);
       } else {
-        alert('⛔️ Оплата не найдена. Попробуй позже.');
+        window.open(task.link, '_blank');
       }
+      alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+    } catch (error) {
+      alert('Не удалось открыть Telegram-бота. Попробуй вручную.');
       return;
     }
+
+    await new Promise(r => setTimeout(r, 3000));
+
+    const res = await fetch('https://vpnempire.vercel.app/vpn-empire/api/check-task', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        taskKey: task.key,
+        taskType: task.type,
+        requiredCount: 0
+      }),
+    });
+
+    const data = await res.json();
+    console.log('Ответ от check-task:', data);
+
+    if (data.success) {
+      completeTask(task);
+      setClickMultiplier(2);
+      alert('🎉 VPN оплачен. Награда и бонус x2 выданы!');
+    } else {
+      alert('⛔️ Оплата не найдена. Попробуй позже.');
+    }
+    return;
+  }
 
     // 3. Подписка на Telegram или Instagram
     if (task.requiresSubscription) {
