@@ -15,58 +15,37 @@ if (!admin.apps.length) {
     credential: admin.credential.cert(serviceAccount),
   });
 }
-const db = admin.firestore();
 
+const db = admin.firestore();
 app.use(bodyParser.json());
 
 app.post('/webhook', async (req, res) => {
   const data = req.body;
-  console.log('📥 Получен вебхук:', JSON.stringify(data, null, 2));
+  console.log('✅ Получен вебхук:', JSON.stringify(data, null, 2));
 
-  if (
-    data.event === 'payment.succeeded' &&
-    data.object &&
-    data.object.paid === true
-  ) {
-    let userId = null;
+  if (data.event === 'payment.succeeded') {
+    const userId = data.object.metadata?.user_id;
 
-    if (data.object.metadata?.user_id) {
-      userId = data.object.metadata.user_id;
-    } else if (data.object.description) {
-      const match = data.object.description.match(/\d+/);
-      if (match) {
-        userId = match[0];
-      }
-    }
+    if (userId) {
+      const userRef = db.collection('users').doc(userId);
+      const userSnap = await userRef.get();
+      const userData = userSnap.exists ? userSnap.data() : { coins: 0 };
 
-    if (!userId) {
-      console.log('❌ Не удалось определить user_id');
-      return res.status(400).send('Missing user_id');
-    }
+      const newCoins = (userData.coins || 0) + 1000;
 
-    const userRef = db.collection('users').doc(userId);
-    const userDoc = await userRef.get();
-    const userData = userDoc.data() || {};
-
-    if (!userData.vpnActivated) {
       await userRef.set(
         {
+          coins: newCoins,
           paid: true,
-          vpnActivated: true,
-          coins: (userData.coins || 0) + 1000,
-          lastPayment: Date.now(),
         },
         { merge: true }
       );
-      console.log(`✅ Пользователю ${userId} начислено 1000 монет`);
-    } else {
-      console.log(`ℹ️ VPN уже активирован для ${userId}, монеты не начислены повторно`);
-    }
 
-    return res.status(200).send('OK');
+      console.log(`🎉 Начислено 1000 монет пользователю ${userId}`);
+    }
   }
 
-  return res.status(200).send('Webhook received, but not handled.');
+  res.sendStatus(200);
 });
 
 app.listen(port, () => {
