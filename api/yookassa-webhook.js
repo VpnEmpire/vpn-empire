@@ -41,14 +41,10 @@ export default async function handler(req, res) {
   if (json.event === 'payment.succeeded' && userId) {
     const amount = json.object.amount?.value;
 
-    await db.collection('users').doc(userId).set({
-      paid: true,
-      amount: Number(amount),
-      timestamp: Date.now(),
-    }, { merge: true });
+      const userRef = db.collection('users').doc(userId);
+    const doc = await userRef.get();
 
-      if (!doc.exists) {
-      // Новый пользователь — создаём запись
+    if (!doc.exists) {
       await userRef.set({
         coins: 1000,
         vpnActivated: true,
@@ -58,8 +54,9 @@ export default async function handler(req, res) {
       });
     } else {
       const data = doc.data();
-      if (!data.vpnActivated) {
-        // Повторно не выдаём награду
+      const alreadyPaid = data.vpnActivated === true;
+
+      if (!alreadyPaid) {
         await userRef.update({
           coins: (data.coins || 0) + 1000,
           vpnActivated: true,
@@ -69,8 +66,13 @@ export default async function handler(req, res) {
         });
       }
     }
+
     return res.status(200).send('OK');
   }
+
+  return res.status(200).send('Ignored');
+}
+
 
   return res.status(400).send('Invalid payload');
 }
