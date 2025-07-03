@@ -404,7 +404,7 @@ const renderTasks = () => (
                         const result = await res.json();
                         if (result.success) {
                           alert('✅ Оплата подтверждена!');
-                          handleTaskComplete(task); // функция начисления награды
+                         completeTask(task); // функция начисления награды
                         } else {
                           alert('❌ Оплата не найдена. Попробуй позже.');
                         }
