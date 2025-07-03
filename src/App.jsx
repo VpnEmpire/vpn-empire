@@ -203,6 +203,10 @@ setTimeout(() => {
 };
   
  const handleTaskClick = async (task) => {
+   if (!userId){
+     alert ('Ошибка: не получен userId');
+     return;
+   }
    if (task.type === 'referral' && !completedTasks[task.key]) {
   const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
  // 1. Реферальные задания
@@ -278,7 +282,10 @@ setTimeout(() => {
   body: JSON.stringify({ user_id: userId }),
 });
       const data = await res.json();
-
+      
+    console.log('Ответ от checkUserPayment:', data);
+    alert('DEBUG: data.success = ' + data.success);
+      
       if (data.success) {
         setVpnActivated(true);
         setClickMultiplier(2);
