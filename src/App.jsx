@@ -203,9 +203,13 @@ setTimeout(() => {
      alert ('Ошибка: не получен userId');
      return;
    }
+   if (completedTasks[task.key]) {
+    alert('✅ Это задание уже выполнено!');
+    return;
+  }
+    // 1. Реферальные задания
    if (task.type === 'referral' && !completedTasks[task.key]) {
   const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
- // 1. Реферальные задания
   try {
     if (window.Telegram?.WebApp?.clipboard?.writeText) {
       await window.Telegram.WebApp.clipboard.writeText(refLink);
@@ -269,7 +273,7 @@ setTimeout(() => {
       alert('Не удалось открыть Telegram-бота. Попробуй вручную.');
       return;
     }
-
+    
     await new Promise(r => setTimeout(r, 3000));
 
     const res = await fetch('https://vpnempire.vercel.app/vpn-empire/api/check-task', {
@@ -328,7 +332,11 @@ setTimeout(() => {
         // Для остальных подписок (Telegram и др.)
         setTimeout(async () => {
           try {
-            const res = await fetch(`/vpn-empire/api/check-subscription?user_id=${userId}&task=${task.key}`);
+            const url = task.key === 'subscribeInstagram'
+          ? `/vpn-empire/api/check-instagram-subscription?user_id=${userId}`
+          : `/vpn-empire/api/check-subscription?user_id=${userId}&task=${task.key}`;
+            
+            const res = await fetch(url);
             const data = await res.json();
             if (data.subscribed) {
               completeTask(task);
@@ -366,22 +374,50 @@ const renderTasks = () => (
           )}
           <p>🎯 Награда: {task.reward} монет</p>
          
-              {task.type === 'vpn' && (
+         {task.type === 'vpn' && (
             <>
               <p>🎁 Бонус: x2 кликов после оплаты</p>
- <div className="task-buttons-vertical">
-    <button
-      className="task-button"
-      onClick={() => {
-        if (window.Telegram?.WebApp?.openTelegramLink) {
-          window.Telegram.WebApp.openTelegramLink(task.link);
-        } else {
-          window.open(task.link, '_blank');
-        }
-      }}
-    >
-      </button>
-             </div>
+           <div className="task-buttons-vertical">
+            <button
+              className="task-button"
+               onClick={() => {
+                if (window.Telegram?.WebApp?.openTelegramLink) {
+                 window.Telegram.WebApp.openTelegramLink(task.link);
+                } else {
+                 window.open(task.link, '_blank');
+               }
+             }}
+           >
+            Открыть бота
+                </button>
+               {!completedTasks[task.key] && (
+                  <button
+                    className="task-button"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch('http://localhost:3000/check-payment', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ user_id: userId })
+                        });
+
+                        const result = await res.json();
+                        if (result.success) {
+                          alert('✅ Оплата подтверждена!');
+                          handleTaskComplete(task); // функция начисления награды
+                        } else {
+                          alert('❌ Оплата не найдена. Попробуй позже.');
+                        }
+                      } catch (err) {
+                        console.error(err);
+                        alert('Ошибка при проверке оплаты');
+                      }
+                    }}
+                  >
+                    Выполнить
+                  </button>
+                )}
+              </div>
             </>
           )}
           
@@ -427,7 +463,7 @@ const renderTasks = () => (
             </div>
           )}
  
-          {!['referral', 'subscribe'].includes(task.type) && !completedTasks[task.key] && (
+          {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
                 onClick={() => handleTaskClick(task)}
