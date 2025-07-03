@@ -377,10 +377,10 @@ const renderTasks = () => (
             <button
               className="task-button"
                onClick={() => {
-                if (window.Telegram?.WebApp?.openTelegramLink) {
-                 window.Telegram.WebApp.openTelegramLink('https://t.me/OrdoHereticus_bot');
-                } else {
-                 window.open('https://t.me/OrdoHereticus_bot', '_blank');
+                  if (window.Telegram?.WebApp?.platform === 'web') {
+                      window.open('https://t.me/OrdoHereticus_bot', '_blank');
+                    } else {
+                      alert('📲 Сверни игру и перейди в бот, чтобы оплатить VPN. Затем вернись и нажми «Выполнить»');
                }
              }}
            >
