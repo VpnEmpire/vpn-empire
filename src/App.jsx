@@ -59,7 +59,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
       setUserId(storedUserId);
     }
   }, []);
-
+  
 useEffect(() => {
     localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
@@ -246,7 +246,7 @@ setTimeout(() => {
     } else {
       alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
     }
-  
+
     // 🔁 Сброс заданий, если все реферальные выполнены
     const allReferralDone = tasks
       .filter(t => t.type === 'referral')
@@ -268,7 +268,13 @@ setTimeout(() => {
 
   return;
 }
- 
+
+  // Если уже выполнено
+  if (task.key === 'activateVpn' && completedTasks['activateVpn']) {
+    alert('✅ Оплата уже подтверждена и награда выдана!');
+    return;
+  }
+
   // Первый клик — просто открыть Telegram-бота
   if (task.type === 'vpn' && task.requiresPayment && !localStorage.getItem('vpnClickedOnce')) {
     try {
@@ -313,13 +319,10 @@ setTimeout(() => {
     } else {
       alert('❌ Оплата не найдена. Попробуй позже.');
     }
- // Если уже выполнено
-  if (task.key === 'activateVpn' && completedTasks['activateVpn']) {
-    alert('✅ Оплата уже подтверждена и награда выдана!');
+
     return;
   }
-  }
- 
+
     // 3. Подписка на Telegram или Instagram
     if (task.requiresSubscription) {
       try {
@@ -332,6 +335,7 @@ setTimeout(() => {
         alert('Не удалось открыть ссылку подписки');
         return;
       }
+    
       // Особенная проверка для Instagram
       if (task.key === 'subscribeInstagram') {
         setTimeout(async () => {
@@ -372,7 +376,7 @@ setTimeout(() => {
     // 4. Прочие простые задания (лайк, комментарий, рассказ в соцсетях)
     completeTask(task);
 };
-
+ 
 const renderTasks = () => (
   <div className="tasks-tab">
     <h2>📋 Задания</h2>
@@ -380,72 +384,50 @@ const renderTasks = () => (
       const isDisabled =
         (task.requiresReferralCount && referrals < task.requiresReferralCount) ||
         (task.disabled && !completedTasks[task.key]);
-
+  
       return (
         <div
           key={task.key}
           className={`task-card ${completedTasks[task.key] ? "completed" : ""}`}
         >
           <h3>{task.label}</h3>
-
+          
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
           <p>🎯 Награда: {task.reward} монет</p>
-
-          {task.key === 'activateVpn' && (
-            <p>🎁 Бонус: x2 кликов после оплаты</p>
-          )}
-
-          {/* Если задание выполнено */}
-          {completedTasks[task.key] && (
-            <div className="task-completed">✅ Выполнено</div>
-          )}
-
-          {/* Основные кнопки */}
-          {!completedTasks[task.key] && (
-            <div className="task-buttons-vertical">
-              {/* Специально для VPN-задания — две кнопки */}
-              {task.key === 'activateVpn' ? (
-                <>
-                  <button
-                    className="task-button"
-                    onClick={() => {
-                      try {
-                        if (window.Telegram?.WebApp?.openTelegramLink) {
-                          window.Telegram.WebApp.openTelegramLink(task.link);
-                        } else {
-                          window.open(task.link, '_blank');
-                        }
-                        alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-                      } catch (err) {
-                        alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
-                      }
-                    }}
-                  >
-                    Открыть бота
-                  </button>
-
-                  <button
-                    className="task-button"
-                    onClick={() => handleTaskClick(task)}
-                  >
-                    Выполнить
-                  </button>
-                </>
-              ) : (
+         
+        {/* VPN Задание — особое */}
+          {task.key === 'activateVpn' && !completedTasks[task.key] && (
+            <>
+              <p>🎁 Бонус: x2 кликов после оплаты</p>
+              <div className="task-buttons-vertical">
+                <button
+                  className="task-button"
+                  onClick={() => {
+                    if (window.Telegram?.WebApp?.platform === 'web') {
+                      window.open(task.link, '_blank');
+                    } else {
+                       alert('🔁 Сверни игру и перейди в бот, чтобы оплатить VPN. Затем вернись и нажми «Выполнить»');
+                      } 
+                  }}
+                >
+                  Открыть бота
+                </button>
                 <button
                   className="task-button"
                   onClick={() => handleTaskClick(task)}
-                  disabled={isDisabled}
                 >
                   Выполнить
                 </button>
-              )}
-            </div>
+              </div>
+            </>
+)}
+          {/* Задание VPN выполнено */}
+          {task.key === 'activateVpn' && completedTasks[task.key] && (
+            <div className="task-completed">✅ Выполнено </div>
           )}
-
-          {/* Кнопки для рефералки и подписки */}
+          
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
@@ -469,14 +451,13 @@ const renderTasks = () => (
                   {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
                 </button>
               )}
-
+ 
               {task.type === 'subscribe' && task.link && (
                 <a href={task.link} target="_blank" rel="noopener noreferrer">
                   <button className="task-button"> Перейти </button>
                 </a>
               )}
-
-              {!completedTasks[task.key] && (
+           {!completedTasks[task.key] && (
                 <button
                   onClick={() => handleTaskClick(task)}
                   disabled={isDisabled}
@@ -485,10 +466,9 @@ const renderTasks = () => (
                   Выполнить
                 </button>
               )}
-            </div>
-          )}
-
-          {/* Кнопки для обычных заданий */}
+          </div>
+            )}
+          
           {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
@@ -500,18 +480,18 @@ const renderTasks = () => (
               </button>
             </div>
           )}
-
+ 
           {completedTasks[task.key] && (
             <span className="done">✅ Выполнено</span>
           )}
         </div>
       );
     })}
-
+    
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
-
+ 
     <button
       style={{ marginTop: 20 }}
       onClick={() => {
@@ -523,7 +503,7 @@ const renderTasks = () => (
     </button>
   </div>
 );
-
+ 
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
@@ -545,7 +525,7 @@ const renderTasks = () => (
       ))}
     </div>
   );
-
+ 
   const renderTop = () => <TopTab coins={coins} />;
   const renderRoulette = () => <Roulette setCoins={setCoins} />;
   const renderWithdraw = () => (
@@ -575,7 +555,7 @@ const renderTasks = () => (
       </button>
      </div>
   );
-  
+ 
   const renderTab = () => {
     switch (activeTab) {
       case 'home': return renderHome();
@@ -586,11 +566,11 @@ const renderTasks = () => (
       default: return renderHome();
     }
   };
-  
+
   return (
 <div className="App">
       {renderTab()}
-        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 } 
