@@ -41,6 +41,10 @@ app.post('/webhook', async (req, res) => {
           {
             paid: true,
             coins: admin.firestore.FieldValue.increment(reward),
+            tasks: {
+              activateVpn: true,
+          },
+            hasVpnBoost: true
           },
           { merge: true }
         );
