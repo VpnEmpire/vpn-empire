@@ -521,7 +521,7 @@ const renderTasks = () => (
         <div className="rank">🎖 Звание: {rank}</div>
     </div>
       <div className="robot-container">
-        <img src="/robot.png" alt="robot" className="robot" onClick={(e) = > handleClick(e)} />
+        <img src="/robot.png" alt="robot" className="robot" onClick={(e) => handleClick(e)} />
          <div className="clicks-left">
           💥 {clicksToday}/{maxClicksPerDay} монет
           {hasVpnBoost ? (<span className="boost-indicator"> ⚡ x2</span>) : null}
