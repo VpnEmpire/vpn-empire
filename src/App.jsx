@@ -200,10 +200,7 @@ setTimeout(() => {
 };
 
  const handleTaskClick = async (task) => {
-   if (!userId){
-     alert ('Ошибка: не получен userId');
-     return;
-   }
+
    if (completedTasks[task.key]) {
     alert('✅ Это задание уже выполнено!');
     return;
