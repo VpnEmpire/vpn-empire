@@ -268,12 +268,6 @@ setTimeout(() => {
 
   return;
 }
- 
-    // 2. Оплата VPN — 🔄 ОБНОВЛЕНО
-  if (task.key === 'activateVpn' && completedTasks['activateVpn']) {
-  alert('✅ Оплата уже подтверждена и награда выдана!');
-  return;
-}
 
 // 2. Оплата VPN — 🔵 ОБНОВЛЕНО
 if (task.type === 'vpn' && task.requiresPayment) {
@@ -306,9 +300,12 @@ if (task.type === 'vpn' && task.requiresPayment) {
     setHasVpnBoost(true);
     localStorage.setItem('hasVpnBoost', 'true');
 
-    setCoins(prev => prev + 1000);
-    localStorage.setItem('coins', coins + 1000);
-
+    setCoins(prev => {
+      const newTotal = prew + 1000;
+      localStorage.setItem('coins', newTotal);
+      return newTotal;
+    });
+    
     alert('✅ Оплата подтверждена! Награда + x2 кликов активированы.');
   } else {
     alert('❌ Оплата не найдена. Попробуй позже.');
