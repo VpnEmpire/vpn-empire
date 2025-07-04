@@ -297,6 +297,7 @@ body, html {
   background-color: #00c2b2;
   color: white;
   cursor: pointer;
+  text-aling: center;
 }
 .task-button:hover {
   background-color: #009f94;
