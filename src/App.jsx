@@ -400,12 +400,12 @@ const renderTasks = () => (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
           {/* Если задание выполнено */}
-          {isCompleted && (
+          {completedTasks[task.key] && ( 
             <div className="task-completed">✅ Выполнено</div>
           )}
 
           {/* Кнопки: Перейти и Выполнить */}
-          {!isCompleted && (
+         {completedTasks[task.key]  && (
             <div className="task-buttons-vertical">
               {/* Для VPN — две кнопки: открыть и выполнить */}
               {task.key === 'activateVpn' ? (
@@ -589,7 +589,7 @@ const renderTasks = () => (
   return (
 <div className="App">
       {renderTab()}
-      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 } 
