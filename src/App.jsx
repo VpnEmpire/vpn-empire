@@ -395,13 +395,12 @@ const renderTasks = () => (
             className="task-button"
             onClick={() => handleTaskClick(task)}
           >
-            Выполнить
-          </button>
-        )}
-        {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
-      </div>
-    </>
-  )}
+             Выполнить
+                  </button>
+                )}
+              </div>
+            </>
+          )}
             
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
