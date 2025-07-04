@@ -382,78 +382,72 @@ const renderTasks = () => (
       const isDisabled =
         (task.requiresReferralCount && referrals < task.requiresReferralCount) ||
         (task.disabled && !completedTasks[task.key]);
-  
+
       return (
         <div
           key={task.key}
           className={`task-card ${completedTasks[task.key] ? "completed" : ""}`}
         >
           <h3>{task.label}</h3>
-          
+
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
           <p>🎯 Награда: {task.reward} монет</p>
-         
-         {task.key === 'activateVpn' && (
+
+          {task.key === 'activateVpn' && (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
-          
+
+          {/* Если задание выполнено */}
           {completedTasks[task.key] && (
             <div className="task-completed">✅ Выполнено</div>
           )}
- 
+
+          {/* Основные кнопки */}
           {!completedTasks[task.key] && (
             <div className="task-buttons-vertical">
-              <button
-                className="task-button"
-                onClick={async () => {
-                  try {
-                    if (window.Telegram?.WebApp?.openTelegramLink) {
-                      window.Telegram.WebApp.openTelegramLink(task.link);
-                    } else {
-                      window.open(task.link, '_blank');
-                    }
-                    alert('🔁 Перейди в Telegram-бота, оплати VPN. Затем вернись и нажми «Выполнить»');
-                  } catch (err) {
-                    alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
-                    return;
-                  }
- 
-                  await new Promise(r => setTimeout(r, 3000));
- 
-                  const res = await fetch('/api/check-payment', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId }),
-                  }).then(res => res.json());
- 
-                  if (res.success) {
-                    const updated = { ...completedTasks, [task.key]: true };
-                    setCompletedTasks(updated);
-                    localStorage.setItem('completedTasks', JSON.stringify(updated));
- 
-                    setHasVpnBoost(true);
-                    localStorage.setItem('hasVpnBoost', 'true');
- 
-                    setCoins(prev => {
-                      const newCoins = prev + 1000;
-                      localStorage.setItem('coins', newCoins);
-                      return newCoins;
-                    });
- 
-                    alert('✅ Оплата подтверждена! Награда + x2 кликов активированы.');
-                  } else {
-                    alert('❌ Оплата не найдена. Попробуй позже.');
-                  }
-                }}
-                disabled={isDisabled}
-              >
-                Выполнить
-              </button>
+              {/* Специально для VPN-задания — две кнопки */}
+              {task.key === 'activateVpn' ? (
+                <>
+                  <button
+                    className="task-button"
+                    onClick={() => {
+                      try {
+                        if (window.Telegram?.WebApp?.openTelegramLink) {
+                          window.Telegram.WebApp.openTelegramLink(task.link);
+                        } else {
+                          window.open(task.link, '_blank');
+                        }
+                        alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+                      } catch (err) {
+                        alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
+                      }
+                    }}
+                  >
+                    Открыть бота
+                  </button>
+
+                  <button
+                    className="task-button"
+                    onClick={() => handleTaskClick(task)}
+                  >
+                    Выполнить
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="task-button"
+                  onClick={() => handleTaskClick(task)}
+                  disabled={isDisabled}
+                >
+                  Выполнить
+                </button>
+              )}
             </div>
           )}
-                 
+
+          {/* Кнопки для рефералки и подписки */}
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
@@ -477,13 +471,14 @@ const renderTasks = () => (
                   {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
                 </button>
               )}
- 
+
               {task.type === 'subscribe' && task.link && (
                 <a href={task.link} target="_blank" rel="noopener noreferrer">
                   <button className="task-button"> Перейти </button>
                 </a>
               )}
-           {!completedTasks[task.key] && (
+
+              {!completedTasks[task.key] && (
                 <button
                   onClick={() => handleTaskClick(task)}
                   disabled={isDisabled}
@@ -492,9 +487,10 @@ const renderTasks = () => (
                   Выполнить
                 </button>
               )}
-          </div>
-            )}
-          
+            </div>
+          )}
+
+          {/* Кнопки для обычных заданий */}
           {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
@@ -506,18 +502,18 @@ const renderTasks = () => (
               </button>
             </div>
           )}
- 
+
           {completedTasks[task.key] && (
             <span className="done">✅ Выполнено</span>
           )}
         </div>
       );
     })}
-    
+
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
- 
+
     <button
       style={{ marginTop: 20 }}
       onClick={() => {
