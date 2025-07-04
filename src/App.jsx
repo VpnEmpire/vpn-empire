@@ -59,8 +59,9 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
       setUserId(storedUserId);
     }
   }, []);
-const storedBoost = localStorage.getiItem('hasVpnBoost'
+  
 useEffect(() => {
+  const storedBoost = localStorage.getiItem('hasVpnBoost')
     localStorage.setItem('coins', coins + reward);
     localStorage.setItem('clicksToday', clicksToday);
     localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
