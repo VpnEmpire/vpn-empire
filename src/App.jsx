@@ -61,8 +61,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   }, []);
   
 useEffect(() => {
-  const storedBoost = localStorage.getiItem('hasVpnBoost')
-    localStorage.setItem('coins', coins + reward);
+    localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
     localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
   }, [coins, clicksToday, completedTasks]);
@@ -73,8 +72,9 @@ useEffect(() => {
   
  useEffect(() => {
 const storedBoost = localStorage.getItem('hasVpnBoost');
-   if (storedBoost === 'true' ){
+   if (storedBoost === 'true' ) {
      setHasVpnBoost(true);
+     setClickMultiplier(2);
     }
   }, []);
   
@@ -328,7 +328,7 @@ if (task.type === 'vpn' && task.requiresPayment) {
         alert('Не удалось открыть ссылку подписки');
         return;
       }
-
+    
       // Особенная проверка для Instagram
       if (task.key === 'subscribeInstagram') {
         setTimeout(async () => {
@@ -462,7 +462,7 @@ const renderTasks = () => (
           </div>
             )}
           
-        
+          
           {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
@@ -497,7 +497,7 @@ const renderTasks = () => (
     </button>
   </div>
 );
-  
+
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
@@ -570,4 +570,3 @@ const renderWithdraw = () => (
 }
  
 export default App;
-
