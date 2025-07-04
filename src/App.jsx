@@ -406,7 +406,7 @@ const renderTasks = () => (
     </>
   )}
             
-        {(task.type === 'referral' || task.type === 'subscribe') && (
+          {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
                 <button
@@ -482,6 +482,7 @@ const renderTasks = () => (
     </button>
   </div>
 );
+  
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
