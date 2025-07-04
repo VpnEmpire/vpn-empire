@@ -374,34 +374,37 @@ const renderTasks = () => (
           )}
           <p>🎯 Награда: {task.reward} монет</p>
          
-          {task.type === 'vpn' && (
-           <>
-      <p>🎁 Бонус: x2 кликов после оплаты</p>
-      <div className="task-buttons-vertical">
-        <button
-          className="task-button"
-          onClick={() => {
-            if (window.Telegram?.WebApp?.platform === 'web') {
-              window.open('https://t.me/OrdoHereticus_bot', '_blank');
-            } else {
-              alert('📲 Сверни игру и перейди в бот, чтобы оплатить VPN. Затем вернись и нажми «Выполнить»');
-            }
-          }}
-        >
-          Открыть бота
-        </button>
-        {!completedTasks[task.key] && (
-          <button
-            className="task-button"
-            onClick={() => handleTaskClick(task)}  
-          >
-             Выполнить
-                  </button>
-                )}
+        {/* VPN Задание — особое */}
+          {task.key === 'activateVpn' && !completedTasks[task.key] && (
+            <>
+              <p>🎁 Бонус: x2 кликов после оплаты</p>
+              <div className="task-buttons-vertical">
+                <button
+                  className="task-button"
+                  onClick={() => {
+                    if (window.Telegram?.WebApp?.platform === 'web') {
+                      window.open(task.link, '_blank');
+                    } else {
+                       alert('🔁 Сверни игру и перейди в бот, чтобы оплатить VPN. Затем вернись и нажми «Выполнить»');
+                      } 
+                  }}
+                >
+                  Открыть бота
+                </button>
+                <button
+                  className="task-button"
+                  onClick={() => handleTaskClick(task)}
+                >
+                  Выполнить
+                </button>
               </div>
             </>
+)}
+          {/* Задание VPN выполнено */}
+          {task.key === 'activateVpn' && completedTasks[task.key] && (
+            <div className="task-completed">✅ Выполнено </div>
           )}
-            
+          
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
@@ -431,7 +434,7 @@ const renderTasks = () => (
                   <button className="task-button"> Перейти </button>
                 </a>
               )}
-   {!completedTasks[task.key] && (
+           {!completedTasks[task.key] && (
                 <button
                   onClick={() => handleTaskClick(task)}
                   disabled={isDisabled}
@@ -440,9 +443,10 @@ const renderTasks = () => (
                   Выполнить
                 </button>
               )}
-            </div>
-          )}
+          </div>
+            )}
           
+        
           {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
@@ -456,12 +460,12 @@ const renderTasks = () => (
           )}
  
           {completedTasks[task.key] && (
-            <span className="done"> ✅ Выполнено< /span>
+            <span className="done">✅ Выполнено</span>
           )}
         </div>
       );
     })}
- 
+    
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
