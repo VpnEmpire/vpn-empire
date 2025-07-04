@@ -398,11 +398,7 @@ const renderTasks = () => (
          {task.key === 'activateVpn' && (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
-
-          {completedTasks[task.key] && (
-            <div className="task-completed">✅ Выполнено</div>
-          )}
-
+          
           {!completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
