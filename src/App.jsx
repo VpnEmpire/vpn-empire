@@ -58,7 +58,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
       setUserId(storedUserId);
     }
   }, []);
-  
+
 useEffect(() => {
     localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
@@ -133,7 +133,7 @@ setTimeout(() => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id }),
     });
-
+  
     const result = await response.json();
 
     if (result.success) {
@@ -159,7 +159,7 @@ setTimeout(() => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId }),
     });
-
+  
     const result = await response.json();
 
     if (result.success) {
@@ -176,7 +176,7 @@ setTimeout(() => {
     alert('Ошибка при проверке. Попробуй позже.');
   }
 };
-  
+
   const completeTask = (task) => {
   if (completedTasks[task.key]) return;
 
@@ -198,7 +198,7 @@ setTimeout(() => {
 
   alert(`🎁 Ты получил ${task.reward || 0} монет!`);
 };
-  
+
  const handleTaskClick = async (task) => {
    if (!userId){
      alert ('Ошибка: не получен userId');
@@ -260,7 +260,7 @@ setTimeout(() => {
 
   return;
 }
-   
+ 
     // 2. Оплата VPN — 🔄 ОБНОВЛЕНО
   if (task.type === 'vpn' && task.requiresPayment) {
     try {
@@ -301,9 +301,8 @@ setTimeout(() => {
       } else {
         alert('⛔ Оплата не найдена. Попробуй позже.');
       }
-    }
-  };
-
+    return;
+  }
     // 3. Подписка на Telegram или Instagram
     if (task.requiresSubscription) {
       try {
@@ -357,7 +356,7 @@ setTimeout(() => {
     // 4. Прочие простые задания (лайк, комментарий, рассказ в соцсетях)
     completeTask(task);
 };
-  
+
 const renderTasks = () => (
   <div className="tasks-tab">
     <h2>📋 Задания</h2>
@@ -365,14 +364,14 @@ const renderTasks = () => (
       const isDisabled =
         (task.requiresReferralCount && referrals < task.requiresReferralCount) ||
         (task.disabled && !completedTasks[task.key]);
- 
+  
       return (
         <div
           key={task.key}
           className={`task-card ${completedTasks[task.key] ? "completed" : ""}`}
         >
           <h3>{task.label}</h3>
- 
+          
           {task.requiresReferralCount && (
             <p>👥 {Math.min(referrals, task.requiresReferralCount)}/{task.requiresReferralCount}</p>
           )}
@@ -404,7 +403,7 @@ const renderTasks = () => (
               </div>
             </>
           )}
-          {task.key !== 'activateVpn' && (
+            {task.key !== 'activateVpn' && (
             <div className="task-buttons-vertical">
               {!completedTasks[task.key] && (
                 <button
@@ -420,7 +419,7 @@ const renderTasks = () => (
               )}
         </div>
         )}
-          
+              
         {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
@@ -497,7 +496,6 @@ const renderTasks = () => (
     </button>
   </div>
 );
-
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
@@ -506,10 +504,8 @@ const renderTasks = () => (
     </div>
       <div className="robot-container">
         <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
-        <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет
-        {hasVpnBoost && <span className="boost-indicator"> ⚡ x2</span>}
+        <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
       </div>
-     </div>
       <div className="helper-box">
         🤖 <strong>Я твой помощник!</strong><br />
         Кликай на робота и зарабатывай монеты.
@@ -568,6 +564,6 @@ const renderWithdraw = () => (
     </div>
   );
 }
-
+ 
 export default App;
 
