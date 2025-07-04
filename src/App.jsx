@@ -259,47 +259,52 @@ setTimeout(() => {
 }
  
     // 2. Оплата VPN — 🔄 ОБНОВЛЕНО
-  if (task.type === 'vpn' && task.requiresPayment) {
-    try {
-      if (window.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-      } else {
-        window.open(task.link, '_blank');
-      }
-      alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-    } catch (error) {
-      alert('Не удалось открыть Telegram-бота. Попробуй вручную.');
-      return;
+  if (task.key === 'activateVpn' && completedTasks['activateVpn']) {
+  alert('✅ Оплата уже подтверждена и награда выдана!');
+  return;
+}
+
+// 2. Оплата VPN — 🔵 ОБНОВЛЕНО
+if (task.type === 'vpn' && task.requiresPayment) {
+  try {
+    if (window.Telegram?.WebApp?.openTelegramLink) {
+      window.Telegram.WebApp.openTelegramLink(task.link);
+    } else {
+      window.open(task.link, '_blank');
     }
-    
-    await new Promise(r => setTimeout(r, 3000));
 
-    const res = await fetch('/vpn-empire/api/check-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({user_id: userId, taskKey: task.key }),
-    }).then(res => res.json());
+    alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+  } catch (error) {
+    alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
+    return;
+  }
 
-    if (res.success) {
-    // ✅ Выполнено
+  await new Promise(r => setTimeout(r, 3000));
+
+  const res = await fetch('/api/check-payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: user_id: userId }),
+  }).then(res => res.json());
+
+  if (res.success) {
     const updated = { ...completedTasks, [task.key]: true };
     setCompletedTasks(updated);
     localStorage.setItem('completedTasks', JSON.stringify(updated));
 
-    // 👇 x2 кликов
     setHasVpnBoost(true);
     localStorage.setItem('hasVpnBoost', 'true');
 
-    // 👇 Обновим монеты
     setCoins(prev => prev + 1000);
     localStorage.setItem('coins', coins + 1000);
-      
-   alert('✅ Оплата подтверждена! Награда + x2 кликов активированы.');
-      } else {
-        alert('⛔ Оплата не найдена. Попробуй позже.');
-      }
-    return;
+
+    alert('✅ Оплата подтверждена! Награда + x2 кликов активированы.');
+  } else {
+    alert('❌ Оплата не найдена. Попробуй позже.');
   }
+
+  return;
+}
     // 3. Подписка на Telegram или Instagram
     if (task.requiresSubscription) {
       try {
