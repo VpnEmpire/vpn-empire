@@ -46,10 +46,11 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const winSoundRef = useRef(null);
   const [canSpin, setCanSpin] = useState(true);
   const [spinResult, setSpinResult] = useState(null);
+  
   useEffect(() => {
     const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
-    const storedUserId = localStorage.getItem('userId');
-
+    const storedUserId = localStorage.getItem('userId')
+    
     if (initDataUnsafe?.user?.id) {
       const tgId = initDataUnsafe.user.id.toString();
       setUserId(tgId);
@@ -58,9 +59,9 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
       setUserId(storedUserId);
     }
   }, []);
-
+const storedBoost = localStorage.getiItem('hasVpnBoost'
 useEffect(() => {
-    localStorage.setItem('coins', coins);
+    localStorage.setItem('coins', coins + reward);
     localStorage.setItem('clicksToday', clicksToday);
     localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
   }, [coins, clicksToday, completedTasks]);
@@ -68,7 +69,14 @@ useEffect(() => {
   useEffect(() => {
     updateRank(coins);
   }, [coins]);
-
+  
+ useEffect(() => {
+const storedBoost = localStorage.getItem('hasVpnBoost');
+   if (storedBoost === 'true' ){
+     setHasVpnBoost(true);
+    }
+  }, []);
+  
   useEffect(() => {
     const today = new Date().toDateString();
     if (localStorage.getItem('lastClickDate') !== today) {
@@ -102,7 +110,9 @@ const audio = new Audio('/click.mp3');
 
   const handleClick = (e) => {
     if (clicksToday < maxClicksPerDay) {
-     const reward = hasVpnBoost ? 2 : 1;
+     const clickMultiplier = hasVpnBoost ? 2 : 1; 
+     const reward = 1 * clickMultiplier;
+      
       setCoins(prev => prev + 1 * clickMultiplier);
       setClicksToday(prev => prev + 1);
       triggerAnimation();
