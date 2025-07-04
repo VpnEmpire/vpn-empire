@@ -31,6 +31,7 @@ export default async function handler(req, res) {
 
     if (userData.paid) {
       await userRef.update({
+        paid: false,
         coins: (userData.coins || 0) + 1000,
         hasVpnBoost: true,
         completedTasks: {
