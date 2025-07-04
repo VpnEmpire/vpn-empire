@@ -399,6 +399,10 @@ const renderTasks = () => (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
           
+          {completedTasks[task.key] && (
+            <div className="task-completed">✅ Выполнено</div>
+          )}
+
           {!completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
@@ -479,7 +483,6 @@ const renderTasks = () => (
                   <button className="task-button"> Перейти </button>
                 </a>
               )}
-           {!completedTasks[task.key] && (
                 <button
                   onClick={() => handleTaskClick(task)}
                   disabled={isDisabled}
@@ -487,11 +490,11 @@ const renderTasks = () => (
                 >
                   Выполнить
                 </button>
-              )}
           </div>
             )}
           
-          {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
+          {completedTasks[task.key] && 
+            !['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] !=='activateVpn' && (
             <div className="task-buttons-vertical">
               <button
                 onClick={() => handleTaskClick(task)}
