@@ -398,19 +398,58 @@ const renderTasks = () => (
          {task.key === 'activateVpn' && (
             <p>🎁 Бонус: x2 кликов после оплаты</p>
           )}
-
-          {completedTasks[task.key] ? (
+          
+          {completedTasks[task.key] && (
             <div className="task-completed">✅ Выполнено</div>
-          ) : (
+          )}
+ 
+          {!completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
                 className="task-button"
-                onClick={() => handleTaskClick(task)}
+                onClick={async () => {
+                  try {
+                    if (window.Telegram?.WebApp?.openTelegramLink) {
+                      window.Telegram.WebApp.openTelegramLink(task.link);
+                    } else {
+                      window.open(task.link, '_blank');
+                    }
+                    alert('🔁 Перейди в Telegram-бота, оплати VPN. Затем вернись и нажми «Выполнить»');
+                  } catch (err) {
+                    alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
+                    return;
+                  }
+ 
+                  await new Promise(r => setTimeout(r, 3000));
+ 
+                  const res = await fetch('/api/check-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId }),
+                  }).then(res => res.json());
+ 
+                  if (res.success) {
+                    const updated = { ...completedTasks, [task.key]: true };
+                    setCompletedTasks(updated);
+                    localStorage.setItem('completedTasks', JSON.stringify(updated));
+ 
+                    setHasVpnBoost(true);
+                    localStorage.setItem('hasVpnBoost', 'true');
+ 
+                    setCoins(prev => {
+                      const newCoins = prev + 1000;
+                      localStorage.setItem('coins', newCoins);
+                      return newCoins;
+                    });
+ 
+                    alert('✅ Оплата подтверждена! Награда + x2 кликов активированы.');
+                  } else {
+                    alert('❌ Оплата не найдена. Попробуй позже.');
+                  }
+                }}
                 disabled={isDisabled}
               >
-                {task.key === 'activateVpn'
-                  ? 'Перейди в Telegram-бота, оплати VPN. Затем вернись и нажми «Выполнить»'
-                  : 'Выполнить'}
+                Выполнить
               </button>
             </div>
           )}
@@ -444,6 +483,7 @@ const renderTasks = () => (
                   <button className="task-button"> Перейти </button>
                 </a>
               )}
+           {!completedTasks[task.key] && (
                 <button
                   onClick={() => handleTaskClick(task)}
                   disabled={isDisabled}
@@ -451,11 +491,11 @@ const renderTasks = () => (
                 >
                   Выполнить
                 </button>
+              )}
           </div>
             )}
           
-          {completedTasks[task.key] && 
-            !['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] !=='activateVpn' && (
+          {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
                 onClick={() => handleTaskClick(task)}
