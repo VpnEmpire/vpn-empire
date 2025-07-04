@@ -431,6 +431,9 @@ const renderTasks = () => (
                   <button className="task-button">Перейти</button>
                 </a>
               )}
+   
+            </div>
+          )}
  
             
           {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
