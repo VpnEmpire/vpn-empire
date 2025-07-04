@@ -428,14 +428,21 @@ const renderTasks = () => (
  
               {task.type === 'subscribe' && task.link && (
                 <a href={task.link} target="_blank" rel="noopener noreferrer">
-                  <button className="task-button">Перейти</button>
+                  <button className="task-button"> Перейти </button>
                 </a>
               )}
-   
+   {!completedTasks[task.key] && (
+                <button
+                  onClick={() => handleTaskClick(task)}
+                  disabled={isDisabled}
+                  className="task-button"
+                >
+                  Выполнить
+                </button>
+              )}
             </div>
           )}
- 
-            
+          
           {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
@@ -449,7 +456,7 @@ const renderTasks = () => (
           )}
  
           {completedTasks[task.key] && (
-            <span className="done">✅ Выполнено</span>
+            <span className="done"> ✅ Выполнено< /span>
           )}
         </div>
       );
