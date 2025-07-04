@@ -395,58 +395,39 @@ const renderTasks = () => (
           )}
           <p>🎯 Награда: {task.reward} монет</p>
          
-         {/* Доп. бонус при VPN */}
-          {task.key === 'activateVpn' && (
-            <p>🎁 Бонус: x2 кликов после оплаты</p>
-          )}
-          {/* Если задание выполнено */}
-          {completedTasks[task.key] && ( 
-            <div className="task-completed">✅ Выполнено</div>
-          )}
+         {task.key === 'activateVpn' && !completedTasks[task.key] ? (
+  <div className="task-buttons-vertical">
+    <button
+      className="task-button"
+      onClick={() => {
+        try {
+          if (window.Telegram?.WebApp?.openTelegramLink) {
+            window.Telegram.WebApp.openTelegramLink(task.link);
+          } else {
+            window.open(task.link, '_blank');
+          }
+          alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+        } catch (err) {
+          alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
+        }
+      }}
+    >
+      Открыть бота
+    </button>
 
-          {/* Кнопки: Перейти и Выполнить */}
-         {completedTasks[task.key]  && (
-            <div className="task-buttons-vertical">
-              {/* Для VPN — две кнопки: открыть и выполнить */}
-              {task.key === 'activateVpn' ? (
-                <>
-                  <button
-                    className="task-button"
-                    onClick={() => {
-                      try {
-                        if (window.Telegram?.WebApp?.openTelegramLink) {
-                          window.Telegram.WebApp.openTelegramLink(task.link);
-                        } else {
-                          window.open(task.link, '_blank');
-                        }
-                        alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-                      } catch (err) {
-                        alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
-                      }
-                    }}
-                  >
-                    Открыть бота
-                  </button>
+    <button
+      className="task-button"
+      onClick={() => handleTaskClick(task)}
+    >
+      Выполнить
+    </button>
+  </div>
+) : null}
 
-                  <button
-                    className="task-button"
-                    onClick={() => handleTaskClick(task)}
-                  >
-                    Выполнить
-                  </button>
-                </>
-              ) : (
-                <button
-                  className="task-button"
-                  onClick={() => handleTaskClick(task)}
-                  disabled={isDisabled}
-                >
-                  Выполнить
-                </button>
-              )}
-            </div>
-          )}
-          
+{task.key === 'activateVpn' && completedTasks[task.key] && (
+  <div className="task-completed">✅ Выполнено</div>
+)}
+                 
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
