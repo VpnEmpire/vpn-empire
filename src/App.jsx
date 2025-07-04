@@ -109,19 +109,15 @@ const audio = new Audio('/click.mp3');
     audio.play().catch((e) => console.log('Ошибка воспроизведения звука:', e));
   };
 
-  const handleClick = () => {
-    const reward = hasVpnBoost ? 2 : 1;
+  const handleClick = (e) => {
     if (clicksToday < maxClicksPerDay) {
-      setClicksToday(prev => {
-        const newClicks = prev + reward;
-        localStorage.setItem('clicksToday', newClicks);
-        return newClicks;
-      });
-      setCoins(prev => {
-        const newTotal = prev + reward;
-        localStorage.setItem('coins', newTotal);
-        return newTotal;
-      });
+     const clickMultiplier = hasVpnBoost ? 2 : 1; 
+     const reward = 1 * clickMultiplier;
+      
+      setCoins(prev => prev + 1 * clickMultiplier);
+      setClicksToday(prev => prev + 1);
+      triggerAnimation();
+      playClickSound();
     }
     const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
     setFlashes(prev => [...prev, flash]);
@@ -129,7 +125,7 @@ setTimeout(() => {
       setFlashes(prev => prev.filter(f => f.id !== flash.id));
     }, 400);
   };
-
+  
   const triggerAnimation = () => {
     const flash = document.createElement('div');
     flash.className = 'flash'; 
