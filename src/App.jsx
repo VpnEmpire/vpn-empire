@@ -375,7 +375,7 @@ const renderTasks = () => (
           <p>🎯 Награда: {task.reward} монет</p>
          
           {task.type === 'vpn' && (
-    <>
+           <>
       <p>🎁 Бонус: x2 кликов после оплаты</p>
       <div className="task-buttons-vertical">
         <button
@@ -393,7 +393,7 @@ const renderTasks = () => (
         {!completedTasks[task.key] && (
           <button
             className="task-button"
-            onClick={() => handleTaskClick(task)}
+            onClick={() => handleTaskClick(task)}  
           >
              Выполнить
                   </button>
