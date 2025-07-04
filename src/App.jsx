@@ -109,7 +109,7 @@ const audio = new Audio('/click.mp3');
     audio.play().catch((e) => console.log('Ошибка воспроизведения звука:', e));
   };
 
-  const handleClick = (e) => {
+  const handleClick = () => {
     const reward = hasVpnBoost ? 2 : 1;
     if (clicksToday < maxClicksPerDay) {
       setClicksToday(prev => {
@@ -521,7 +521,7 @@ const renderTasks = () => (
         <div className="rank">🎖 Звание: {rank}</div>
     </div>
       <div className="robot-container">
-        <img src="/robot.png" alt="robot" className="robot" onClick={(e) => handleClick(e)} />
+        <img src="/robot.png" alt="robot" className="robot" onClick={ => handleClick} />
          <div className="clicks-left">
           💥 {clicksToday}/{maxClicksPerDay} монет
           {hasVpnBoost ? (<span className="boost-indicator"> ⚡ x2</span>) : null}
