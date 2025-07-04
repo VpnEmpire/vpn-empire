@@ -46,7 +46,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const winSoundRef = useRef(null);
   const [canSpin, setCanSpin] = useState(true);
   const [spinResult, setSpinResult] = useState(null);
-  
+
   useEffect(() => {
     const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
     const storedUserId = localStorage.getItem('userId')
@@ -269,7 +269,6 @@ setTimeout(() => {
   return;
 }
 
-const handleTaskClick = async (task) => {
   // Если уже выполнено
   if (task.key === 'activateVpn' && completedTasks['activateVpn']) {
     alert('✅ Оплата уже подтверждена и награда выдана!');
@@ -377,7 +376,7 @@ const handleTaskClick = async (task) => {
     // 4. Прочие простые задания (лайк, комментарий, рассказ в соцсетях)
     completeTask(task);
 };
-
+ 
 const renderTasks = () => (
   <div className="tasks-tab">
     <h2>📋 Задания</h2>
@@ -470,7 +469,6 @@ const renderTasks = () => (
           </div>
             )}
           
-          
           {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
@@ -505,7 +503,7 @@ const renderTasks = () => (
     </button>
   </div>
 );
-
+ 
   const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
@@ -527,10 +525,10 @@ const renderTasks = () => (
       ))}
     </div>
   );
-
+ 
   const renderTop = () => <TopTab coins={coins} />;
   const renderRoulette = () => <Roulette setCoins={setCoins} />;
-const renderWithdraw = () => (
+  const renderWithdraw = () => (
     <div className="withdraw-tab">
       <h2>💸 Вывод</h2>
       <p>Минимум для вывода: 10000 монет</p>
@@ -557,7 +555,7 @@ const renderWithdraw = () => (
       </button>
      </div>
   );
-
+ 
   const renderTab = () => {
     switch (activeTab) {
       case 'home': return renderHome();
@@ -575,6 +573,5 @@ const renderWithdraw = () => (
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
-}
- 
+} 
 export default App;
