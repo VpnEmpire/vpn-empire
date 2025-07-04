@@ -50,7 +50,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   useEffect(() => {
     const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
     const storedUserId = localStorage.getItem('userId')
-    
+  
     if (initDataUnsafe?.user?.id) {
       const tgId = initDataUnsafe.user.id.toString();
       setUserId(tgId);
@@ -59,7 +59,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
       setUserId(storedUserId);
     }
   }, []);
-  
+
 useEffect(() => {
     localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
@@ -77,7 +77,7 @@ const storedBoost = localStorage.getItem('hasVpnBoost');
      setClickMultiplier(2);
     }
   }, []);
-  
+
   useEffect(() => {
     const today = new Date().toDateString();
     if (localStorage.getItem('lastClickDate') !== today) {
@@ -109,7 +109,7 @@ const audio = new Audio('/click.mp3');
     audio.play().catch((e) => console.log('Ошибка воспроизведения звука:', e));
   };
 
-  const handleClick = () => {
+  const handleClick = (e) => {
     const reward = hasVpnBoost ? 2 : 1;
     if (clicksToday < maxClicksPerDay) {
       setClicksToday(prev => {
@@ -122,7 +122,7 @@ const audio = new Audio('/click.mp3');
         localStorage.setItem('coins', newTotal);
         return newTotal;
       });
-      
+    }
     const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
     setFlashes(prev => [...prev, flash]);
 setTimeout(() => {
@@ -174,7 +174,7 @@ setTimeout(() => {
     alert('🚫 Ошибка при проверке оплаты. Попробуйте позже.');
   }
 };
-
+  
   const handlePaymentCheck = async (taskKey) => {
   try {
     const response = await fetch('https://vpnempire.vercel.app/vpn-empire/api/checkUserPayment', {
@@ -521,7 +521,7 @@ const renderTasks = () => (
         <div className="rank">🎖 Звание: {rank}</div>
     </div>
       <div className="robot-container">
-        <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
+        <img src="/robot.png" alt="robot" className="robot" onClick={(e) = > handleClick(e)} />
          <div className="clicks-left">
           💥 {clicksToday}/{maxClicksPerDay} монет
           {hasVpnBoost ? (<span className="boost-indicator"> ⚡ x2</span>) : null}
