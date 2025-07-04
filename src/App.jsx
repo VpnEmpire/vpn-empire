@@ -269,50 +269,61 @@ setTimeout(() => {
   return;
 }
 
-// 2. Оплата VPN — 🔵 ОБНОВЛЕНО
-if (task.type === 'vpn' && task.requiresPayment) {
-  try {
-    if (window.Telegram?.WebApp?.openTelegramLink) {
-      window.Telegram.WebApp.openTelegramLink(task.link);
-    } else {
-      window.open(task.link, '_blank');
-    }
+const handleTaskClick = async (task) => {
+  // Если уже выполнено
+  if (task.key === 'activateVpn' && completedTasks['activateVpn']) {
+    alert('✅ Оплата уже подтверждена и награда выдана!');
+    return;
+  }
 
-    alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-  } catch (error) {
-    alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
-    return;
-  }
+  // Первый клик — просто открыть Telegram-бота
+  if (task.type === 'vpn' && task.requiresPayment && !localStorage.getItem('vpnClickedOnce')) {
+    try {
+      if (window.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(task.link);
+      } else {
+        window.open(task.link, '_blank');
+      }
 
-  await new Promise(r => setTimeout(r, 3000));
+      alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+      localStorage.setItem('vpnClickedOnce', 'true');
+      return; // ❗ Никаких начислений пока
+    } catch (error) {
+      alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
+      return;
+    }
+  }
 
-  const res = await fetch('/api/check-payment', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: userId }),
-  }).then(res => res.json());
+  // Второй клик — проверка оплаты
+  if (task.type === 'vpn' && task.requiresPayment) {
+    const res = await fetch('/api/check-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId }),
+    }).then(res => res.json());
 
-  if (res.success) {
-    const updated = { ...completedTasks, [task.key]: true };
-    setCompletedTasks(updated);
-    localStorage.setItem('completedTasks', JSON.stringify(updated));
+    if (res && res.success === true) {
+      const updated = { ...completedTasks, [task.key]: true };
+      setCompletedTasks(updated);
+      localStorage.setItem('completedTasks', JSON.stringify(updated));
 
-    setHasVpnBoost(true);
-    localStorage.setItem('hasVpnBoost', 'true');
+      setHasVpnBoost(true);
+      localStorage.setItem('hasVpnBoost', 'true');
 
-    setCoins(prev => {
-      const newTotal = prew + 1000;
-      localStorage.setItem('coins', newTotal);
-      return newTotal;
-    });
-    
-    alert('✅ Оплата подтверждена! Награда + x2 кликов активированы.');
-  } else {
-    alert('❌ Оплата не найдена. Попробуй позже.');
-  }
+      setCoins(prev => {
+        const newTotal = prev + 1000;
+        localStorage.setItem('coins', newTotal);
+        return newTotal;
+      });
 
-  return;
-}
+      alert('✅ Оплата подтверждена! Награда + x2 кликов активированы.');
+    } else {
+      alert('❌ Оплата не найдена. Попробуй позже.');
+    }
+
+    return;
+  }
+
     // 3. Подписка на Telegram или Instagram
     if (task.requiresSubscription) {
       try {
