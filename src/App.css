@@ -283,7 +283,7 @@ body, html {
 .task-buttons-vertical {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   margin-top: 10px;
   align-items: center;
 }
