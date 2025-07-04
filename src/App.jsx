@@ -19,7 +19,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [copiedLink, setCopiedLink] = useState('');
   const [vpnActivated, setVpnActivated] = useState(false);
-  const [clickMultiplier, setClickMultiplier] = useState (1);
+  const [clickMultiplier, setClickMultiplier] = useState (() => Number(localStorage.getItem('clickMultiplier')) || 1);
   const [hasVpnBoost, setHasVpnBoost] = useState(() => localStorage.getItem('hasVpnBoost') === 'true');
   const [subscribed, setSubscribed] = useState(false);
   const [isWithdrawApproved, setIsWithdrawApproved] = useState(() => localStorage.getItem('isWithdrawApproved') === 'true');
@@ -109,16 +109,20 @@ const audio = new Audio('/click.mp3');
     audio.play().catch((e) => console.log('Ошибка воспроизведения звука:', e));
   };
 
-  const handleClick = (e) => {
+  const handleClick = () => {
+    const reward = hasVpnBoost ? 2 : 1;
     if (clicksToday < maxClicksPerDay) {
-     const clickMultiplier = hasVpnBoost ? 2 : 1; 
-     const reward = 1 * clickMultiplier;
+      setClicksToday(prev => {
+        const newClicks = prev + reward;
+        localStorage.setItem('clicksToday', newClicks);
+        return newClicks;
+      });
+      setCoins(prev => {
+        const newTotal = prev + reward;
+        localStorage.setItem('coins', newTotal);
+        return newTotal;
+      });
       
-      setCoins(prev => prev + 1 * clickMultiplier);
-      setClicksToday(prev => prev + 1);
-      triggerAnimation();
-      playClickSound();
-    }
     const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
     setFlashes(prev => [...prev, flash]);
 setTimeout(() => {
@@ -144,22 +148,30 @@ setTimeout(() => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id }),
     });
-  
+
     const result = await response.json();
 
     if (result.success) {
-      alert('Оплата подтверждена. Награда выдана!');
-      // здесь обнови localStorage или состояние completedTasks
+      alert('✅ Оплата подтверждена. Вы получили 1000 монет и x2 кликов!');
+      
       const updated = { ...completedTasks, vpnPayment: true };
       setCompletedTasks(updated);
       localStorage.setItem('completedTasks', JSON.stringify(updated));
-      setCoins(coins + 1000);
+
+      setCoins(prev => {
+        const newTotal = prev + 1000;
+        localStorage.setItem('coins', newTotal);
+        return newTotal;
+      });
+
+      setClickMultiplier(2);
+      localStorage.setItem('clickMultiplier', '2');
     } else {
-      alert('Оплата не найдена. Убедись, что оплатил в Telegram-боте.');
+      alert('❌ Оплата не найдена. Убедитесь, что оплатили в Telegram-боте.');
     }
   } catch (err) {
     console.error(err);
-    alert('Ошибка при проверке оплаты.');
+    alert('🚫 Ошибка при проверке оплаты. Попробуйте позже.');
   }
 };
 
@@ -211,7 +223,6 @@ setTimeout(() => {
 };
 
  const handleTaskClick = async (task) => {
-
    if (completedTasks[task.key]) {
     alert('✅ Это задание уже выполнено!');
     return;
@@ -283,7 +294,6 @@ setTimeout(() => {
       } else {
         window.open(task.link, '_blank');
       }
-
       alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
       localStorage.setItem('vpnClickedOnce', 'true');
       return; // ❗ Никаких начислений пока
@@ -512,9 +522,10 @@ const renderTasks = () => (
     </div>
       <div className="robot-container">
         <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
-        <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет
-       {hasVpnBoost ? (<span className="boost-indicator"> ⚡ x2</span> ) : null}
-     </div>
+         <div className="clicks-left">
+          💥 {clicksToday}/{maxClicksPerDay} монет
+          {hasVpnBoost ? (<span className="boost-indicator"> ⚡ x2</span>) : null}
+        </div>
       </div>
       <div className="helper-box">
         🤖 <strong>Я твой помощник!</strong><br />
