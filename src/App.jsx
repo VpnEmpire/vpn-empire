@@ -393,31 +393,16 @@ const renderTasks = () => (
            >
             Открыть бота
                 </button>
-                <button
-                  className="task-button"
-                  disabled={completedTasks[task.key]}
-                  onClick={() => handleTaskClick(task)}
-                >
-                  {completedTasks[task.key] ? '✅ Выполнено' : 'Выполнить'}
-                </button>
-              </div>
-            </>
-          )}
-            {task.key !== 'activateVpn' && (
-            <div className="task-buttons-vertical">
-              {!completedTasks[task.key] && (
-                <button
-                  onClick={() => handleTaskClick(task)}
-                  disabled={isDisabled}
-                  className="task-button"
-                >
-                  Выполнить
-                </button>
-              )}
+               )}
               {completedTasks[task.key] && (
                 <span className="done">✅ Выполнено</span>
               )}
         </div>
+        )}
+        
+            {task.key !== 'activateVpn' && (
+            <div className="task-buttons-vertical">
+              </div>
         )}
               
         {(task.type === 'referral' || task.type === 'subscribe') && (
