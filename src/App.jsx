@@ -20,7 +20,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [copiedLink, setCopiedLink] = useState('');
   const [vpnActivated, setVpnActivated] = useState(false);
   const [clickMultiplier, setClickMultiplier] = useState (1);
-  const [hasVpnBoost, setHasVpnBoost] = useState(() => localStorage.gerItem('hasVpnBoost') === 'true');
+  const [hasVpnBoost, setHasVpnBoost] = useState(() => localStorage.getItem('hasVpnBoost') === 'true');
   const [subscribed, setSubscribed] = useState(false);
   const [isWithdrawApproved, setIsWithdrawApproved] = useState(() => localStorage.getItem('isWithdrawApproved') === 'true');
   const [tasks, setTasks] = useState([
@@ -103,7 +103,7 @@ const audio = new Audio('/click.mp3');
   const handleClick = (e) => {
     if (clicksToday < maxClicksPerDay) {
      const reward = hasVpnBoost ? 2 : 1;
-      setCoins(prev => prev + 1 * multiplier);
+      setCoins(prev => prev + 1 * clickMultiplier);
       setClicksToday(prev => prev + 1);
       triggerAnimation();
       playClickSound();
@@ -504,7 +504,9 @@ const renderTasks = () => (
     </div>
       <div className="robot-container">
         <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
-        <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет</div>
+        <div className="clicks-left">💥 {clicksToday}/{maxClicksPerDay} монет
+       {hasVpnBoost ? (<span className="boost-indicator"> ⚡ x2</span> ) : null}
+     </div>
       </div>
       <div className="helper-box">
         🤖 <strong>Я твой помощник!</strong><br />
