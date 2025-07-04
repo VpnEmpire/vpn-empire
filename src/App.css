@@ -298,8 +298,6 @@ body, html {
   color: white;
   cursor: pointer;
   text-aling: center;
-  display: block;
-  margin: 0 auto;
 }
 .task-button:hover {
   background-color: #009f94;
