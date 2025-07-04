@@ -284,7 +284,7 @@ if (task.type === 'vpn' && task.requiresPayment) {
   const res = await fetch('/api/check-payment', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: user_id: userId }),
+    body: JSON.stringify({ user_id: userId }),
   }).then(res => res.json());
 
   if (res.success) {
