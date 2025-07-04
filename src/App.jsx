@@ -377,34 +377,35 @@ const renderTasks = () => (
           )}
           <p>🎯 Награда: {task.reward} монет</p>
          
-         {task.type === 'vpn' && (
-            <>
-              <p>🎁 Бонус: x2 кликов после оплаты</p>
-           <div className="task-buttons-vertical">
-            <button
-              className="task-button"
-               onClick={() => {
-                  if (window.Telegram?.WebApp?.platform === 'web') {
-                      window.open('https://t.me/OrdoHereticus_bot', '_blank');
-                    } else {
-                      alert('📲 Сверни игру и перейди в бот, чтобы оплатить VPN. Затем вернись и нажми «Выполнить»');
-               }
-             }}
-           >
-            Открыть бота
-                </button>
-               )}
-              {completedTasks[task.key] && (
-                <span className="done">✅ Выполнено</span>
-              )}
-        </div>
+          {task.type === 'vpn' && (
+    <>
+      <p>🎁 Бонус: x2 кликов после оплаты</p>
+      <div className="task-buttons-vertical">
+        <button
+          className="task-button"
+          onClick={() => {
+            if (window.Telegram?.WebApp?.platform === 'web') {
+              window.open('https://t.me/OrdoHereticus_bot', '_blank');
+            } else {
+              alert('📲 Сверни игру и перейди в бот, чтобы оплатить VPN. Затем вернись и нажми «Выполнить»');
+            }
+          }}
+        >
+          Открыть бота
+        </button>
+        {!completedTasks[task.key] && (
+          <button
+            className="task-button"
+            onClick={() => handleTaskClick(task)}
+          >
+            Выполнить
+          </button>
         )}
-        
-            {task.key !== 'activateVpn' && (
-            <div className="task-buttons-vertical">
-              </div>
-        )}
-              
+        {completedTasks[task.key] && <span className="done">✅ Выполнено</span>}
+      </div>
+    </>
+  )}
+            
         {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
