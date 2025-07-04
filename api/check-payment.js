@@ -32,10 +32,14 @@ export default async function handler(req, res) {
     if (userData.paid) {
       await userRef.update({
         coins: (userData.coins || 0) + 1000,
-        ['tasks.activateVpn']: true
+        hasVpnBoost: true,
+        completedTasks: {
+          ...(userData.completedTasks || {}),
+          activateVpn: true,
+        }
       });
 
-      return res.status(200).json({ success: true, message: 'VPN оплачен и награда выдана' });
+      return res.status(200).json({ success: true, message: 'VPN оплачен, награда и boost выданы' });
     } else {
       return res.status(200).json({ success: false, message: 'Оплата не найдена' });
     }
