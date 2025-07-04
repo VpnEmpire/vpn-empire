@@ -268,11 +268,6 @@ setTimeout(() => {
 
   return;
 }
-  // Если уже выполнено
-  if (task.key === 'activateVpn' && completedTasks['activateVpn']) {
-    alert('✅ Оплата уже подтверждена и награда выдана!');
-    return;
-  }
  
   // Первый клик — просто открыть Telegram-бота
   if (task.type === 'vpn' && task.requiresPayment && !localStorage.getItem('vpnClickedOnce')) {
@@ -318,8 +313,11 @@ setTimeout(() => {
     } else {
       alert('❌ Оплата не найдена. Попробуй позже.');
     }
-
+ // Если уже выполнено
+  if (task.key === 'activateVpn' && completedTasks['activateVpn']) {
+    alert('✅ Оплата уже подтверждена и награда выдана!');
     return;
+  }
   }
  
     // 3. Подписка на Telegram или Instagram
