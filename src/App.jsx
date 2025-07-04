@@ -432,18 +432,7 @@ const renderTasks = () => (
                 </a>
               )}
  
-              {!completedTasks[task.key] && (
-                <button
-                  onClick={() => handleTaskClick(task)}
-                  disabled={isDisabled}
-                  className="task-button"
-                >
-                  Выполнить
-                </button>
-              )}
-            </div>
-          )}
- 
+            
           {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
