@@ -1,46 +1,44 @@
-mport { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://wkdhylmqfzigaxxhnqho.supabase.co';
-const supabaseKey = 'YOUR_SUPABASE_SERVICE_ROLE_KEY'; // сервисный ключ с полными правами
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrZGh5bG1xZnppZ2F4eGhucWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2ODI2NjYsImV4cCI6MjA2NzI1ODY2Nn0.9gaWyWvsvftewF3WJx03p0kZhZ6-5ReNDe2CsXoor6E';
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).send('Method Not Allowed');
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const event = req.body;
 
-  // В зависимости от структуры webhook ЮKassa
-  // Например, event.object === 'payment' и event.status === 'succeeded'
+  try {
+    const user_id = event.object?.metadata?.user_id;
+    const status = event.object?.status;
 
-  if (event.object === 'payment' && event.status === 'succeeded') {
-    const paymentId = event.id;
-    const userId = event.metadata?.user_id || null; // пользовательский id из metadata платежа
-
-    if (!userId) {
-      return res.status(400).send('No user_id in payment metadata');
+    if (!user_id) {
+      return res.status(400).json({ error: 'No user_id in metadata' });
     }
 
-    // Записываем платеж в Supabase
-    const { data, error } = await supabase.from('payments').insert([
-      {
-        payment_id: paymentId,
-        user_id: userId,
-        status: event.status,
-        amount: event.amount?.value || 0,
-        created_at: new Date().toISOString(),
-      },
-    ]);
+    if (status === 'succeeded') {
+      const { data, error } = await supabase
+        .from('payments')
+        .upsert(
+          { user_id, status, payment_id: event.object.id },
+          { onConflict: 'payment_id' }
+        );
 
-    if (error) {
-      console.error('Supabase insert error:', error);
-      return res.status(500).send('Database error');
+      if (error) {
+        console.error('Supabase error:', error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(200).json({ message: 'Payment recorded' });
+    } else {
+      return res.status(200).json({ message: 'Payment not successful yet' });
     }
-
-    return res.status(200).send('Payment recorded');
+  } catch (err) {
+    console.error('Webhook handler error:', err);
+    return res.status(500).json({ error: err.message });
   }
-
-  res.status(400).send('Event ignored');
 }
-
