@@ -1,28 +1,36 @@
-// /api/check-subscription.js
+import express from 'express';
+import db from '../db.js';
 import fetch from 'node-fetch';
 
-const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN; // Убедись, что в .env указано TELEGRAM_BOT_TOKEN
-const CHANNEL_ID = '@OrdoHereticusVPN';
+const router = express.Router();
 
-export default async function handler(req, res) {
+router.get('/', async (req, res) => {
   const { user_id } = req.query;
+  const channelUsername = 'OrdoHereticusVPN';
 
-  if (!user_id) {
-    return res.status(400).json({ error: 'Missing user_id' });
-  }
+  if (!user_id) return res.status(400).json({ error: 'user_id is required' });
 
   try {
-    const tgUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/getChatMember?chat_id=${CHANNEL_ID}&user_id=${user_id}`;
-    const tgRes = await fetch(tgUrl);
-    const tgData = await tgRes.json();
+    const response = await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getChatMember?chat_id=@${channelUsername}&user_id=${user_id}`);
+    const data = await response.json();
 
-    const isMember =
-      tgData.ok &&
-      ['member', 'creator', 'administrator'].includes(tgData?.result?.status);
+    const isMember = data.ok && ['member', 'creator', 'administrator'].includes(data.result.status);
 
-    return res.status(200).json({ subscribed: isMember });
-  } catch (err) {
-    console.error('Ошибка при проверке подписки:', err);
-    return res.status(500).json({ error: 'Subscription check failed' });
+    if (isMember) {
+      await db.run(`
+        INSERT INTO users (user_id, hasSubscribed)
+        VALUES (?, 1)
+        ON CONFLICT(user_id) DO UPDATE SET hasSubscribed = 1
+      `, [user_id]);
+
+      return res.json({ success: true });
+    } else {
+      return res.json({ success: false });
+    }
+  } catch (error) {
+    console.error('❌ Ошибка подписки:', error);
+    return res.status(500).json({ error: 'Server error' });
   }
-}
+});
+
+export default router;
