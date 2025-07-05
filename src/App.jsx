@@ -4,10 +4,6 @@ import BottomNav from './components/BottomNav.jsx';
 import TopTab from './components/Top.jsx';
 import Roulette from './components/Roulette.jsx';
 import Hometab from './components/Home.jsx';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://wkdhylmqfzigaxxhnqho.supabase.co';
-const supabase = createClient(supabaseUrl, supabaseKey);
   
 function App() {
   const [activeTab, setActiveTab] = useState('home');
