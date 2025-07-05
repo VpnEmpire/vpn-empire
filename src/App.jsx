@@ -51,23 +51,6 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const winSoundRef = useRef(null);
   const [canSpin, setCanSpin] = useState(true);
   const [spinResult, setSpinResult] = useState(null);
-  
-const saveUserToSupabase = async (uid) => {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('user_id')
-        .eq('user_id', uid)
-        .single();
-
-      if (!data && !error) {
-        await supabase.from('users').insert([{ user_id: uid, coins: 0, referrals: 0, had_paid: false }]);
-        console.log('✅ Пользователь добавлен в Supabase');
-      }
-    } catch (err) {
-      console.error('Ошибка при добавлении пользователя в Supabase:', err);
-    }
-  };
 
   useEffect(() => {
     if (userId) {
