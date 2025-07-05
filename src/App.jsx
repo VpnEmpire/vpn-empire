@@ -6,9 +6,8 @@ import Roulette from './components/Roulette.jsx';
 import Hometab from './components/Home.jsx';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseUrl = 'https://wkdhylmqfzigaxxhnqho.supabase.co';
+const supabase = createClient(supabaseUrl, supabaseKey);
   
 function App() {
   const [activeTab, setActiveTab] = useState('home');
