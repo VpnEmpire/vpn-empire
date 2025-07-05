@@ -1,93 +1,42 @@
-// server.js
-const express = require('express');
-const bodyParser = require('body-parser');
-const admin = require('firebase-admin');
-const cors = require('cors');
-const fs = require('fs');
+import express from 'express';
+import cors from 'cors';
+import db from './db.js';
 
-const serviceAccount = JSON.parse(
-  fs.readFileSync('./firebase-secret.json', 'utf8')
-);
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
-const db = admin.firestore();
 const app = express();
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// ✅ Обработка Webhook от YooKassa
-app.post('/webhook', async (req, res) => {
-  const event = req.body;
-
-  if (
-    event.event === 'payment.succeeded' &&
-    event.object &&
-    event.object.metadata &&
-    event.object.metadata.user_id
-  ) {
-    const userId = event.object.metadata.user_id;
-    const reward = 1000;
-
-    try {
-      const userRef = db.collection('users').doc(userId);
-      const userDoc = await userRef.get();
-
-      if (!userDoc.exists || !userDoc.data().paid) {
-        await userRef.set(
-          {
-            paid: true,
-            coins: admin.firestore.FieldValue.increment(reward),
-            tasks: {
-              activateVpn: true,
-          },
-            hasVpnBoost: true
-          },
-          { merge: true }
-        );
-        console.log(`✅ Пользователю ${userId} начислено ${reward} монет`);
-      }
-    } catch (error) {
-      console.error('❌ Ошибка при начислении монет:', error);
-    }
-  }
-
-  res.sendStatus(200);
-});
-
-// ✅ Проверка оплаты из клиента
-app.post('/vpn-empire/api/check-task', async (req, res) => {
-  const { user_id, taskKey } = req.body;
-
-  if (!user_id || !taskKey) {
-    return res.status(400).json({ success: false, message: 'Missing user_id or taskKey' });
-  }
-
-  try {
-    const userRef = db.collection('users').doc(user_id);
-    const userDoc = await userRef.get();
-
-    if (!userDoc.exists) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    const userData = userDoc.data();
-
-    if (userData.paid === true) {
-      return res.json({ success: true });
-    } else {
-      return res.json({ success: false, message: 'Payment not found' });
-    }
-  } catch (error) {
-    console.error('Ошибка при проверке оплаты:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+// ✅ создаём таблицу users, если её ещё нет
+db.run(`
+  CREATE TABLE IF NOT EXISTS users (
+    user_id TEXT PRIMARY KEY,
+    hasSubscribed INTEGER DEFAULT 0,
+    hasPaid INTEGER DEFAULT 0,
+    referrals INTEGER DEFAULT 0
+  )
+`, (err) => {
+  if (err) {
+    console.error('❌ Ошибка при создании таблицы:', err.message);
+  } else {
+    console.log('✅ Таблица users готова');
   }
 });
 
-const PORT = process.env.PORT || 3000;
+// 🔁 Проверка, работает ли сервер
+app.get('/', (req, res) => {
+  res.send('VPN Empire сервер работает 🛠️');
+});
+
+// 🧩 импорт API роутов
+import checkSubscription from './api/check-subscription.js';
+import yookassaWebhook from './api/yookassa-webhook.js';
+
+app.use('/api/check-subscription', checkSubscription);
+app.use('/api/check-payment', yookassaWebhook);
+
+// ✅ запуск сервера
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
 });
