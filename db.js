@@ -1,18 +1,17 @@
+// db.js
 import sqlite3 from 'sqlite3';
-import fs from 'fs';
+import { open } from 'sqlite';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const dataPath = path.resolve('./data');
-if (!fs.existsSync(dataPath)) {
-  fs.mkdirSync(dataPath);
-}
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const db = new sqlite3.Database('./data/database.sqlite', (err) => {
-  if (err) {
-    console.error('❌ Ошибка подключения к базе данных:', err.message);
-  } else {
-    console.log('✅ База данных подключена: ./data/database.sqlite');
-  }
+const dbPath = path.join(__dirname, 'data', 'database.sqlite');
+
+const db = await open({
+  filename: dbPath,
+  driver: sqlite3.Database,
 });
 
 export default db;
