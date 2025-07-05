@@ -1,46 +1,38 @@
-import { buffer } from 'micro';
-import { getDb, initDb } from '../../db';
+// api/yookassa-webhook.js
+import express from 'express';
+import db from '../db.js';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+const router = express.Router();
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
+router.use(express.json());
 
+router.post('/', async (req, res) => {
   try {
-    const rawBody = await buffer(req);
-    const json = JSON.parse(rawBody.toString());
-
-    console.log('📥 Webhook получен:', JSON.stringify(json));
+    const data = req.body;
+    console.log('📥 Webhook получен:', JSON.stringify(data));
 
     if (
-      json.type === 'notification' &&
-      json.event === 'payment.succeeded' &&
-      json.object.status === 'succeeded'
+      data.type === 'notification' &&
+      data.event === 'payment.succeeded' &&
+      data.object.status === 'succeeded'
     ) {
-      const description = json.object.description;
+      const description = data.object.description;
       const userIdMatch = description.match(/\d+/);
       const user_id = userIdMatch ? userIdMatch[0] : null;
 
       if (!user_id) {
-        console.log('❌ Не найден user_id в description:', description);
+        console.log('❌ Не удалось извлечь user_id из description:', description);
         return res.status(400).json({ error: 'user_id not found' });
       }
 
-      await initDb();
-      const db = await getDb();
-
-      // Проверка: выполнено ли уже
-      const existing = await db.get(`SELECT activateVpn FROM users WHERE user_id = ?`, [user_id]);
-      if (existing?.activateVpn) {
-        console.log(`⚠️ Задание уже выполнено: ${user_id}`);
+      // Проверяем — уже выполнено?
+      const row = await db.get('SELECT activateVpn FROM users WHERE user_id = ?', user_id);
+      if (row?.activateVpn) {
+        console.log(`⚠️ Задание уже выполнено для user_id: ${user_id}`);
         return res.status(200).json({ success: true });
       }
 
-      // Обновление или вставка пользователя
+      // ✅ Начисляем награду
       await db.run(
         `INSERT INTO users (user_id, coins, hasVpnBoost, activateVpn)
          VALUES (?, 1000, 1, 1)
@@ -51,13 +43,15 @@ export default async function handler(req, res) {
         [user_id]
       );
 
-      console.log(`🎉 ${user_id} получил 1000 монет и VPN Boost`);
+      console.log(`🎉 Награда выдана: 1000 монет + x2 Boost активирован для user_id: ${user_id}`);
       return res.status(200).json({ success: true });
     }
 
-    return res.status(200).json({ received: true });
-  } catch (err) {
-    console.error('❌ Ошибка в webhook:', err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    res.status(200).json({ received: true });
+  } catch (error) {
+    console.error('❌ Ошибка в обработке webhook:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-}
+});
+
+export default router;
