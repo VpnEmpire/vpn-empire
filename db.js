@@ -1,13 +1,18 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
+import fs from 'fs';
+import path from 'path';
 
-export const dbPromise = open({
-  filename: './data/database.sqlite',
-  driver: sqlite3.Database,
+// Создание папки "data", если нет
+const dataPath = path.resolve('./data');
+if (!fs.existsSync(dataPath)) {
+  fs.mkdirSync(dataPath);
+}
+
+// Открываем или создаём базу в /data
+const dbPromise = open({
+  filename: path.resolve(dataPath, 'database.sqlite'),
+  driver: sqlite3.Database
 });
 
-export const db = {
-  run: async (...args) => (await dbPromise).run(...args),
-  get: async (...args) => (await dbPromise).get(...args),
-  all: async (...args) => (await dbPromise).all(...args),
-};
+export default dbPromise;
