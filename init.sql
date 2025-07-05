@@ -1,1 +1,6 @@
-
+CREATE TABLE IF NOT EXISTS users (
+  user_id TEXT PRIMARY KEY,
+  coins INTEGER DEFAULT 0,
+  hasVpnBoost INTEGER DEFAULT 0,
+  activateVpn INTEGER DEFAULT 0
+);
