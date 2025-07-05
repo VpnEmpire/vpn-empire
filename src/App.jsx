@@ -6,6 +6,10 @@ import Roulette from './components/Roulette.jsx';
 import Hometab from './components/Home.jsx';
 import supabase from './supabaseClient';
 
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
@@ -47,7 +51,44 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const winSoundRef = useRef(null);
   const [canSpin, setCanSpin] = useState(true);
   const [spinResult, setSpinResult] = useState(null);
+  
+const saveUserToSupabase = async (uid) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('user_id')
+        .eq('user_id', uid)
+        .single();
 
+      if (!data && !error) {
+        await supabase.from('users').insert([{ user_id: uid, coins: 0, referrals: 0, had_paid: false }]);
+        console.log('✅ Пользователь добавлен в Supabase');
+      }
+    } catch (err) {
+      console.error('Ошибка при добавлении пользователя в Supabase:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+      saveUserToSupabase(userId);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    const storedId = localStorage.getItem('user_id');
+    if (storedId) {
+      setUserId(storedId);
+    } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      const uid = urlParams.get('user_id');
+      if (uid) {
+        setUserId(uid);
+        localStorage.setItem('user_id', uid);
+      }
+    }
+  }, []);
+  
   useEffect(() => {
     const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
     const storedUserId = localStorage.getItem('userId')
