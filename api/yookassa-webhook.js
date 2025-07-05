@@ -1,6 +1,6 @@
 import express from 'express';
 import { buffer } from 'micro';
-import { db } from '../db.js';
+import db from '../db.js';
 
 export const config = { api: { bodyParser: false } };
 const router = express.Router();
