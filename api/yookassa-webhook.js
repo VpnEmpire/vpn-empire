@@ -1,5 +1,5 @@
-import admin from 'firebase-admin';
 import { buffer } from 'micro';
+import { getDb, initDb } from '../../db';
 
 export const config = {
   api: {
@@ -7,64 +7,57 @@ export const config = {
   },
 };
 
-const serviceAccount = JSON.parse(process.env.FIREBASE_SECRET_JSON);
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: process.env.FIREBASE_DB_URL,
-  });
-}
-
-const db = admin.database();
-
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).end('Method Not Allowed');
-  }
+  if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
 
   try {
     const rawBody = await buffer(req);
     const json = JSON.parse(rawBody.toString());
-    const data = json;
 
     console.log('📥 Webhook получен:', JSON.stringify(json));
 
     if (
-      data.type === 'notification' &&
-      data.event === 'payment.succeeded' &&
-      data.object.status === 'succeeded'
+      json.type === 'notification' &&
+      json.event === 'payment.succeeded' &&
+      json.object.status === 'succeeded'
     ) {
-      const description = data.object.description;
+      const description = json.object.description;
       const userIdMatch = description.match(/\d+/);
       const user_id = userIdMatch ? userIdMatch[0] : null;
 
       if (!user_id) {
-        console.log('❌ Не удалось извлечь user_id из description:', description);
+        console.log('❌ Не найден user_id в description:', description);
         return res.status(400).json({ error: 'user_id not found' });
       }
 
-      // Проверка: уже выполнено?
-      const taskSnapshot = await db.ref(`users/${user_id}/completedTasks/activateVpn`).once('value');
-      const alreadyCompleted = taskSnapshot.val();
+      await initDb();
+      const db = await getDb();
 
-      if (alreadyCompleted) {
-        console.log(`⚠️ Задание уже выполнено для user_id: ${user_id}`);
+      // Проверка: выполнено ли уже
+      const existing = await db.get(`SELECT activateVpn FROM users WHERE user_id = ?`, [user_id]);
+      if (existing?.activateVpn) {
+        console.log(`⚠️ Задание уже выполнено: ${user_id}`);
         return res.status(200).json({ success: true });
       }
 
-      // ✅ Обновляем Firebase Realtime Database
-      await db.ref(`users/${user_id}/completedTasks/activateVpn`).set(true);
-      await db.ref(`users/${user_id}/hasVpnBoost`).set(true);
-      await db.ref(`users/${user_id}/coins`).transaction(current => (current || 0) + 1000);
+      // Обновление или вставка пользователя
+      await db.run(
+        `INSERT INTO users (user_id, coins, hasVpnBoost, activateVpn)
+         VALUES (?, 1000, 1, 1)
+         ON CONFLICT(user_id) DO UPDATE SET
+           coins = coins + 1000,
+           hasVpnBoost = 1,
+           activateVpn = 1`,
+        [user_id]
+      );
 
-      console.log(`🎉 Награда выдана: 1000 монет, VPN Boost активирован для user_id: ${user_id}`);
+      console.log(`🎉 ${user_id} получил 1000 монет и VPN Boost`);
       return res.status(200).json({ success: true });
     }
 
-    res.status(200).json({ received: true });
-  } catch (error) {
-    console.error('❌ Ошибка в обработке webhook:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(200).json({ received: true });
+  } catch (err) {
+    console.error('❌ Ошибка в webhook:', err);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
