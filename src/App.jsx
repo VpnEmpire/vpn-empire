@@ -53,26 +53,6 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [spinResult, setSpinResult] = useState(null);
 
   useEffect(() => {
-    if (userId) {
-      saveUserToSupabase(userId);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    const storedId = localStorage.getItem('user_id');
-    if (storedId) {
-      setUserId(storedId);
-    } else {
-      const urlParams = new URLSearchParams(window.location.search);
-      const uid = urlParams.get('user_id');
-      if (uid) {
-        setUserId(uid);
-        localStorage.setItem('user_id', uid);
-      }
-    }
-  }, []);
-  
-  useEffect(() => {
     const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
     const storedUserId = localStorage.getItem('userId')
     if (initDataUnsafe?.user?.id) {
