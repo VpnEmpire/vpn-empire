@@ -1,43 +1,46 @@
-import express from 'express';
-import { buffer } from 'micro';
-import db from '../db.js';
+mport { createClient } from '@supabase/supabase-js';
 
-export const config = { api: { bodyParser: false } };
-const router = express.Router();
+const supabaseUrl = 'https://wkdhylmqfzigaxxhnqho.supabase.co';
+const supabaseKey = 'YOUR_SUPABASE_SERVICE_ROLE_KEY'; // сервисный ключ с полными правами
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-router.post('/', async (req, res) => {
-  try {
-    const rawBody = await buffer(req);
-    const data = JSON.parse(rawBody.toString());
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).send('Method Not Allowed');
+  }
 
-    if (
-      data.type === 'notification' &&
-      data.event === 'payment.succeeded' &&
-      data.object.status === 'succeeded'
-    ) {
-      const description = data.object.description;
-      const userIdMatch = description.match(/\d+/);
-      const user_id = userIdMatch ? userIdMatch[0] : null;
+  const event = req.body;
 
-      if (!user_id) return res.status(400).json({ error: 'user_id not found' });
+  // В зависимости от структуры webhook ЮKassa
+  // Например, event.object === 'payment' и event.status === 'succeeded'
 
-      const row = await db.get(`SELECT hasVpnBoost FROM users WHERE user_id = ?`, [user_id]);
-      if (row?.hasVpnBoost) return res.json({ success: true });
+  if (event.object === 'payment' && event.status === 'succeeded') {
+    const paymentId = event.id;
+    const userId = event.metadata?.user_id || null; // пользовательский id из metadata платежа
 
-      await db.run(`
-        INSERT INTO users (user_id, hasVpnBoost, coins)
-        VALUES (?, 1, 1000)
-        ON CONFLICT(user_id) DO UPDATE SET hasVpnBoost = 1, coins = coins + 1000
-      `, [user_id]);
-
-      return res.json({ success: true });
+    if (!userId) {
+      return res.status(400).send('No user_id in payment metadata');
     }
 
-    res.status(200).json({ received: true });
-  } catch (err) {
-    console.error('❌ Ошибка webhook:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
+    // Записываем платеж в Supabase
+    const { data, error } = await supabase.from('payments').insert([
+      {
+        payment_id: paymentId,
+        user_id: userId,
+        status: event.status,
+        amount: event.amount?.value || 0,
+        created_at: new Date().toISOString(),
+      },
+    ]);
 
-export default router;
+    if (error) {
+      console.error('Supabase insert error:', error);
+      return res.status(500).send('Database error');
+    }
+
+    return res.status(200).send('Payment recorded');
+  }
+
+  res.status(400).send('Event ignored');
+}
+
