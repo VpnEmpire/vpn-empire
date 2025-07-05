@@ -7,7 +7,7 @@ import Hometab from './components/Home.jsx';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseKey = process.env.REACT_APP_SUPABASE_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY; // этот ключ для server side!
 const supabase = createClient(supabaseUrl, supabaseKey);
   
 function App() {
