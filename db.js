@@ -1,18 +1,18 @@
 import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
 import fs from 'fs';
 import path from 'path';
 
-// Создание папки "data", если нет
 const dataPath = path.resolve('./data');
 if (!fs.existsSync(dataPath)) {
   fs.mkdirSync(dataPath);
 }
 
-// Открываем или создаём базу в /data
-const dbPromise = open({
-  filename: path.resolve(dataPath, 'database.sqlite'),
-  driver: sqlite3.Database
+const db = new sqlite3.Database('./data/database.sqlite', (err) => {
+  if (err) {
+    console.error('❌ Ошибка подключения к базе данных:', err.message);
+  } else {
+    console.log('✅ База данных подключена: ./data/database.sqlite');
+  }
 });
 
-export default dbPromise;
+export default db;
