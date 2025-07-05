@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
-import supabase from './supabaseClient.js';
+import Supabase from './supabaseClient.js';
 import BottomNav from './components/BottomNav.jsx';
 import TopTab from './components/Top.jsx';
 import Roulette from './components/Roulette.jsx';
