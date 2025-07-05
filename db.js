@@ -4,22 +4,10 @@ import { open } from 'sqlite';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const dbPath = path.join(__dirname, 'data', 'database.sqlite');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
-const db = await open({
-  filename: dbPath,
-  driver: sqlite3.Database,
-});
+const dbPath = path.resolve(__dirname, 'data', 'database.sqlite');
+const db = new sqlite3.Database(dbPath);
 
-await db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    user_id TEXT PRIMARY KEY,
-    coins INTEGER DEFAULT 0,
-    referrals INTEGER DEFAULT 0,
-    has_paid INTEGER DEFAULT 0
-  );
-`);
-
-export default db;
+module.exports = db;
