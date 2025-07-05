@@ -1,15 +1,14 @@
-// api/yookassa-webhook.js
 import express from 'express';
+import { buffer } from 'micro';
 import db from '../db.js';
 
+export const config = { api: { bodyParser: false } };
 const router = express.Router();
-
-router.use(express.json());
 
 router.post('/', async (req, res) => {
   try {
-    const data = req.body;
-    console.log('📥 Webhook получен:', JSON.stringify(data));
+    const rawBody = await buffer(req);
+    const data = JSON.parse(rawBody.toString());
 
     if (
       data.type === 'notification' &&
@@ -20,37 +19,24 @@ router.post('/', async (req, res) => {
       const userIdMatch = description.match(/\d+/);
       const user_id = userIdMatch ? userIdMatch[0] : null;
 
-      if (!user_id) {
-        console.log('❌ Не удалось извлечь user_id из description:', description);
-        return res.status(400).json({ error: 'user_id not found' });
-      }
+      if (!user_id) return res.status(400).json({ error: 'user_id not found' });
 
-      // Проверяем — уже выполнено?
-      const row = await db.get('SELECT activateVpn FROM users WHERE user_id = ?', user_id);
-      if (row?.activateVpn) {
-        console.log(`⚠️ Задание уже выполнено для user_id: ${user_id}`);
-        return res.status(200).json({ success: true });
-      }
+      const row = await db.get(`SELECT hasVpnBoost FROM users WHERE user_id = ?`, [user_id]);
+      if (row?.hasVpnBoost) return res.json({ success: true });
 
-      // ✅ Начисляем награду
-      await db.run(
-        `INSERT INTO users (user_id, coins, hasVpnBoost, activateVpn)
-         VALUES (?, 1000, 1, 1)
-         ON CONFLICT(user_id) DO UPDATE SET
-           coins = coins + 1000,
-           hasVpnBoost = 1,
-           activateVpn = 1`,
-        [user_id]
-      );
+      await db.run(`
+        INSERT INTO users (user_id, hasVpnBoost, coins)
+        VALUES (?, 1, 1000)
+        ON CONFLICT(user_id) DO UPDATE SET hasVpnBoost = 1, coins = coins + 1000
+      `, [user_id]);
 
-      console.log(`🎉 Награда выдана: 1000 монет + x2 Boost активирован для user_id: ${user_id}`);
-      return res.status(200).json({ success: true });
+      return res.json({ success: true });
     }
 
     res.status(200).json({ received: true });
-  } catch (error) {
-    console.error('❌ Ошибка в обработке webhook:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+  } catch (err) {
+    console.error('❌ Ошибка webhook:', err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
