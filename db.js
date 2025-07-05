@@ -1,12 +1,29 @@
 import sqlite3 from 'sqlite3';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
+const dbPath = path.join(__dirname, 'data', 'database.sqlite');
+const initSqlPath = path.join(__dirname, 'init.sql');
 
-const dbPath = path.resolve(__dirname, 'data', 'database.sqlite');
-const db = new sqlite3.Database(dbPath);
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Ошибка подключения к БД:', err.message);
+  } else {
+    console.log('✅ База данных подключена');
+
+    const initSql = fs.readFileSync(initSqlPath, 'utf8');
+    db.exec(initSql, (err) => {
+      if (err) {
+        console.error('[INIT SQL ERROR]', err.message);
+      } else {
+        console.log('✅ Таблица users создана или уже существует');
+      }
+    });
+  }
+});
 
 export default db;
+
