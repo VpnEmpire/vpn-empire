@@ -6,8 +6,8 @@ import Roulette from './components/Roulette.jsx';
 import Hometab from './components/Home.jsx';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://wkdhylmqfzigaxxhnqho.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrZGh5bG1xZnppZ2F4eGhucWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2ODI2NjYsImV4cCI6MjA2NzI1ODY2Nn0.9gaWyWvsvftewF3WJx03p0kZhZ6-5ReNDe2CsXoor6E';
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseKey = process.env.REACT_APP_SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
   
 function App() {
