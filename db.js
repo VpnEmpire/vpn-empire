@@ -6,12 +6,20 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const dbPath = path.join(__dirname, 'data', 'database.sqlite');
 
 const db = await open({
   filename: dbPath,
   driver: sqlite3.Database,
 });
+
+await db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    user_id TEXT PRIMARY KEY,
+    coins INTEGER DEFAULT 0,
+    referrals INTEGER DEFAULT 0,
+    has_paid INTEGER DEFAULT 0
+  );
+`);
 
 export default db;
