@@ -4,7 +4,12 @@ import BottomNav from './components/BottomNav.jsx';
 import TopTab from './components/Top.jsx';
 import Roulette from './components/Roulette.jsx';
 import Hometab from './components/Home.jsx';
+import { createClient } from '@supabase/supabase-js';
 
+const supabaseUrl = 'https://wkdhylmqfzigaxxhnqho.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndrZGh5bG1xZnppZ2F4eGhucWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2ODI2NjYsImV4cCI6MjA2NzI1ODY2Nn0.9gaWyWvsvftewF3WJx03p0kZhZ6-5ReNDe2CsXoor6E';
+const supabase = createClient(supabaseUrl, supabaseKey);
+  
 function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
@@ -50,7 +55,6 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   useEffect(() => {
     const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
     const storedUserId = localStorage.getItem('userId')
-  
     if (initDataUnsafe?.user?.id) {
       const tgId = initDataUnsafe.user.id.toString();
       setUserId(tgId);
@@ -70,14 +74,225 @@ useEffect(() => {
     updateRank(coins);
   }, [coins]);
   
- useEffect(() => {
-const storedBoost = localStorage.getItem('hasVpnBoost');
-   if (storedBoost === 'true' ) {
-     setHasVpnBoost(true);
-     setClickMultiplier(2);
+useEffect(() => {
+    const storedBoost = localStorage.getItem('hasVpnBoost');
+    if (storedBoost === 'true') {
+      setHasVpnBoost(true);
+      setClickMultiplier(2);
     }
   }, []);
 
+  useEffect(() => {
+    const today = new Date().toDateString();
+    if (localStorage.getItem('lastClickDate') !== today) {
+      setClicksToday(0);
+      localStorage.setItem('lastClickDate', today);
+    }
+    if (localStorage.getItem('dailyVpnResetDate') !== today) {
+      const updated = { ...completedTasks };
+      delete updated['dailyVpn'];
+      setCompletedTasks(updated);
+      localStorage.setItem('completedTasks', JSON.stringify(updated));
+      localStorage.setItem('dailyVpnResetDate', today);
+    }
+    if (localStorage.getItem('lastSpinDate') === today) {
+      setCanSpin(false);
+    }
+  }, []);
+
+  const updateRank = (totalCoins) => {
+    if (totalCoins >= 5000) setRank('Легенда VPN');
+    else if (totalCoins >= 2000) setRank('Эксперт');
+    else if (totalCoins >= 1000) setRank('Профи');
+    else if (totalCoins >= 500) setRank('Агент');
+    else setRank('Новичок');
+  };
+
+  const playClickSound = () => {
+    const audio = new Audio('/click.mp3');
+    audio.play().catch(e => console.log('Ошибка воспроизведения звука:', e));
+  };
+
+  const handleClick = (e) => {
+    if (clicksToday < maxClicksPerDay) {
+      const multiplier = hasVpnBoost ? 2 : 1;
+      setCoins(prev => prev + 1 * multiplier);
+      setClicksToday(prev => prev + 1);
+      triggerAnimation();
+      playClickSound();
+    }
+    const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
+    setFlashes(prev => [...prev, flash]);
+    setTimeout(() => {
+      setFlashes(prev => prev.filter(f => f.id !== flash.id));
+    }, 400);
+  };
+
+  const triggerAnimation = () => {
+    const flash = document.createElement('div');
+    flash.className = 'flash';
+    flash.style.left = `${Math.random() * window.innerWidth}px`;
+    flash.style.top = `${Math.random() * window.innerHeight}px`;
+    document.body.appendChild(flash);
+    setTimeout(() => {
+      document.body.removeChild(flash);
+    }, 300);
+  };
+
+  const completeTask = (task) => {
+    if (completedTasks[task.key]) return;
+
+    setCompletedTasks(prev => {
+      const updated = { ...prev, [task.key]: true };
+      localStorage.setItem('completedTasks', JSON.stringify(updated));
+      return updated;
+    });
+
+    setCoins(prev => {
+      const newCoins = prev + (task.reward || 0);
+      localStorage.setItem('coins', newCoins);
+      return newCoins;
+    });
+
+    if (task.requiresPayment) {
+      setClickMultiplier(2);
+      localStorage.setItem('clickMultiplier', '2');
+      setHasVpnBoost(true);
+      localStorage.setItem('hasVpnBoost', 'true');
+    }
+
+    alert(`🎁 Ты получил ${task.reward || 0} монет!`);
+  };
+ const handleTaskClick = async (task) => {
+    if (completedTasks[task.key]) {
+      alert('✅ Это задание уже выполнено!');
+      return;
+    }
+ 
+    if (task.type === 'referral') {
+      const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+      try {
+        if (window.Telegram?.WebApp?.clipboard?.writeText) {
+          await window.Telegram.WebApp.clipboard.writeText(refLink);
+        } else {
+          await navigator.clipboard.writeText(refLink);
+        }
+        setCopiedLink(refLink);
+      } catch {
+        alert(`Скопируй вручную:\n${refLink}`);
+      }
+    
+      try {
+        const { data, error } = await supabase
+          .from('referrals')
+          .select('count')
+          .eq('user_id', userId)
+          .single();
+
+        const count = data?.count || 0;
+        setReferrals(count);
+
+        if (count >= task.requiresReferralCount) {
+          completeTask(task);
+        } else {
+          alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
+        }
+        // Сброс реферальных заданий, если все выполнены
+        const allReferralDone = tasks
+          .filter(t => t.type === 'referral')
+          .every(t => completedTasks[t.key] || t.key === task.key);
+
+        if (allReferralDone) {
+          const updated = { ...completedTasks };
+          tasks.forEach(t => {
+            if (t.type === 'referral') delete updated[t.key];
+          });
+          setCompletedTasks(updated);
+          localStorage.setItem('completedTasks', JSON.stringify(updated));
+          alert('Все реферальные задания выполнены — они сброшены и доступны снова!');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Ошибка при проверке приглашений.');
+      }
+      return;
+    }
+
+    if (task.type === 'vpn' && task.requiresPayment && !localStorage.getItem('vpnClickedOnce')) {
+      try {
+        if (window.Telegram?.WebApp?.openTelegramLink) {
+          window.Telegram.WebApp.openTelegramLink(task.link);
+        } else {
+          window.open(task.link, '_blank');
+        }
+        alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+        localStorage.setItem('vpnClickedOnce', 'true');
+        return;
+      } catch (error) {
+        alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
+        return;
+      }
+    }
+
+    if (task.type === 'vpn' && task.requiresPayment) {
+      // Проверяем оплату через Supabase
+      try {
+        const { data, error } = await supabase
+          .from('payments')
+          .select('status')
+          .eq('user_id', userId)
+          .eq('status', 'succeeded')
+          .limit(1)
+          .single();
+
+        if (data && data.status === 'succeeded') {
+          completeTask(task);
+        } else {
+          alert('❌ Оплата не найдена. Попробуй позже.');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Ошибка при проверке оплаты. Попробуй позже.');
+      }
+      return;
+    }
+
+    if (task.requiresSubscription) {
+      try {
+        if (window.Telegram?.WebApp?.openTelegramLink) {
+          window.Telegram.WebApp.openTelegramLink(task.link);
+        } else {
+          window.open(task.link, '_blank');
+        }
+      } catch {
+        alert('Не удалось открыть ссылку подписки');
+        return;
+      }
+      setTimeout(async () => {
+        try {
+          const { data, error } = await supabase
+            .from('subscriptions')
+            .select('is_subscribed')
+            .eq('user_id', userId)
+            .eq('channel', task.key === 'subscribeTelegram' ? 'telegram' : 'instagram')
+            .limit(1)
+            .single();
+
+          if (data?.is_subscribed) {
+            completeTask(task);
+          } else {
+            alert('Пожалуйста, подпишитесь на канал для получения награды');
+          }
+        } catch {
+          alert('Ошибка при проверке подписки. Попробуйте позже.');
+        }
+      }, 3000);
+      return;
+    }
+
+    // Для прочих заданий
+    completeTask(task);
+};
   useEffect(() => {
     const today = new Date().toDateString();
     if (localStorage.getItem('lastClickDate') !== today) {
@@ -136,65 +351,6 @@ setTimeout(() => {
       document.body.removeChild(flash);
     }, 300);
   };
-  
-  const checkVpnPayment = async () => {
-  try {
-    const response = await fetch('/api/check-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id }),
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-      alert('✅ Оплата подтверждена. Вы получили 1000 монет и x2 кликов!');
-      
-      const updated = { ...completedTasks, vpnPayment: true };
-      setCompletedTasks(updated);
-      localStorage.setItem('completedTasks', JSON.stringify(updated));
-
-      setCoins(prev => {
-        const newTotal = prev + 1000;
-        localStorage.setItem('coins', newTotal);
-        return newTotal;
-      });
-
-      setClickMultiplier(2);
-      localStorage.setItem('clickMultiplier', '2');
-    } else {
-      alert('❌ Оплата не найдена. Убедитесь, что оплатили в Telegram-боте.');
-    }
-  } catch (err) {
-    console.error(err);
-    alert('🚫 Ошибка при проверке оплаты. Попробуйте позже.');
-  }
-};
-  
-  const handlePaymentCheck = async (taskKey) => {
-  try {
-    const response = await fetch('https://vpnempire.vercel.app/vpn-empire/api/checkUserPayment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
-    });
-  
-    const result = await response.json();
-
-    if (result.success) {
-      const updated = { ...completedTasks, [taskKey]: true };
-      setCompletedTasks(updated);
-      localStorage.setItem('completedTasks', JSON.stringify(updated));
-      setCoins(coins + 1000);
-      alert('Оплата подтверждена! Награда выдана.');
-    } else {
-      alert('Оплата не найдена. Убедись, что оплатил VPN в Telegram-боте.');
-    }
-  } catch (error) {
-    console.error('Ошибка при проверке оплаты:', error);
-    alert('Ошибка при проверке. Попробуй позже.');
-  }
-};
 
   const completeTask = (task) => {
   if (completedTasks[task.key]) return;
@@ -212,8 +368,11 @@ setTimeout(() => {
   });
 
   if (task.requiresPayment) {
-    setClickMultiplier(2);
-  }
+      setClickMultiplier(2);
+      localStorage.setItem('clickMultiplier', '2');
+      setHasVpnBoost(true);
+      localStorage.setItem('hasVpnBoost', 'true');
+    }
 
   alert(`🎁 Ты получил ${task.reward || 0} монет!`);
 };
@@ -238,98 +397,82 @@ setTimeout(() => {
     alert(`Скопируй вручную:\n${refLink}`);
   }
 
-  try {
-    const res = await fetch(`/api/check-referrals?user_id=${userId}`);
-    const data = await res.json();
+   try {
+        const { data, error } = await supabase
+          .from('referrals')
+          .select('count')
+          .eq('user_id', userId)
+          .single();
+     
     const count = data.referrals || 0;
     setReferrals(count);
 
     if (count >= task.requiresReferralCount) {
-      const updatedTasks = { ...completedTasks, [task.key]: true };
-      setCompletedTasks(updatedTasks);
-      setCoins(prev => prev + task.reward);
-      localStorage.setItem('coins', coins + task.reward);
-      localStorage.setItem('completedTasks', JSON.stringify(updatedTasks));
-    } else {
-      alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
+          completeTask(task);
+        } else {
+          alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
+        }
+
+        // Сброс реферальных заданий, если все выполнены
+        const allReferralDone = tasks
+          .filter(t => t.type === 'referral')
+          .every(t => completedTasks[t.key] || t.key === task.key);
+
+        if (allReferralDone) {
+          const updated = { ...completedTasks };
+          tasks.forEach(t => {
+            if (t.type === 'referral') delete updated[t.key];
+          });
+          setCompletedTasks(updated);
+          localStorage.setItem('completedTasks', JSON.stringify(updated));
+          alert('Все реферальные задания выполнены — они сброшены и доступны снова!');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Ошибка при проверке приглашений.');
+      }
+      return;
     }
 
-    // 🔁 Сброс заданий, если все реферальные выполнены
-    const allReferralDone = tasks
-      .filter(t => t.type === 'referral')
-      .every(t => completedTasks[t.key] || t.key === task.key);
-
-    if (allReferralDone) {
-      const resetCompleted = { ...completedTasks };
-      tasks.forEach(t => {
-        if (t.type === 'referral') delete resetCompleted[t.key];
-      });
-      setCompletedTasks(resetCompleted);
-      localStorage.setItem('completedTasks', JSON.stringify(resetCompleted));
-      alert('Все реферальные задания выполнены — они сброшены и доступны снова!');
+    if (task.type === 'vpn' && task.requiresPayment && !localStorage.getItem('vpnClickedOnce')) {
+      try {
+        if (window.Telegram?.WebApp?.openTelegramLink) {
+          window.Telegram.WebApp.openTelegramLink(task.link);
+        } else {
+          window.open(task.link, '_blank');
+        }
+        alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+        localStorage.setItem('vpnClickedOnce', 'true');
+        return;
+      } catch (error) {
+        alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
+        return;
+      }
     }
-  } catch (error) {
-    console.error(error);
-    alert('Ошибка при проверке приглашений.');
-  }
 
-  return;
-}
+    if (task.type === 'vpn' && task.requiresPayment) {
+      // Проверяем оплату через Supabase
+      try {
+        const { data, error } = await supabase
+          .from('payments')
+          .select('status')
+          .eq('user_id', userId)
+          .eq('status', 'succeeded')
+          .limit(1)
+          .single();
 
-  // Если уже выполнено
-  if (task.key === 'activateVpn' && completedTasks['activateVpn']) {
-    alert('✅ Оплата уже подтверждена и награда выдана!');
-    return;
-  }
+        if (data && data.status === 'succeeded') {
+          completeTask(task);
+        } else {
+          alert('❌ Оплата не найдена. Попробуй позже.');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Ошибка при проверке оплаты. Попробуй позже.');
+      }
+      return;
+    }
 
-  // Первый клик — просто открыть Telegram-бота
-  if (task.type === 'vpn' && task.requiresPayment && !localStorage.getItem('vpnClickedOnce')) {
-    try {
-      if (window.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-      } else {
-        window.open(task.link, '_blank');
-      }
-      alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-      localStorage.setItem('vpnClickedOnce', 'true');
-      return; // ❗ Никаких начислений пока
-    } catch (error) {
-      alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
-      return;
-    }
-  }
-
-  // Второй клик — проверка оплаты
-  if (task.type === 'vpn' && task.requiresPayment) {
-    const res = await fetch('/api/check-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
-    }).then(res => res.json());
-
-    if (res && res.success === true) {
-      const updated = { ...completedTasks, [task.key]: true };
-      setCompletedTasks(updated);
-      localStorage.setItem('completedTasks', JSON.stringify(updated));
-
-      setHasVpnBoost(true);
-      localStorage.setItem('hasVpnBoost', 'true');
-
-      setCoins(prev => {
-        const newTotal = prev + 1000;
-        localStorage.setItem('coins', newTotal);
-        return newTotal;
-      });
-
-      alert('✅ Оплата подтверждена! Награда + x2 кликов активированы.');
-    } else {
-      alert('❌ Оплата не найдена. Попробуй позже.');
-    }
-
-    return;
-  }
-
-    // 3. Подписка на Telegram или Instagram
     if (task.requiresSubscription) {
       try {
         if (window.Telegram?.WebApp?.openTelegramLink) {
@@ -337,52 +480,36 @@ setTimeout(() => {
         } else {
           window.open(task.link, '_blank');
         }
-      } catch (error) {
+      } catch {
         alert('Не удалось открыть ссылку подписки');
         return;
       }
-    
-      // Особенная проверка для Instagram
-      if (task.key === 'subscribeInstagram') {
-        setTimeout(async () => {
-          try {
-            const res = await fetch(`/api/check-instagram-subscription?user_id=${userId}`);
-            const data = await res.json();
-            if (data.subscribed) {
-              completeTask(task);
-            } else {
-              alert('Пожалуйста, подпишитесь на Instagram для получения награды');
-            }
-          } catch {
-            alert('Ошибка при проверке подписки Instagram. Попробуйте позже.');
+      setTimeout(async () => {
+        try {
+          const { data, error } = await supabase
+            .from('subscriptions')
+            .select('is_subscribed')
+            .eq('user_id', userId)
+            .eq('channel', task.key === 'subscribeTelegram' ? 'telegram' : 'instagram')
+            .limit(1)
+            .single();
+
+          if (data?.is_subscribed) {
+            completeTask(task);
+          } else {
+            alert('Пожалуйста, подпишитесь на канал для получения награды');
           }
-        }, 3000);
-      } else {
-        // Для остальных подписок (Telegram и др.)
-        setTimeout(async () => {
-          try {
-            const url = task.key === 'subscribeInstagram'
-          ? `/api/check-instagram-subscription?user_id=${userId}`
-          : `/api/check-subscription?user_id=${userId}&task=${task.key}`;
-            
-            const res = await fetch(url);
-            const data = await res.json();
-            if (data.subscribed) {
-              completeTask(task);
-            } else {
-              alert('Пожалуйста, подпишитесь на канал для получения награды');
-            }
-          } catch {
-            alert('Ошибка при проверке подписки. Попробуйте позже.');
-          }
-        }, 3000);
-      }
+        } catch {
+          alert('Ошибка при проверке подписки. Попробуйте позже.');
+        }
+      }, 3000);
       return;
- };
-    // 4. Прочие простые задания (лайк, комментарий, рассказ в соцсетях)
+    }
+
+    // Для прочих заданий
     completeTask(task);
-};
- 
+  };
+
 const renderTasks = () => (
   <div className="tasks-tab">
     <h2>📋 Задания</h2>
@@ -562,7 +689,7 @@ const renderTasks = () => (
       </button>
      </div>
   );
- 
+
   const renderTab = () => {
     switch (activeTab) {
       case 'home': return renderHome();
