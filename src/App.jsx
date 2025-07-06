@@ -246,6 +246,11 @@ useEffect(() => {
     if (result.success) {
       console.log('✅ Оплата найдена. Начисляем награду!');
       completeTask(task);
+   
+      if (task.key === 'activateVpn') {
+        setClickMultiplier(2);
+        localStorage.setItem('clickMultiplier', 2);
+      }
     } else {
       console.warn('❌ Оплата не найдена');
       alert('❌ Оплата не найдена. Попробуй позже.');
