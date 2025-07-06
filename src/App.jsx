@@ -348,7 +348,6 @@ const renderTasks = () => (
             )}
                       
           {/* Задание VPN выполнено */}
-          {/* Задание VPN выполнено */}
           {task.key === 'activateVpn' && completedTasks[task.key] && (
             <div className="task-completed">✅ Выполнено </div>
           )}
