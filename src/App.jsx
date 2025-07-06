@@ -62,6 +62,20 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   }, []);
 
 useEffect(() => {
+    const checkVpnPayment = async () => {
+      if (!userId) return;
+      try {
+        const res = await fetch(`/api/check-vpn-payment?user_id=${userId}`);
+        const result = await res.json();
+        setVpnPaid(result.success);
+      } catch (err) {
+        console.error('Ошибка при проверке оплаты VPN:', err);
+      }
+    };
+    checkVpnPayment();
+  }, [userId]);
+
+useEffect(() => {
     localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
     localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
@@ -309,28 +323,34 @@ const renderTasks = () => (
                 <button
                   className="task-button"
                   onClick={() => {
-                    if (window.Telegram?.WebApp?.platform === 'web') {
-                      window.open(task.link, '_blank');
+                    if (window.Telegram?.WebApp?.openTelegramLink) {
+                      window.Telegram.WebApp.openTelegramLink(task.link);
                     } else {
-                       alert('🔁 Сверни игру и перейди в бот, чтобы оплатить VPN. Затем вернись и нажми «Выполнить»');
+                       window.open(task.link, '_blank');
                       } 
                   }}
                 >
                   Открыть бота
                 </button>
+                {vpnPaid && (
                 <button
                   className="task-button"
                   onClick={() => handleTaskClick(task)}
                 >
                   Выполнить
                 </button>
+                )}
               </div>
             </>
 )}
           {/* Задание VPN выполнено */}
-          {task.key === 'activateVpn' && completedTasks[task.key] && (
-            <div className="task-completed">✅ Выполнено </div>
-          )}
+{task.key === 'activateVpn' && completedTasks[task.key] && (
+  <div className="task-completed" style={{ marginTop: '10px' }}>
+    ✅ Выполнено<br />
+    🎉 +1000 монет<br />
+    ⚡ x2 кликов активирован
+  </div>
+)}
           
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
