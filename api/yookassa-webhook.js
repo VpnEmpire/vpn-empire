@@ -35,6 +35,7 @@ export default async function handler(req, res) {
       .from('payments')
       .select('id')
       .eq('payment_id', paymentId)
+      .limit(1)
       .maybeSingle();
 
     if (errCheck) {
