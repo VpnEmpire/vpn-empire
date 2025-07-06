@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       .from('payments')
       .select('id')
       .eq('payment_id', paymentId)
-      .single();
+      .single(1);
 
     if (errCheck) {
       console.error('❌ Ошибка при проверке дубликата:', errCheck);
