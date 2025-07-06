@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_KEY
+  process.env.VITE_SUPABASE_ANON_KEY
 );
 
 export default async function handler(req, res) {
@@ -18,13 +18,12 @@ export default async function handler(req, res) {
     const { data, error } = await supabase
       .from('users')
       .select('hasVpnBoost')
-      .user_id: String(userId),
-      .limit(1)
-      .maybeSingle();
+      .eq('user_id', String(user_id))
+      .maybeSingle(); // Внутри уже есть .limit(1)
 
     if (error) {
-      console.error('Ошибка при запросе к Supabase:', error);
-      return res.status(500).json({ error: 'Ошибка запроса к Supabase' });
+      console.error('❌ Ошибка запроса к Supabase:', error);
+      return res.status(500).json({ error: 'Ошибка при обращении к базе данных' });
     }
 
     if (data?.hasVpnBoost) {
@@ -34,7 +33,7 @@ export default async function handler(req, res) {
     }
 
   } catch (err) {
-    console.error('❌ Ошибка сервера:', err);
+    console.error('💥 Внутренняя ошибка сервера:', err);
     return res.status(500).json({ error: 'Server error' });
   }
 }
