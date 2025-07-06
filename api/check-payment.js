@@ -1,52 +1,40 @@
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+// /api/check-vpn-payment.js
 
-if (!getApps().length) {
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SECRET_JSON);
-  initializeApp({ credential: cert(serviceAccount) });
-}
+import { createClient } from '@supabase/supabase-js';
 
-const db = getFirestore();
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Метод не поддерживается' });
-  }
-
-  const { user_id } = req.body;
+  const { user_id } = req.query;
 
   if (!user_id) {
-    return res.status(400).json({ success: false, error: 'Нет user_id' });
+    return res.status(400).json({ error: 'user_id is required' });
   }
 
   try {
-    const userRef = db.collection('users').doc(user_id.toString());
-    const userDoc = await userRef.get();
+    const { data, error } = await supabase
+      .from('users')
+      .select('hasVpnBoost')
+      .eq('user_id', user_id)
+      .limit(1)
+      .single();
 
-    if (!userDoc.exists) {
-      return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+    if (error) {
+      console.error('Ошибка при запросе к Supabase:', error);
+      return res.status(500).json({ error: 'Ошибка запроса к Supabase' });
     }
 
-    const userData = userDoc.data();
-
-    if (userData.paid === true) {
-      await userRef.update({
-        paid: false, // Сбросим, чтобы нельзя было повторно
-        coins: (userData.coins || 0) + 1000,
-        hasVpnBoost: true,
-        completedTasks: {
-          ...(userData.completedTasks || {}),
-          activateVpn: true,
-        },
-      });
-
-      return res.status(200).json({ success: true, message: 'VPN оплачен, награда и boost выданы' });
+    if (data?.hasVpnBoost) {
+      return res.status(200).json({ success: true });
     } else {
-      return res.status(200).json({ success: false, message: 'Оплата не найдена' });
+      return res.status(200).json({ success: false });
     }
 
-  } catch (error) {
-    console.error('Ошибка при проверке оплаты VPN:', error);
-    return res.status(500).json({ success: false, error: 'Ошибка сервера' });
+  } catch (err) {
+    console.error('❌ Ошибка сервера:', err);
+    return res.status(500).json({ error: 'Server error' });
   }
 }
