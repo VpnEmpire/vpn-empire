@@ -2,9 +2,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Используем переменные без префикса VITE_ — только такие работают на backend
 const supabase = createClient(
-  process.env.SUPABASE_URL,
+  process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
 
@@ -16,21 +15,34 @@ export default async function handler(req, res) {
   }
 
   try {
+    // 1. Проверка: есть ли успешная оплата в payments
     const { data, error } = await supabase
-      .from('users')
-      .select('hasVpnBoost')
-      .user_id: String(userId),
+      .from('payments')
+      .select('*')
+      .eq('user_id', user_id)
+      .eq('status', 'succeeded')
       .maybeSingle();
 
     if (error) {
-      console.error('Ошибка при запросе к Supabase:', error);
-      return res.status(500).json({ error: 'Ошибка Supabase' });
+      console.error('❌ Ошибка при запросе payments:', error);
+      return res.status(500).json({ error: 'Ошибка при запросе к payments' });
     }
 
-    if (data?.hasVpnBoost) {
+    if (data) {
+      // 2. Обновить users.hasVpnBoost = true (если ещё не обновлено)
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ hasVpnBoost: true })
+        .eq('user_id', user_id);
+
+      if (updateError) {
+        console.error('⚠️ Ошибка обновления hasVpnBoost:', updateError);
+      }
+
+      // 3. Вернуть успешный ответ
       return res.status(200).json({ success: true });
     } else {
-      return res.status(200).json({ success: false });
+      return res.status(200).json({ success: false }); // Оплата не найдена
     }
   } catch (err) {
     console.error('❌ Ошибка сервера:', err);
