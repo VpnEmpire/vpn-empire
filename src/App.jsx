@@ -185,6 +185,7 @@ useEffect(() => {
           .from('referrals')
           .select('count')
           .eq('user_id', userId)
+          .limit(1)
           .single();
      
     const count = data.referrals || 0;
