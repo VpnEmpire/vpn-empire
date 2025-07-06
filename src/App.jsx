@@ -185,7 +185,6 @@ useEffect(() => {
           .from('referrals')
           .select('count')
           .eq('user_id', userId)
-          .limit(1)
           .single();
      
     const count = data.referrals || 0;
@@ -242,6 +241,7 @@ useEffect(() => {
           .select('status')
           .eq('user_id', String (userId))
           .eq('status', 'succeeded')
+          .limit(1)
           .maybesingle();
 
         if (data && data.status === 'succeeded') {
