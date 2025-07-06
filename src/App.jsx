@@ -221,21 +221,14 @@ useEffect(() => {
   console.log('🟡 Повторный клик: запускаем проверку оплаты');
 
   const stringUserId = String(userId).trim(); // Убедимся, что userId точно строка
-  console.log('👁 userId перед запросом:', stringUserId);
+  console.log('👁 userId перед fetch-запросом:', stringUserId);
 
   try {
-    const { data, error } = await supabase
-      .from('payments')
-      .select('status')
-      .eq('user_id', stringUserId)
-      .eq('status', 'succeeded')
-      .limit(1)
-      .maybeSingle();
+    const res = await fetch(`/api/check-vpn-payment?user_id=${stringUserId}`);
+    const result = await res.json();
+    console.log('🔄 Ответ от /api/check-vpn-payment:', result);
 
-    console.log('🧾 Результат из Supabase:', data);
-    console.log('❌ Ошибка Supabase:', error);
-
-    if (data && data.status === 'succeeded') {
+    if (result.success) {
       console.log('✅ Оплата найдена. Начисляем награду!');
       completeTask(task);
     } else {
@@ -243,9 +236,10 @@ useEffect(() => {
       alert('❌ Оплата не найдена. Попробуй позже.');
     }
   } catch (error) {
-    console.error('💥 Ошибка в блоке try:', error);
+    console.error('💥 Ошибка в блоке try/fetch:', error);
     alert('Ошибка при проверке оплаты. Попробуй позже.');
   }
+
   return;
 }
 
