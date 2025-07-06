@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     const { data, error } = await supabase
       .from('users')
       .select('hasVpnBoost')
-      .eq('user_id', user_id)
+      .user_id: String(userId),
       .maybeSingle();
 
     if (error) {
