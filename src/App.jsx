@@ -241,7 +241,7 @@ useEffect(() => {
           .select('status')
           .eq('user_id', userId)
           .eq('status', 'succeeded')
-          .Maybesingle();
+          .maybesingle();
 
         if (data && data.status === 'succeeded') {
           completeTask(task);
