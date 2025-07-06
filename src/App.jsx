@@ -224,7 +224,7 @@ useEffect(() => {
   console.log('👁 userId перед fetch-запросом:', stringUserId);
 
   try {
-    const res = await fetch(`/api/check-vpn-payment?user_id=${stringUserId}`);
+    const res = await fetch(`/api/check-vpn-payment?user_id=${stringUserId}`); 
     const result = await res.json();
     console.log('🔄 Ответ от /api/check-vpn-payment:', result);
 
