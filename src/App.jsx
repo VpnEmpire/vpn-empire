@@ -217,31 +217,17 @@ useEffect(() => {
       return;
     }
 
-    if (task.type === 'vpn' && task.requiresPayment && !localStorage.getItem('vpnClickedOnce')) {
-  console.log('🟠 Первый клик: открываем Telegram-бота');
-  try {
-    if (window.Telegram?.WebApp?.openTelegramLink) {
-      window.Telegram.WebApp.openTelegramLink(task.link);
-    } else {
-      window.open(task.link, '_blank');
-    }
-    alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-    localStorage.setItem('vpnClickedOnce', 'true');
-    return;
-  } catch (error) {
-    console.error('❌ Ошибка при открытии Telegram:', error);
-    return;
-  }
-}
-
-if (task.type === 'vpn' && task.requiresPayment) {
+  if (task.type === 'vpn' && task.requiresPayment) {
   console.log('🟡 Повторный клик: запускаем проверку оплаты');
+
+  const stringUserId = String(userId).trim(); // Убедимся, что userId точно строка
+  console.log('👁 userId перед запросом:', stringUserId);
 
   try {
     const { data, error } = await supabase
       .from('payments')
       .select('status')
-      .eq('user_id', String(userId))
+      .eq('user_id', stringUserId)
       .eq('status', 'succeeded')
       .limit(1)
       .maybeSingle();
