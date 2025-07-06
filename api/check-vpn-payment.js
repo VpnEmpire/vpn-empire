@@ -21,6 +21,7 @@ export default async function handler(req, res) {
       .select('*')
       .eq('user_id', user_id)
       .eq('status', 'succeeded')
+      .limit (1)
       .maybeSingle();
 
     if (error) {
