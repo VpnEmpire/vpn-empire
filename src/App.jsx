@@ -218,43 +218,50 @@ useEffect(() => {
     }
 
     if (task.type === 'vpn' && task.requiresPayment && !localStorage.getItem('vpnClickedOnce')) {
-      try {
-        if (window.Telegram?.WebApp?.openTelegramLink) {
-          window.Telegram.WebApp.openTelegramLink(task.link);
-        } else {
-          window.open(task.link, '_blank');
-        }
-        alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
-        localStorage.setItem('vpnClickedOnce', 'true');
-        return;
-      } catch (error) {
-        alert('❌ Не удалось открыть Telegram-бота. Попробуй вручную.');
-        return;
-      }
+  console.log('🟠 Первый клик: открываем Telegram-бота');
+  try {
+    if (window.Telegram?.WebApp?.openTelegramLink) {
+      window.Telegram.WebApp.openTelegramLink(task.link);
+    } else {
+      window.open(task.link, '_blank');
     }
+    alert('🔁 Оплати VPN в Telegram-боте, затем вернись и нажми «Выполнить»');
+    localStorage.setItem('vpnClickedOnce', 'true');
+    return;
+  } catch (error) {
+    console.error('❌ Ошибка при открытии Telegram:', error);
+    return;
+  }
+}
 
-    if (task.type === 'vpn' && task.requiresPayment) {
-      // Проверяем оплату через Supabase
-      try {
-        const { data, error } = await supabase
-          .from('payments')
-          .select('status')
-          .eq('user_id', String (userId))
-          .eq('status', 'succeeded')
-          .limit(1)
-          .maybeSingle();
+if (task.type === 'vpn' && task.requiresPayment) {
+  console.log('🟡 Повторный клик: запускаем проверку оплаты');
 
-        if (data && data.status === 'succeeded') {
-          completeTask(task);
-        } else {
-          alert('❌ Оплата не найдена. Попробуй позже.');
-        }
-      } catch (error) {
-        console.error(error);
-        alert('Ошибка при проверке оплаты. Попробуй позже.');
-      }
-      return;
+  try {
+    const { data, error } = await supabase
+      .from('payments')
+      .select('status')
+      .eq('user_id', String(userId))
+      .eq('status', 'succeeded')
+      .limit(1)
+      .maybeSingle();
+
+    console.log('🧾 Результат из Supabase:', data);
+    console.log('❌ Ошибка Supabase:', error);
+
+    if (data && data.status === 'succeeded') {
+      console.log('✅ Оплата найдена. Начисляем награду!');
+      completeTask(task);
+    } else {
+      console.warn('❌ Оплата не найдена');
+      alert('❌ Оплата не найдена. Попробуй позже.');
     }
+  } catch (error) {
+    console.error('💥 Ошибка в блоке try:', error);
+    alert('Ошибка при проверке оплаты. Попробуй позже.');
+  }
+  return;
+}
 
     if (task.requiresSubscription) {
       try {
