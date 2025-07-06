@@ -16,15 +16,14 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
   const event = req.body;
+  console.log('📦 Получено событие от YooKassa:', event);
 
-  // Извлекаем description
   const description = event.object?.description || '';
-  // Парсим userId из строки "Заказ для 773074832"
   const userIdMatch = description.match(/Заказ для (\d+)/);
   const userId = userIdMatch ? userIdMatch[1] : null;
 
   if (!userId) {
-    console.error('userId не найден в description:', description);
+    console.error('❌ userId не найден в description:', description);
     return res.status(400).json({ error: 'userId не найден в description' });
   }
 
@@ -32,7 +31,6 @@ export default async function handler(req, res) {
     const paymentId = event.object.id;
     const amount = event.object.amount?.value || null;
 
-    // Проверяем нет ли уже такого платежа
     const { data: existing, error: errCheck } = await supabase
       .from('payments')
       .select('id')
@@ -40,14 +38,15 @@ export default async function handler(req, res) {
       .single();
 
     if (errCheck) {
-      console.error('Ошибка проверки дубликата:', errCheck);
-      return res.status(500).json({ error: 'Ошибка базы данных' });
+      console.error('❌ Ошибка при проверке дубликата:', errCheck);
+      return res.status(500).json({ error: 'Ошибка при проверке' });
     }
+
     if (existing) {
+      console.log('⚠️ Платеж уже существует:', paymentId);
       return res.status(200).json({ message: 'Платеж уже зарегистрирован' });
     }
 
-    // Вставляем новую запись
     const { error } = await supabase.from('payments').insert([
       {
         user_id: userId,
@@ -59,10 +58,11 @@ export default async function handler(req, res) {
     ]);
 
     if (error) {
-      console.error('Ошибка вставки платежа:', error);
-      return res.status(500).json({ error: 'Ошибка записи в базу' });
+      console.error('❌ Ошибка вставки в базу:', error);
+      return res.status(500).json({ error: 'Ошибка вставки' });
     }
 
+    console.log('✅ Платеж успешно записан');
     return res.status(200).json({ success: true });
   }
 
