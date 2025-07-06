@@ -49,7 +49,7 @@ export default async function handler(req, res) {
 
     const { error } = await supabase.from('payments').insert([
       {
-        user_id: userId,
+        user_id: String(userId),
         payment_id: paymentId,
         amount: amount,
         status: 'succeeded',
