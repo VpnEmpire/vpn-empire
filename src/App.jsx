@@ -320,7 +320,7 @@ const renderTasks = () => (
           )}
           <p>🎯 Награда: {task.reward} монет</p>
          
-        {/* VPN Задание — особое */}
+                {/* VPN Задание — особое */}
           {task.key === 'activateVpn' && !completedTasks[task.key] && (
             <>
               <p>🎁 Бонус: x2 кликов после оплаты</p>
@@ -328,34 +328,30 @@ const renderTasks = () => (
                 <button
                   className="task-button"
                   onClick={() => {
-                    if (window.Telegram?.WebApp?.openTelegramLink) {
-                      window.Telegram.WebApp.openTelegramLink(task.link);
+                    if (window.Telegram?.WebApp?.platform === 'web') {
+                      window.open(task.link, '_blank');
                     } else {
-                       window.open(task.link, '_blank');
-                      } 
+                       alert('🔁 Сверни игру и перейди в бот, чтобы оплатить VPN. Затем вернись и нажми «Выполнить»');
+                                            } 
                   }}
                 >
                   Открыть бота
                 </button>
-                {vpnPaid && (
                 <button
                   className="task-button"
                   onClick={() => handleTaskClick(task)}
                 >
                   Выполнить
                 </button>
-                )}
               </div>
             </>
-)}
+            )}
+                      
           {/* Задание VPN выполнено */}
-{task.key === 'activateVpn' && completedTasks[task.key] && (
-  <div className="task-completed" style={{ marginTop: '10px' }}>
-    ✅ Выполнено<br />
-    🎉 +1000 монет<br />
-    ⚡ x2 кликов активирован
-  </div>
-)}
+          {/* Задание VPN выполнено */}
+          {task.key === 'activateVpn' && completedTasks[task.key] && (
+            <div className="task-completed">✅ Выполнено </div>
+          )}
           
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
