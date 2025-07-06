@@ -241,7 +241,6 @@ useEffect(() => {
           .select('status')
           .eq('user_id', userId)
           .eq('status', 'succeeded')
-          .limit(1)
           .Maybesingle();
 
         if (data && data.status === 'succeeded') {
