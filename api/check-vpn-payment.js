@@ -20,6 +20,7 @@ export default async function handler(req, res) {
       .from('users')
       .select('hasVpnBoost')
       .eq('user_id', user_id)
+      .limit(1)
       .single();
 
     if (error) {
