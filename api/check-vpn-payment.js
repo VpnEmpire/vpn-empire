@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL, // можно оставить тот же URL
-  process.env.VITE_SUPABASE_ANON_KEY // 🔐 правильный приватный ключ
+  process.env.SUPABASE_KEY // 🔐 правильный приватный ключ
 );
 
 export default async function handler(req, res) {
