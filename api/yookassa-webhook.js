@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY; // этот ключ для server side!
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.SUPABASE_KEY; // этот ключ для server side!
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
