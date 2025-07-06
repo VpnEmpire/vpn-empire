@@ -239,7 +239,7 @@ useEffect(() => {
         const { data, error } = await supabase
           .from('payments')
           .select('status')
-          .eq('user_id', userId)
+          .eq('user_id', String (userId))
           .eq('status', 'succeeded')
           .maybesingle();
 
