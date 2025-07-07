@@ -15,7 +15,6 @@ const supabase = createClient(
     return res.status(400).json({ error: 'user_id и task_key обязательны' });
   }
 
-  try {
     // 1. Проверка: есть ли успешная оплата в payments
     const { data, error } = await supabase
       .from('payments')
@@ -30,7 +29,6 @@ const supabase = createClient(
       
     if (error || !data || data.length === 0) {
       return res.status(200).json({ success: false });
-    }
 
     const payment = data[0];
     
