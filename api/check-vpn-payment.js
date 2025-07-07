@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     const { error: updateError } = await supabase
       .from('payments')
       .update({ used: true, task_key: 'activateVpn' })
-      .eq('id', user.id);
+      .eq('id',payment.id);
        
       if (updateError) {
       console.error('Ошибка при обновлении used:', updateError);
