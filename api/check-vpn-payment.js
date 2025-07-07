@@ -1,5 +1,3 @@
-// /api/check-vpn-payment.js
-
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -26,12 +24,17 @@ export default async function handler(req, res) {
       .limit (1)
       .maybeSingle();
 
+    if (error) {
+      console.error('❌ Ошибка при запросе payments:', error);
+      return res.status(500).json({ error: 'Ошибка при запросе к payments' });
+    }
+
     if (data) {
       // 2. Обновить users.hasVpnBoost = true (если ещё не обновлено)
       const { error: updateError } = await supabase
         .from('payments')
         .update({ used: true })
-        .eq('id', data[0].id);  // ✅ правильное использование ID из результата запроса
+        .eq('id', data_id);
 
       if (updateError) {
       console.error('Ошибка при обновлении used:', updateError);
