@@ -59,7 +59,7 @@ export default async function handler(req, res) {
         amount: amount,
         status: 'succeeded',
         used: false, // автоматически
-        task_key: task_key || null, // если указан
+        task_key: null, // если указан
         created_at: new Date().toISOString(),
       },
     ]);
