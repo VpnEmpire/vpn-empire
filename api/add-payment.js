@@ -7,11 +7,11 @@ const supabase = createClient(
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { user_id, payment_id, amount, status } = req.body;
+    const { user_id, payment_id, amount, status, used, task_key } = req.body;
 
     const { data, error } = await supabase
       .from('payments')
-      .insert([{ user_id, payment_id, amount, status }]);
+      .insert([{ user_id, payment_id, amount, status, used, task_key }]);
 
     if (error) return res.status(500).json({ error: error.message });
 
