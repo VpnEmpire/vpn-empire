@@ -5,10 +5,9 @@ import { createClient } from '@supabase/supabase-js';
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_KEY );
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Метод не поддерживается' });
-  }
+  
+  export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
   const { user_id, task_key } = req.body;
 
