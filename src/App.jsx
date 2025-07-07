@@ -278,27 +278,35 @@ useEffect(() => {
         alert('Не удалось открыть ссылку подписки');
         return;
       }
-      setTimeout(async () => {
-        try {
-          const { data, error } = await supabase
-            .from('subscriptions')
-            .select('is_subscribed')
-            .eq('user_id', userId)
-            .eq('channel', task.key === 'subscribeTelegram' ? 'telegram' : 'instagram')
-            .limit(1)
-            .single();
-
-          if (data?.is_subscribed) {
-            completeTask(task);
-          } else {
-            alert('Пожалуйста, подпишитесь на канал для получения награды');
-          }
-        } catch {
-          alert('Ошибка при проверке подписки. Попробуйте позже.');
-        }
-      }, 3000);
-      return;
+      if (task.requiresSubscription) {
+  try {
+    if (window.Telegram?.WebApp?.openTelegramLink) {
+      window.Telegram.WebApp.openTelegramLink(task.link);
+    } else {
+      window.open(task.link, '_blank');
     }
+  } catch {
+    alert('❌ Не удалось открыть ссылку');
+    return;
+  }
+
+  setTimeout(async () => {
+    try {
+      const res = await fetch(`/api/check-subscription?user_id=${userId}&channel=${task.key === 'subscribeTelegram' ? 'telegram' : 'instagram'}`);
+      const result = await res.json();
+
+      if (result.success) {
+        completeTask(task);
+      } else {
+        alert('❌ Подписка не подтверждена. Подпишись и попробуй снова.');
+      }
+    } catch (e) {
+      alert('Ошибка при проверке подписки');
+    }
+  }, 3000);
+  return;
+}
+
 
     // Для прочих заданий
     completeTask(task);
@@ -312,6 +320,10 @@ const renderTasks = () => (
         (task.requiresReferralCount && referrals < task.requiresReferralCount) ||
         (task.disabled && !completedTasks[task.key]);
   
+    // Скрывать некоторые задачи после выполнения:
+      const shouldHideAfterComplete = ['subscribe', 'shareSocial', 'commentPost', 'reactPost'].includes(task.type || task.key);
+      if (completedTasks[task.key] && shouldHideAfterComplete) return null;
+      
       return (
         <div
           key={task.key}
