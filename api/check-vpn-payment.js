@@ -8,10 +8,14 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  const { user_id } = req.query;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Метод не поддерживается' });
+  }
 
-  if (!user_id) {
-    return res.status(400).json({ error: 'user_id is required' });
+  const { user_id, task_key } = req.body;
+
+  if (!user_id || !task_key) {
+    return res.status(400).json({ error: 'user_id и task_key обязательны' });
   }
 
   try {
@@ -20,8 +24,9 @@ export default async function handler(req, res) {
       .from('payments')
       .select('*')
       .eq('user_id', user_id)
+      .eq('task_key', task_key)
       .eq('status', 'succeeded')
-      .eq ('used', false)
+      .eq('used', false)
       .order('created_at', { ascending: false })
       .limit (1) ();
       
