@@ -6,36 +6,40 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  const { user_id, task_key } = req.query;
+  console.log('🔍 Получен запрос на check-subscription');
+  console.log('📦 Метод:', req.method);
 
-  if (!user_id || !task_key) {
-    return res.status(400).json({ success: false, error: 'Отсутствует user_id или task_key' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Метод не поддерживается. Используй POST.' });
   }
 
-  // Определим канал по ключу задания
-  let channel = '';
-  if (task_key === 'subscribeTelegram') channel = 'telegram';
-  else if (task_key === 'subscribeInstagram') channel = 'instagram';
-  else return res.status(400).json({ success: false, error: 'Неверный task_key' });
+  const { user_id, channel } = req.body;
+  console.log('📨 user_id:', user_id);
+  console.log('📨 channel:', channel);
+
+  if (!user_id || !channel) {
+    return res.status(400).json({ error: 'Не хватает данных: user_id или channel' });
+  }
 
   try {
     const { data, error } = await supabase
       .from('subscriptions')
-      .select('*')
+      .select('is_subscribed')
       .eq('user_id', user_id)
       .eq('channel', channel)
-      .eq('is_subscribed', true)
-      .limit(1);
+      .single();
 
     if (error) {
-      console.error('Ошибка Supabase:', error);
-      return res.status(500).json({ success: false });
+      console.error('❌ Ошибка Supabase:', error.message);
+      return res.status(500).json({ success: false, error: 'Ошибка запроса Supabase' });
     }
 
-    const isSubscribed = data && data.length > 0;
+    const isSubscribed = data?.is_subscribed === true;
+
+    console.log('✅ Подписка найдена:', isSubscribed);
     return res.status(200).json({ success: isSubscribed });
-  } catch (err) {
-    console.error('❌ Ошибка проверки подписки:', err);
-    return res.status(500).json({ success: false });
+  } catch (e) {
+    console.error('❌ Ошибка на сервере:', e);
+    return res.status(500).json({ success: false, error: 'Внутренняя ошибка сервера' });
   }
 }
