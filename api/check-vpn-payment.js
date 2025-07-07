@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       .from('payments')
       .select('*')
       .eq('user_id', user_id)
-      .eq('task_key', task_key)
+      .eq('task_key', null)
       .eq('status', 'succeeded')
       .eq('used', false)
       .order('created_at', { ascending: false })
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
     // 2. Помечаем оплату как использованную
     const { error: updateError } = await supabase
       .from('payments')
-      .update({ used: true })
+      .update({ used: true, task_key: 'activateVpn' })
       .eq('id', payment.id);
        
       if (updateError) {
