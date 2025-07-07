@@ -349,7 +349,10 @@ const renderTasks = () => (
                       
           {/* Задание VPN выполнено */}
           {task.key === 'activateVpn' && completedTasks[task.key] && (
-            <div className="task-completed">✅ Выполнено </div>
+          <div className="task-completed" style={{ marginTop: '10px' }}>
+        🎉 +1000 монет<br />
+        ⚡ x2 кликов активирован
+      </div>
           )}
           
           {(task.type === 'referral' || task.type === 'subscribe') && (
