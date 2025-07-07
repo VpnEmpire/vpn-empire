@@ -24,11 +24,11 @@ export default async function handler(req, res) {
       .from('payments')
       .select('*')
       .eq('user_id', user_id)
-      .eq('task_key', null)
       .eq('status', 'succeeded')
       .eq('used', false)
       .order('created_at', { ascending: false })
-      .limit (1) ();
+      .limit(1)
+      .maybeSingle();
       
       
     if (error || !data || data.length === 0) {
