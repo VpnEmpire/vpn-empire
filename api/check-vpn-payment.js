@@ -32,9 +32,9 @@ export default async function handler(req, res) {
     if (data) {
       // 2. Обновить users.hasVpnBoost = true (если ещё не обновлено)
       const { error: updateError } = await supabase
-        .from('payments')
-        .update({ used: true })
-        .eq('id', data_id);
+         .from('users')
+        .update({ hasVpnBoost: true })
+        .eq('user_id', user_id);
 
       if (updateError) {
       console.error('Ошибка при обновлении used:', updateError);
