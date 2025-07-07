@@ -58,9 +58,9 @@ export default async function handler(req, res) {
         payment_id: paymentId,
         amount: amount,
         status: 'succeeded',
-        created_at: new Date().toISOString(),
-        task_key: task_key || null, // если указан
         used: false, // автоматически
+        task_key: task_key || null, // если указан
+        created_at: new Date().toISOString(),
       },
     ]);
 
