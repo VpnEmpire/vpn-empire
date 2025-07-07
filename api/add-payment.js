@@ -11,7 +11,8 @@ export default async function handler(req, res) {
 
     const { data, error } = await supabase
       .from('payments')
-      .insert([{ user_id, payment_id, amount, status, used, task_key }]);
+      .insert([{ user_id, payment_id, amount, status, task_key: task_key || null,
+    used: false }]); }]);
 
     if (error) return res.status(500).json({ error: error.message });
 
