@@ -8,11 +8,11 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  const { user_id } = req.query;
-
-  if (!user_id) {
-    return res.status(400).json({ error: 'user_id is required' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Метод не поддерживается' });
   }
+
+  const { user_id, task_key } = req.body;
 
   try {
     const { data, error } = await supabase
