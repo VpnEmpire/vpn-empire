@@ -44,9 +44,8 @@ const supabase = createClient(
     }
     
           // 3. Возвращаем успех
+    console.log('✅ Задание выполнено');
     return res.status(200).json({ success: true });
-
-    console.error('❌ Ошибка сервера:', err);
+}
     return res.status(500).json({ error: 'Server error' });
   }
-}
