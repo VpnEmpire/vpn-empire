@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       .eq('user_id', user_id)
       .eq('status', 'succeeded')
       .limit (1)
-      .maybeSingle();
+      .order('created_at', { ascending: false })();
 
     if (error) {
       console.error('❌ Ошибка при запросе payments:', error);
