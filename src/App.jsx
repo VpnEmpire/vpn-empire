@@ -232,29 +232,36 @@ useEffect(() => {
       return;
     }
 
-  if (task.type === 'vpn') {
-    try {
-      const res = await fetch('/api/check-vpn-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, task_key: task.key }),
-      });
+  if (task.type === 'vpn' && task.requiresPayment) {
+  console.log('🟡 Повторный клик: запускаем проверку оплаты');
 
-      const result = await res.json();
+  const stringUserId = String(userId).trim(); // Убедимся, что userId точно строка
+  console.log('👁 userId перед fetch-запросом:', stringUserId);
 
-      if (result.success) {
-        completeTask(task);
+  try {
+    const res = await fetch(`/api/check-vpn-payment?user_id=${stringUserId}`);
+    const result = await res.json();
+    console.log('🔄 Ответ от /api/check-vpn-payment:', result);
+
+    if (result.success) {
+      console.log('✅ Оплата найдена. Начисляем награду!');
+      completeTask(task);
+   
+      if (task.key === 'activateVpn') {
         setClickMultiplier(2);
         localStorage.setItem('clickMultiplier', 2);
-      } else {
-        alert('❌ Оплата не найдена. Попробуй позже.');
       }
-    } catch (err) {
-      alert('Ошибка при проверке оплаты. Попробуй позже.');
-      console.error('Ошибка:', err);
+    } else {
+      console.warn('❌ Оплата не найдена');
+      alert('❌ Оплата не найдена. Попробуй позже.');
     }
-    return;
+  } catch (error) {
+    console.error('💥 Ошибка в блоке try/fetch:', error);
+    alert('Ошибка при проверке оплаты. Попробуй позже.');
   }
+
+  return;
+}
 
     if (task.requiresSubscription) {
       try {
@@ -342,10 +349,7 @@ const renderTasks = () => (
                       
           {/* Задание VPN выполнено */}
           {task.key === 'activateVpn' && completedTasks[task.key] && (
-          <div className="task-completed" style={{ marginTop: '10px' }}>
-        🎉 +1000 монет<br />
-        ⚡ x2 кликов активирован
-      </div>
+            <div className="task-completed">✅ Выполнено </div>
           )}
           
           {(task.type === 'referral' || task.type === 'subscribe') && (
