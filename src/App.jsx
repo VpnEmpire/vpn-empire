@@ -50,16 +50,31 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [spinResult, setSpinResult] = useState(null);
 
   useEffect(() => {
-    const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
-    const storedUserId = localStorage.getItem('userId')
-    if (initDataUnsafe?.user?.id) {
-      const tgId = initDataUnsafe.user.id.toString();
-      setUserId(tgId);
-      localStorage.setItem('userId', tgId);
-    } else if (storedUserId) {
-      setUserId(storedUserId);
-    }
-  }, []);
+  const initData = window.Telegram?.WebApp?.initDataUnsafe;
+  if (!initData || !initData.user) return;
+
+  const id = initData.user.id;
+  setUserId(id);
+  localStorage.setItem('user_id', id);
+
+  const ref = initData.start_param;
+  if (ref && ref !== String(id)) {
+    // Отправляем в Supabase инфу о реферале
+    fetch('/api/add-referral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: ref,
+        referred_id: String(id),
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log('📥 Реферал записан:', result);
+      })
+      .catch((err) => console.error('❌ Ошибка записи реферала:', err));
+  }
+}, []);
 
 useEffect(() => {
     const checkVpnPayment = async () => {
