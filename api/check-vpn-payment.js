@@ -21,30 +21,31 @@ export default async function handler(req, res) {
       .select('*')
       .eq('user_id', user_id)
       .eq('status', 'succeeded')
-      .limit (1)
-      .order('created_at', { ascending: false })();
-
-    if (error) {
-      console.error('❌ Ошибка при запросе payments:', error);
-      return res.status(500).json({ error: 'Ошибка при запросе к payments' });
+      .eq ('used', false)
+      .order('created_at', { ascending: false })
+      .limit (1) ();
+      
+      
+    if (error || !data || data.length === 0) {
+      return res.status(200).json({ success: false });
     }
 
-    if (data) {
-      // 2. Обновить users.hasVpnBoost = true (если ещё не обновлено)
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ hasVpnBoost: true })
-        .eq('user_id', user_id);
-      
+    const payment = data[0];
+    
+    // 2. Помечаем оплату как использованную
+    const { error: updateError } = await supabase
+      .from('payments')
+      .update({ used: true })
+      .eq('id', payment.id);
+       
       if (updateError) {
-        console.error('⚠️ Ошибка обновления hasVpnBoost:', updateError);
-      }
-      
-      // 3. Вернуть успешный ответ
-      return res.status(200).json({ success: true });
-    } else {
-      return res.status(200).json({ success: false }); // Оплата не найдена
+      console.error('Ошибка при обновлении used:', updateError);
+      return res.status(500).json({ error: 'Не удалось отметить оплату как использованную' });
     }
+    
+          // 3. Возвращаем успех
+    return res.status(200).json({ success: true });
+
   } catch (err) {
     console.error('❌ Ошибка сервера:', err);
     return res.status(500).json({ error: 'Server error' });
