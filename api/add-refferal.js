@@ -6,35 +6,36 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
+  const { user_id, task_key } = req.query;
 
-  const { user_id, referred_id } = req.body;
-
-  if (!user_id || !referred_id || user_id === referred_id) {
-    return res.status(400).json({ error: 'Некорректные данные' });
+  if (!user_id || !task_key) {
+    return res.status(400).json({ success: false, error: 'Отсутствует user_id или task_key' });
   }
 
-  const { data, error } = await supabase
-    .from('referrals')
-    .select('*')
-    .eq('user_id', user_id)
-    .eq('referred_id', referred_id)
-    .maybeSingle();
+  // Определим канал по ключу задания
+  let channel = '';
+  if (task_key === 'subscribeTelegram') channel = 'telegram';
+  else if (task_key === 'subscribeInstagram') channel = 'instagram';
+  else return res.status(400).json({ success: false, error: 'Неверный task_key' });
 
-  if (data) {
-    return res.status(200).json({ message: 'Реферал уже существует' });
+  try {
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', user_id)
+      .eq('channel', channel)
+      .eq('is_subscribed', true)
+      .limit(1);
+
+    if (error) {
+      console.error('Ошибка Supabase:', error);
+      return res.status(500).json({ success: false });
+    }
+
+    const isSubscribed = data && data.length > 0;
+    return res.status(200).json({ success: isSubscribed });
+  } catch (err) {
+    console.error('❌ Ошибка проверки подписки:', err);
+    return res.status(500).json({ success: false });
   }
-
-  const { error: insertError } = await supabase.from('referrals').insert([
-    {
-      user_id,
-      referred_id,
-    },
-  ]);
-
-  if (insertError) {
-    return res.status(500).json({ error: insertError.message });
-  }
-
-  return res.status(200).json({ success: true });
 }
