@@ -232,7 +232,6 @@ useEffect(() => {
       return;
     }
 
-  const handleTaskClick = async (task) => {
   if (task.type === 'vpn') {
     try {
       const res = await fetch('/api/check-vpn-payment', {
