@@ -36,7 +36,7 @@ export default async function handler(req, res) {
       const { error: updateError } = await supabase
         .from('payments')
         .update({ used: true })
-        .eq('id', data[0].id);  // ✅ правильное использование ID из результата запроса
+        .eq('id', data[0].id);
 
       if (updateError) {
       console.error('Ошибка при обновлении used:', updateError);
