@@ -31,23 +31,24 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Ошибка при запросе к payments' });
     }
 
-    if (data) {
-      // 2. Обновить users.hasVpnBoost = true (если ещё не обновлено)
-      const { error: updateError } = await supabase
-        .from('payments')
-        .update({ used: true })
-        .eq('id', data[0].id);
+    if (error || !data || data.length === 0) {
+      return res.status(200).json({ success: false });
+    }
 
-      if (updateError) {
+    // 2. Отмечаем оплату как использованную
+    const { error: updateError } = await supabase
+      .from('payments')
+      .update({ used: true })
+      .eq('id', data[0].id); // ✅ правильно: используем id из найденной записи
+
+    if (updateError) {
       console.error('Ошибка при обновлении used:', updateError);
       return res.status(500).json({ error: 'Не удалось отметить оплату как использованную' });
-      }
-      
-      // 3. Вернуть успешный ответ
-      return res.status(200).json({ success: true });
-    } else {
-      return res.status(200).json({ success: false }); // Оплата не найдена
     }
+
+    // 3. Возвращаем успех
+    return res.status(200).json({ success: true });
+
   } catch (err) {
     console.error('❌ Ошибка сервера:', err);
     return res.status(500).json({ error: 'Server error' });
