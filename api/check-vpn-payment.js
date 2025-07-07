@@ -36,10 +36,6 @@ export default async function handler(req, res) {
         .update({ hasVpnBoost: true })
         .eq('user_id', user_id);
 
-      if (updateError) {
-        console.error('⚠️ Ошибка обновления hasVpnBoost:', updateError);
-      }
-
       // 3. Вернуть успешный ответ
       return res.status(200).json({ success: true });
     } else {
