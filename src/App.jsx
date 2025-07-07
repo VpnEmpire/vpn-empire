@@ -235,18 +235,23 @@ useEffect(() => {
   if (task.type === 'vpn' && task.requiresPayment) {
   console.log('🟡 Повторный клик: запускаем проверку оплаты');
 
-  const stringUserId = String(userId).trim(); // Убедимся, что userId точно строка
+  const stringUserId = String(userId).trim();
   console.log('👁 userId перед fetch-запросом:', stringUserId);
 
   try {
-    const res = await fetch(`/api/check-vpn-payment?user_id=${stringUserId}`);
+    const res = await fetch('/api/check-vpn-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: stringUserId, task_key: task.key }),
+    });
+
     const result = await res.json();
     console.log('🔄 Ответ от /api/check-vpn-payment:', result);
 
     if (result.success) {
       console.log('✅ Оплата найдена. Начисляем награду!');
       completeTask(task);
-   
+
       if (task.key === 'activateVpn') {
         setClickMultiplier(2);
         localStorage.setItem('clickMultiplier', 2);
@@ -262,7 +267,6 @@ useEffect(() => {
 
   return;
 }
-
     if (task.requiresSubscription) {
       try {
         if (window.Telegram?.WebApp?.openTelegramLink) {
