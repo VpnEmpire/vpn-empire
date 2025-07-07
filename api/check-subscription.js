@@ -1,36 +1,41 @@
-import express from 'express';
-import db from '../db.js';
-import fetch from 'node-fetch';
+import { createClient } from '@supabase/supabase-js';
 
-const router = express.Router();
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
-router.get('/', async (req, res) => {
-  const { user_id } = req.query;
-  const channelUsername = 'OrdoHereticusVPN';
+export default async function handler(req, res) {
+  const { user_id, task_key } = req.query;
 
-  if (!user_id) return res.status(400).json({ error: 'user_id is required' });
+  if (!user_id || !task_key) {
+    return res.status(400).json({ success: false, error: 'Отсутствует user_id или task_key' });
+  }
+
+  // Определим канал по ключу задания
+  let channel = '';
+  if (task_key === 'subscribeTelegram') channel = 'telegram';
+  else if (task_key === 'subscribeInstagram') channel = 'instagram';
+  else return res.status(400).json({ success: false, error: 'Неверный task_key' });
 
   try {
-    const response = await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getChatMember?chat_id=@${channelUsername}&user_id=${user_id}`);
-    const data = await response.json();
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', user_id)
+      .eq('channel', channel)
+      .eq('is_subscribed', true)
+      .limit(1);
 
-    const isMember = data.ok && ['member', 'creator', 'administrator'].includes(data.result.status);
-
-    if (isMember) {
-      await db.run(`
-        INSERT INTO users (user_id, hasSubscribed)
-        VALUES (?, 1)
-        ON CONFLICT(user_id) DO UPDATE SET hasSubscribed = 1
-      `, [user_id]);
-
-      return res.json({ success: true });
-    } else {
-      return res.json({ success: false });
+    if (error) {
+      console.error('Ошибка Supabase:', error);
+      return res.status(500).json({ success: false });
     }
-  } catch (error) {
-    console.error('❌ Ошибка подписки:', error);
-    return res.status(500).json({ error: 'Server error' });
-  }
-});
 
-export default router;
+    const isSubscribed = data && data.length > 0;
+    return res.status(200).json({ success: isSubscribed });
+  } catch (err) {
+    console.error('❌ Ошибка проверки подписки:', err);
+    return res.status(500).json({ success: false });
+  }
+}
