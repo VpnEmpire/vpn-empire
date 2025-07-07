@@ -22,6 +22,10 @@ export default async function handler(req, res) {
   const userIdMatch = description.match(/Заказ для (\d+)/);
   const userId = userIdMatch ? userIdMatch[1] : null;
 
+  // 🔹 task_key: ищем, если указано (например: task_key:activateVPN)
+  const taskKeyMatch = description.match(/task_key:([\w\d_-]+)/);
+  const task_key = taskKeyMatch ? taskKeyMatch[1] : null;
+  
   if (!userId) {
     console.error('❌ userId не найден в description:', description);
     return res.status(400).json({ error: 'userId не найден в description' });
@@ -55,6 +59,8 @@ export default async function handler(req, res) {
         amount: amount,
         status: 'succeeded',
         created_at: new Date().toISOString(),
+        task_key: task_key || null, // если указан
+        used: false, // автоматически
       },
     ]);
 
