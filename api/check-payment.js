@@ -16,10 +16,14 @@ export default async function handler(req, res) {
 
   try {
     const { data, error } = await supabase
-      .from('users')
-      .select('hasVpnBoost')
-      .eq('user_id', String(user_id))
-      .maybeSingle(); // Внутри уже есть .limit(1)
+      .from('payments')
+      .select('*')
+      .eq('user_id', user_id)
+      .eq('task_key', null)
+      .eq('status', 'succeeded')
+      .eq('used', false)
+      .order('created_at', { ascending: false })
+      .limit (1) ();
 
     if (error) {
       console.error('❌ Ошибка запроса к Supabase:', error);
