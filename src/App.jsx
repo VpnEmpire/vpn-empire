@@ -289,7 +289,6 @@ useEffect(() => {
     alert('❌ Не удалось открыть ссылку');
     return;
   }
-
   setTimeout(async () => {
     try {
       const res = await fetch(`/api/check-subscription?user_id=${userId}&channel=${task.key === 'subscribeTelegram' ? 'telegram' : 'instagram'}`);
@@ -306,12 +305,11 @@ useEffect(() => {
   }, 3000);
   return;
 }
-
-
+    };
     // Для прочих заданий
     completeTask(task);
-  };
-
+ };
+  
 const renderTasks = () => (
   <div className="tasks-tab">
     <h2>📋 Задания</h2>
@@ -510,7 +508,7 @@ const renderTasks = () => (
       default: return renderHome();
     }
   };
-
+  
   return (
 <div className="App">
       {renderTab()}
