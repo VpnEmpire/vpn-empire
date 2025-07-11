@@ -77,6 +77,24 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
 }, []);
 
 useEffect(() => {
+  const checkVpnPayment = async () => {
+    if (!userId) return;
+    try {
+      const res = await fetch('/api/check-vpn-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId })
+      });
+      const result = await res.json();
+      setVpnPaid(result.success);
+    } catch (err) {
+      console.error('Ошибка при проверке оплаты VPN:', err);
+    }
+  };
+  checkVpnPayment();
+}, [userId]);
+
+useEffect(() => {
     localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
     localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
