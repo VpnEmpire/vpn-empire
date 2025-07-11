@@ -326,8 +326,16 @@ const handleTaskClick = async (task) => {
 }
     };
     // Для прочих заданий
-    completeTask(task);
- };
+    // 👇 Добавь это в самый конец функции вместо старого блока
+if (
+  task.type !== 'referral' &&
+  task.type !== 'vpn' &&
+  !task.requiresSubscription &&
+  !task.requiresReferralCount
+) {
+  completeTask(task);
+}
+};
   
 const renderTasks = () => (
   <div className="tasks-tab">
