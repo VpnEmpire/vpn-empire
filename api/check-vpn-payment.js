@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   if (!user_id || !task_key) {
     return res.status(400).json({ error: 'user_id и task_key обязательны' });
   }
-
+  
   // 1. Найдём успешную и неиспользованную оплату
   const { data, error } = await supabase
     .from('payments')
