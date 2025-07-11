@@ -324,6 +324,7 @@ const handleTaskClick = async (task) => {
   }, 3000);
   return;
 }
+};
     // Для прочих заданий
 if (
   task.type !== 'referral' &&
