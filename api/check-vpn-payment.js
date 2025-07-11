@@ -27,11 +27,10 @@ export default async function handler(req, res) {
     .limit(1)
     .maybeSingle();
 
-  if (!data || Object.keys(data).length === 0 || error) {
-      console.warn('❌ Оплата не найдена или ошибка:', error);
-      return res.status(200).json({ success: false });
-    }
-
+  if (error || !data || !data.id) {
+  console.error('❌ Платёж не найден или ошибка:', error);
+  return res.status(200).json({ success: false });
+}
   // 2. Отмечаем оплату как использованную
   const { error: updateError } = await supabase
     .from('payments')
