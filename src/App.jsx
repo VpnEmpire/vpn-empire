@@ -325,15 +325,17 @@ const handleTaskClick = async (task) => {
   return;
 }
 };
-    // Для прочих заданий
-if (
-  task.type !== 'referral' &&
-  task.type !== 'vpn' &&
-  !task.requiresSubscription &&
-  !task.requiresReferralCount
-) {
-  completeTask(task);
-}
+     // ✅ Простой тип — без подписки, рефералов, оплаты
+  if (
+    task.type === 'default' ||
+    (!task.requiresSubscription &&
+      !task.requiresPayment &&
+      !task.requiresReferralCount &&
+      task.type !== 'referral' &&
+      task.type !== 'vpn')
+  ) {
+    completeTask(task);
+  }
 };
   
 const renderTasks = () => (
