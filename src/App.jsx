@@ -324,19 +324,10 @@ const handleTaskClick = async (task) => {
   }, 3000);
   return;
 }
-};
-     // ✅ Простой тип — без подписки, рефералов, оплаты
-  if (
-    task.type === 'default' ||
-    (!task.requiresSubscription &&
-      !task.requiresPayment &&
-      !task.requiresReferralCount &&
-      task.type !== 'referral' &&
-      task.type !== 'vpn')
-  ) {
+    };
+    // Для прочих заданий
     completeTask(task);
-  }
-};
+ };
   
 const renderTasks = () => (
   <div className="tasks-tab">
