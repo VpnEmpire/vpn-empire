@@ -338,8 +338,8 @@ const renderTasks = () => (
         (task.disabled && !completedTasks[task.key]);
   
     // Скрывать некоторые задачи после выполнения:
-      const shouldHideAfterComplete = ['subscribe', 'shareSocial', 'commentPost', 'reactPost'].includes(task.type || task.key);
-      if (completedTasks[task.key] && shouldHideAfterComplete) return null;
+      const shouldHideAfterComplete = !['referral', 'dailyVpn'].includes(task.type || task.key);
+if (completedTasks[task.key] && shouldHideAfterComplete) return null;
       
       return (
         <div
