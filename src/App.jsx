@@ -527,39 +527,41 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
   const renderWithdraw = () => (
   <div className="withdraw-tab">
     <h2>💸 Вывод</h2>
-    <p>Свяжись с нами в Instagram, чтобы получить выплату!</p>
-    <button
-      disabled={!isWithdrawApproved}
-      className={isWithdrawApproved ? 'withdraw-button' : 'withdraw-button disabled'}
-      onClick={() => {
-        if (isWithdrawApproved) {
-          window.open('https://www.instagram.com/internet.bot.001', '_blank');
-        }
-      }}
-    >
-      {isWithdrawApproved ? 'Вывести через Instagram' : 'Ожидает одобрения'}
-    </button>
+    <p>Минимум для вывода: 10000 монет</p> {/* Просто надпись, логика не зависит от неё */}
 
-    {isWithdrawApproved && (
-      <button
-        className="reset-button"
-        onClick={async () => {
-          // Обнуляем монеты
-          setCoins(0);
-          localStorage.setItem('coins', '0');
-          setIsWithdrawApproved(false);
-          localStorage.removeItem('isWithdrawApproved');
+    {isWithdrawApproved ? (
+      <>
+        <button
+          className="withdraw-button"
+          onClick={async () => {
+            window.open('https://www.instagram.com/internet.bot.001', '_blank');
+            alert('📩 Напиши в Direct с ID: ' + userId + ' и суммой к выводу.');
 
-          // Обновляем Supabase
-          await supabase
-            .from('users')
-            .update({ can_withdraw: false })
-            .eq('user_id', userId);
-        }}
-        style={{ marginTop: 15, backgroundColor: '#d9534f', color: '#fff' }}
-      >
-        Завершить выплату и обнулить монеты
-      </button>
+            // Обнуляем монеты
+            setCoins(0);
+            localStorage.setItem('coins', '0');
+
+            // Скрываем кнопку
+            setIsWithdrawApproved(false);
+            localStorage.setItem('isWithdrawApproved', 'false');
+
+            // Обновляем Supabase
+            await supabase
+              .from('users')
+              .update({ can_withdraw: false })
+              .eq('user_id', String(userId));
+          }}
+        >
+          Вывести через Instagram
+        </button>
+        <p style={{ marginTop: '10px', color: 'green' }}>✅ Кнопка вывода активна!</p>
+      </>
+    ) : (
+      <>
+        <p style={{ marginTop: '10px', color: 'gray' }}>
+          ⏳ Ожидай одобрения на вывод. Мы свяжемся с тобой!
+        </p>
+      </>
     )}
   </div>
 );
