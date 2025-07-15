@@ -77,6 +77,41 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
 }, []);
 
 useEffect(() => {
+    if (!userId) return;
+    const fetchWithdrawPermission = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('can_withdraw')
+          .eq('id', userId)
+          .single();
+        if (error) throw error;
+        setCanWithdraw(data?.can_withdraw || false);
+      } catch (err) {
+        console.error('Ошибка получения права на вывод:', err);
+      }
+    };
+    fetchWithdrawPermission();
+  }, [userId]);
+
+useEffect(() => {
+  const fetchWithdrawStatus = async () => {
+    if (!userId) return;
+    const { data, error } = await supabase
+      .from('users')
+      .select('can_withdraw')
+      .eq('user_id', userId)
+      .single();
+
+    if (data?.can_withdraw) {
+      setIsWithdrawApproved(true);
+    }
+  };
+
+  fetchWithdrawStatus();
+}, [userId]);
+
+useEffect(() => {
   const checkVpnPayment = async () => {
     if (!userId) return;
     try {
