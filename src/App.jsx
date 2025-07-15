@@ -525,32 +525,44 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
   const renderTop = () => <TopTab coins={coins} />;
   const renderRoulette = () => <Roulette setCoins={setCoins} />;
   const renderWithdraw = () => (
-    <div className="withdraw-tab">
-      <h2>💸 Вывод</h2>
-      <p>Минимум для вывода: 10000 монет</p>
+  <div className="withdraw-tab">
+    <h2>💸 Вывод</h2>
+    <p>Свяжись с нами в Instagram, чтобы получить выплату!</p>
+    <button
+      disabled={!isWithdrawApproved}
+      className={isWithdrawApproved ? 'withdraw-button' : 'withdraw-button disabled'}
+      onClick={() => {
+        if (isWithdrawApproved) {
+          window.open('https://www.instagram.com/internet.bot.001', '_blank');
+        }
+      }}
+    >
+      {isWithdrawApproved ? 'Вывести через Instagram' : 'Ожидает одобрения'}
+    </button>
+
+    {isWithdrawApproved && (
       <button
-        disabled={!isWithdrawApproved}
-        className={isWithdrawApproved ? 'withdraw-button' : 'withdraw-button disabled'}
-        onClick={() => {
-          if (isWithdrawApproved) {
-            window.open('https://www.instagram.com/internet.bot.001', '_blank');
-          }
+        className="reset-button"
+        onClick={async () => {
+          // Обнуляем монеты
+          setCoins(0);
+          localStorage.setItem('coins', '0');
+          setIsWithdrawApproved(false);
+          localStorage.removeItem('isWithdrawApproved');
+
+          // Обновляем Supabase
+          await supabase
+            .from('users')
+            .update({ can_withdraw: false })
+            .eq('user_id', userId);
         }}
+        style={{ marginTop: 15, backgroundColor: '#d9534f', color: '#fff' }}
       >
-        {isWithdrawApproved ? 'Вывести через Instagram' : 'Ожидает одобрения'}
+        Завершить выплату и обнулить монеты
       </button>
-      <button
-        className="approve-button"
-        onClick={() => {
-          setIsWithdrawApproved(true);
-          localStorage.setItem('isWithdrawApproved', 'true');
-        }}
-        style={{ marginTop: '20px', backgroundColor: 'green', color: 'white' }}
-      >
-        ✅ Одобрить вывод
-      </button>
-     </div>
-  );
+    )}
+  </div>
+);
 
   const renderTab = () => {
     switch (activeTab) {
