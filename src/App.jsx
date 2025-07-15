@@ -148,6 +148,17 @@ useEffect(() => {
     }
   }, []);
 
+ useEffect(() => {
+    if (!userId) return;
+    supabase
+      .from('users')
+      .update({ coins })
+      .eq('user_id', String(userId))
+      .then(({ error }) => {
+        if (error) console.error('❌ Ошибка обновления монет в Supabase:', error);
+      });
+  }, [coins, userId]);
+
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
