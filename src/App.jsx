@@ -527,41 +527,39 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
   const renderWithdraw = () => (
   <div className="withdraw-tab">
     <h2>💸 Вывод</h2>
-    <p>Минимум для вывода: 10000 монет</p> {/* Просто надпись, логика не зависит от неё */}
+    <p>Минимум для вывода: 10000 монет</p> {/* Просто мотивационная надпись */}
 
-    {isWithdrawApproved ? (
-      <>
-        <button
-          className="withdraw-button"
-          onClick={async () => {
-            window.open('https://www.instagram.com/internet.bot.001', '_blank');
-            alert('📩 Напиши в Direct с ID: ' + userId + ' и суммой к выводу.');
+    <button
+      disabled={!isWithdrawApproved}
+      className={isWithdrawApproved ? 'withdraw-button' : 'withdraw-button disabled'}
+      onClick={async () => {
+        if (!isWithdrawApproved) return;
 
-            // Обнуляем монеты
-            setCoins(0);
-            localStorage.setItem('coins', '0');
+        window.open('https://www.instagram.com/internet.bot.001', '_blank');
+        alert('📩 Напиши в Direct с ID: ' + userId + ' и суммой к выводу.');
 
-            // Скрываем кнопку
-            setIsWithdrawApproved(false);
-            localStorage.setItem('isWithdrawApproved', 'false');
+        // Обнуляем монеты
+        setCoins(0);
+        localStorage.setItem('coins', '0');
 
-            // Обновляем Supabase
-            await supabase
-              .from('users')
-              .update({ can_withdraw: false })
-              .eq('user_id', String(userId));
-          }}
-        >
-          Вывести через Instagram
-        </button>
-        <p style={{ marginTop: '10px', color: 'green' }}>✅ Кнопка вывода активна!</p>
-      </>
-    ) : (
-      <>
-        <p style={{ marginTop: '10px', color: 'gray' }}>
-          ⏳ Ожидай одобрения на вывод. Мы свяжемся с тобой!
-        </p>
-      </>
+        // Скрываем кнопку
+        setIsWithdrawApproved(false);
+        localStorage.setItem('isWithdrawApproved', 'false');
+
+        // Обновляем Supabase
+        await supabase
+          .from('users')
+          .update({ can_withdraw: false })
+          .eq('user_id', String(userId));
+      }}
+    >
+      Вывести через Instagram
+    </button>
+
+    {!isWithdrawApproved && (
+      <p style={{ marginTop: '10px', color: 'gray' }}>
+        ⏳ Ожидай одобрения — свяжись с нами, когда кнопка станет активной.
+      </p>
     )}
   </div>
 );
