@@ -553,7 +553,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
           .eq('user_id', String(userId));
       }}
     >
-      Вывести через Instagram
+      Вывести
     </button>
 
     {!isWithdrawApproved && (
