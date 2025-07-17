@@ -387,9 +387,9 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
           <p>🎯 Награда: {task.reward} монет</p>
          
                 {/* VPN Задание — особое */}
-          {task.key === 'activateVpn' && !completedTasks[task.key] && (
-            <>
-              <p>🎁 Бонус: x2 кликов после оплаты</p>
+          {task.type === 'vpn' && task.requiresPayment && !completedTasks[task.key] && (
+  <>
+    <p>🎁 Бонус: x{task.multiplier || 2} кликов после оплаты</p>
               <div className="task-buttons-vertical">
                 <button
                   className="task-button"
@@ -414,12 +414,12 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
             )}
                       
           {/* Задание VPN выполнено */}
-          {task.key === 'activateVpn' && completedTasks[task.key] && (
-          <div className="task-completed" style={{ marginTop: '10px' }}>
-        🎉 +1000 монет<br />
-        ⚡ x2 кликов активирован
-      </div>
-          )}
+{task.type === 'vpn' && completedTasks[task.key] && (
+  <div className="task-completed" style={{ marginTop: '10px' }}>
+    🎉 +{task.reward} монет<br />
+    ⚡ x{task.multiplier || 2} кликов активирован
+  </div>
+)}
           
           {(task.type === 'referral' || task.type === 'subscribe') && (
             <div className="task-buttons-vertical">
