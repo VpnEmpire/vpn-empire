@@ -316,17 +316,6 @@ const handleTaskClick = async (task) => {
   return;
 }
     if (task.requiresSubscription) {
-      try {
-        if (window.Telegram?.WebApp?.openTelegramLink) {
-          window.Telegram.WebApp.openTelegramLink(task.link);
-        } else {
-          window.open(task.link, '_blank');
-        }
-      } catch {
-        alert('Не удалось открыть ссылку подписки');
-        return;
-      }
-      if (task.requiresSubscription) {
   try {
     if (window.Telegram?.WebApp?.openTelegramLink) {
       window.Telegram.WebApp.openTelegramLink(task.link);
@@ -337,20 +326,42 @@ const handleTaskClick = async (task) => {
     alert('❌ Не удалось открыть ссылку');
     return;
   }
-  setTimeout(async () => {
-    try {
-      const res = await fetch(`/api/check-subscription?user_id=${userId}&channel=${task.key === 'subscribeTelegram' ? 'telegram' : 'instagram'}`);
-      const result = await res.json();
 
-      if (result.success) {
-        completeTask(task);
-      } else {
-        alert('❌ Подписка не подтверждена. Подпишись и попробуй снова.');
-      }
-    } catch (e) {
-      alert('Ошибка при проверке подписки');
+  // ручная проверка для Instagram
+  if (task.key === 'subscribeInstagram') {
+    const confirmed = window.confirm('✅ Подпишись на Instagram, затем нажми OK, чтобы получить награду');
+    if (confirmed) {
+      completeTask(task);
     }
-  }, 3000);
+  }
+
+  // авто-проверка Telegram
+  if (task.key === 'subscribeTelegram') {
+    setTimeout(async () => {
+      try {
+        await fetch('/api/add-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            channel: 'telegram'
+          })
+        });
+
+        const res = await fetch(`/api/check-subscription?user_id=${userId}&channel=telegram`);
+        const result = await res.json();
+
+        if (result.success) {
+          completeTask(task);
+        } else {
+          alert('❌ Подписка не подтверждена. Подпишись и попробуй снова.');
+        }
+      } catch {
+        alert('❌ Ошибка при проверке подписки');
+      }
+    }, 3000);
+  }
+
   return;
 }
     };
