@@ -34,11 +34,11 @@ export default async function handler(req, res) {
     }
 
     // Добавляем новую запись
-    const { error } = await supabase
+    const { error: insertError } = await supabase
       .from('referrals')
-      .insert([{ user_id, referred_id }]);
+      .insert([{ user_id, referral_id }]);
 
-    if (error) {
+    if (insertError) {
       console.error('❌ Ошибка вставки:', error);
       return res.status(500).json({ success: false });
     }
