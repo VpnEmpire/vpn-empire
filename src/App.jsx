@@ -315,8 +315,7 @@ const handleTaskClick = async (task) => {
 
   return;
 }
-    // Подписка на Telegram или Instagram
-    if (task.type === 'subscription') {
+    if (task.requiresSubscription) {
       try {
         if (window.Telegram?.WebApp?.openTelegramLink) {
           window.Telegram.WebApp.openTelegramLink(task.link);
@@ -324,35 +323,36 @@ const handleTaskClick = async (task) => {
           window.open(task.link, '_blank');
         }
       } catch {
-        alert('❌ Не удалось открыть ссылку');
+        alert('Не удалось открыть ссылку подписки');
         return;
       }
-
-      setTimeout(async () => {
-        try {
-          await fetch('/api/add-subscription', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              user_id: userId,
-              channel: task.key === 'subscribeTelegram' ? 'telegram' : 'instagram',
-            }),
-          });
-
-          const res = await fetch(`/api/check-subscription?user_id=${userId}&channel=${task.key === 'subscribeTelegram' ? 'telegram' : 'instagram'}`);
-          const result = await res.json();
-
-          if (result.success) {
-            completeTask(task);
-          } else {
-            alert('❌ Подписка не подтверждена. Подпишись и попробуй снова.');
-          }
-        } catch {
-          alert('❌ Ошибка при проверке подписки');
-        }
-      }, 3000);
-      return;
+      if (task.requiresSubscription) {
+  try {
+    if (window.Telegram?.WebApp?.openTelegramLink) {
+      window.Telegram.WebApp.openTelegramLink(task.link);
+    } else {
+      window.open(task.link, '_blank');
     }
+  } catch {
+    alert('❌ Не удалось открыть ссылку');
+    return;
+  }
+  setTimeout(async () => {
+    try {
+      const res = await fetch(`/api/check-subscription?user_id=${userId}&channel=${task.key === 'subscribeTelegram' ? 'telegram' : 'instagram'}`);
+      const result = await res.json();
+
+      if (result.success) {
+        completeTask(task);
+      } else {
+        alert('❌ Подписка не подтверждена. Подпишись и попробуй снова.');
+      }
+    } catch (e) {
+      alert('Ошибка при проверке подписки');
+    }
+  }, 3000);
+  return;
+}
     };
     // Для прочих заданий
     completeTask(task);
