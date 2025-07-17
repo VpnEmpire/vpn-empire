@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   const { user_id, referral_id } = req.body;
 
-  if (!user_id || !referred_id || user_id === referred_id) {
+  if (!user_id || !referral_id || user_id === referral_id) {
     return res.status(400).json({ success: false, error: 'Неверные параметры' });
   }
 
