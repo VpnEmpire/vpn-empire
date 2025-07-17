@@ -6,36 +6,46 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  const { user_id, task_key } = req.query;
-
-  if (!user_id || !task_key) {
-    return res.status(400).json({ success: false, error: 'Отсутствует user_id или task_key' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Метод не поддерживается' });
   }
 
-  // Определим канал по ключу задания
-  let channel = '';
-  if (task_key === 'subscribeTelegram') channel = 'telegram';
-  else if (task_key === 'subscribeInstagram') channel = 'instagram';
-  else return res.status(400).json({ success: false, error: 'Неверный task_key' });
+  const { user_id, referred_id } = req.body;
+
+  if (!user_id || !referred_id || user_id === referred_id) {
+    return res.status(400).json({ success: false, error: 'Неверные параметры' });
+  }
 
   try {
-    const { data, error } = await supabase
-      .from('subscriptions')
+    // Проверим, не существует ли уже такой записи
+    const { data: existing, error: fetchError } = await supabase
+      .from('referrals')
       .select('*')
       .eq('user_id', user_id)
-      .eq('channel', channel)
-      .eq('is_subscribed', true)
-      .limit(1);
+      .eq('referred_id', referred_id)
+      .maybeSingle();
+
+    if (fetchError) {
+      return res.status(500).json({ success: false, error: 'Ошибка поиска' });
+    }
+
+    if (existing) {
+      return res.status(200).json({ success: true, message: 'Реферал уже существует' });
+    }
+
+    // Добавляем новую запись
+    const { error } = await supabase
+      .from('referrals')
+      .insert([{ user_id, referred_id }]);
 
     if (error) {
-      console.error('Ошибка Supabase:', error);
+      console.error('❌ Ошибка вставки:', error);
       return res.status(500).json({ success: false });
     }
 
-    const isSubscribed = data && data.length > 0;
-    return res.status(200).json({ success: isSubscribed });
+    return res.status(200).json({ success: true });
   } catch (err) {
-    console.error('❌ Ошибка проверки подписки:', err);
+    console.error('❌ Ошибка сервера:', err);
     return res.status(500).json({ success: false });
   }
 }
