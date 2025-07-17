@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       .from('referrals')
       .select('*')
       .eq('user_id', user_id)
-      .eq('referred_id', referred_id)
+      .eq('referral_id', referral_id)
       .maybeSingle();
 
     if (fetchError) {
