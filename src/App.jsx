@@ -25,23 +25,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [hasVpnBoost, setHasVpnBoost] = useState(() => localStorage.getItem('hasVpnBoost') === 'true');
   const [subscribed, setSubscribed] = useState(false);
   const [isWithdrawApproved, setIsWithdrawApproved] = useState(() => localStorage.getItem('isWithdrawApproved') === 'true');
-  const [tasks, setTasks] = useState([
-    { key: 'invite1', label: 'Пригласи 1 друга', reward: 50, type: 'referral', requiresReferralCount: 1 },
-    { key: 'invite2', label: 'Пригласи 2 друзей', reward: 100, type: 'referral', requiresReferralCount: 2 },
-    { key: 'invite3', label: 'Пригласи 3 друзей', reward: 200, type: 'referral', requiresReferralCount: 3 },
-    { key: 'invite4', label: 'Пригласи 4 друзей', reward: 300, type: 'referral', requiresReferralCount: 4 },
-    { key: 'invite5', label: 'Пригласи 5 друзей', reward: 400, type: 'referral', requiresReferralCount: 5 },
-    { key: 'invite6', label: 'Пригласи 6 друзей', reward: 500, type: 'referral', requiresReferralCount: 6 },
-    { key: 'invite7', label: 'Пригласи 7 друзей', reward: 600, type: 'referral', requiresReferralCount: 7 },
-    { key: 'subscribeTelegram', label: '📨 Подписаться на Telegram', reward: 100, type: 'subscribe', link: 'https://t.me/OrdoHereticusVPN', requiresSubscription: true },
-    { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, type: 'subscribe', link: 
-'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
-    { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
-    { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
-    { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
-    { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
-    { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, type: 'vpn', link: 'https://t.me/OrdoHereticus_bot', bonus: 'x2 кликов', requiresPayment: true }
-  ]);
+  const [tasks, setTasks] = useState([]);
 
   const maxClicksPerDay = 100;
   const spinSoundRef = useRef(null);
@@ -93,6 +77,26 @@ useEffect(() => {
   };
   fetchWithdrawPermission();
 }, [userId]);
+
+useEffect(() => {
+  const fetchTasks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*');
+
+      if (error) {
+        console.error('❌ Ошибка при загрузке заданий из Supabase:', error);
+      } else {
+        setTasks(data);
+      }
+    } catch (err) {
+      console.error('❌ Ошибка загрузки заданий:', err);
+    }
+  };
+
+  fetchTasks();
+}, []);
 
 useEffect(() => {
   const checkVpnPayment = async () => {
