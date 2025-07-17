@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, error: 'Метод не поддерживается' });
   }
 
-  const { user_id, referred_id } = req.body;
+  const { user_id, referral_id } = req.body;
 
   if (!user_id || !referred_id || user_id === referred_id) {
     return res.status(400).json({ success: false, error: 'Неверные параметры' });
