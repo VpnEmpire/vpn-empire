@@ -55,3 +55,4 @@ export default async function handler(req, res) {
   // Всё прошло успешно
   res.status(200).json({ message: 'Referral recorded successfully' });
 }
+}
