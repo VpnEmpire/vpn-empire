@@ -39,13 +39,19 @@ export default async function handler(req, res) {
       .insert([{ user_id, referral_id }]);
 
     if (insertError) {
-      console.error('❌ Ошибка вставки:', error);
-      return res.status(500).json({ success: false });
-    }
-
-    return res.status(200).json({ success: true });
-  } catch (err) {
-    console.error('❌ Ошибка сервера:', err);
-    return res.status(500).json({ success: false });
+    return res.status(500).json({ error: insertError.message });
   }
+
+  // Увеличиваем поле `referrals` на 1 у referral_id
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ referrals: supabase.raw('referrals + 1') })
+    .eq('user_id', referral_id);
+
+  if (updateError) {
+    return res.status(500).json({ error: updateError.message });
+  }
+
+  // Всё прошло успешно
+  res.status(200).json({ message: 'Referral recorded successfully' });
 }
