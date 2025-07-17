@@ -380,7 +380,7 @@ const renderTasks = () => (
     // Скрывать некоторые задачи после выполнения:
       const shouldHideAfterComplete = !['referral', 'dailyVpn'].includes(task.type || task.key);
 if (completedTasks[task.key] && shouldHideAfterComplete) return null;
-      
+       
       return (
         <div
           key={task.key}
