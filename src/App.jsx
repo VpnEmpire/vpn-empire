@@ -77,6 +77,19 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
 }, []);
 
 useEffect(() => {
+  const fetchTasks = async () => {
+    const { data, error } = await supabase.from('tasks').select('*');
+    if (error) {
+      console.error('Ошибка загрузки заданий:', error);
+    } else {
+      setTasks(data);
+    }
+  };
+
+  fetchTasks();
+}, []);
+
+useEffect(() => {
   if (!userId) return;
   const fetchWithdrawPermission = async () => {
     try {
