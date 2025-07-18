@@ -473,13 +473,12 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
                     className="task-button"
                     onClick={() => {
                       setTasks(prev =>
-                        prev.map(t =>
-                          t.key === task.key ? { ...t, visited: true } : t
-                        )
-                      );
-                    }}
+                        prev.map(t => t.key === task.key ? { ...t, visited: true } : t)
+                        );
+                 }, 3000); // ⏱ Ждём 3 секунды перед тем, как разрешить "Выполнить"
+                  }}
                   >
-                    Перейти
+                   Перейти
                   </button>
                 </a>
               )}
