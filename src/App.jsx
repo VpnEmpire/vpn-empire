@@ -300,7 +300,35 @@ useEffect(() => {
   return;
 }
 
+    // 2. Задания с оплатой VPN
+  if (task.type === 'vpn' && task.requiresPayment) {
+  console.log('🟡 Повторный клик: запускаем проверку оплаты');
+
+  const stringUserId = String(userId).trim();
+  console.log('👁 userId перед fetch-запросом:', stringUserId);
   
+    try {
+      const res = await fetch('/api/check-vpn-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: stringUserId, task_key: task.key }),
+      });
+      
+      const result = await res.json();
+      if (result.success) {
+        completeTask(task);
+        if (task.key === 'activateVpn') {
+          setClickMultiplier(2);
+          localStorage.setItem('clickMultiplier', 2);
+        }
+      } else {
+        alert('❌ Оплата не найдена. Попробуй позже.');
+      }
+    } catch (error) {
+      alert('Ошибка при проверке оплаты. Попробуй позже.');
+    }
+    return;
+    }
 
   // 3.  Подписка Telegram — логика Перейти → Выполнить
   if (task.key === 'subscribeTelegram') {
