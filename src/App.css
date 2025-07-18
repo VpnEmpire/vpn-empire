@@ -309,6 +309,15 @@ body, html {
   color: white;
   cursor: pointer;
   text-align: center;
+
+  /* Новое — для центрирования текста */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Чтобы всё помещалось красиво */
+  height: 40px;
+  box-sizing: border-box;
 }
 .task-button:hover {
   background-color: #009f94;
