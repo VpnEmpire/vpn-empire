@@ -1,3 +1,5 @@
+// /api/add-referral.js
+
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -16,43 +18,47 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, error: 'Неверные параметры' });
   }
 
-  try {
-    // Проверим, не существует ли уже такой записи
-    const { data: existing, error: fetchError } = await supabase
-      .from('referrals')
-      .select('*')
-      .eq('user_id', user_id)
-      .eq('referral_id', referral_id)
-      .maybeSingle();
+  // 1. Проверим, не существует ли уже такая пара
+  const { data: existing, error: fetchError } = await supabase
+    .from('referrals')
+    .select('*')
+    .eq('user_id', user_id)
+    .eq('referral_id', referral_id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-    if (fetchError) {
-      return res.status(500).json({ success: false, error: 'Ошибка поиска' });
-    }
-
-    if (existing) {
-      return res.status(200).json({ success: true, message: 'Реферал уже существует' });
-    }
-
-    // Добавляем новую запись
-    const { error: insertError } = await supabase
-      .from('referrals')
-      .insert([{ user_id, referral_id }]);
-
-    if (insertError) {
-    return res.status(500).json({ error: insertError.message });
+  if (fetchError) {
+    console.error('❌ Ошибка при поиске существующего реферала:', fetchError);
+    return res.status(500).json({ success: false, error: 'Ошибка поиска' });
   }
 
-  // Увеличиваем поле `referrals` на 1 у referral_id
+  if (existing) {
+    console.warn(`⚠️ Реферал уже существует: ${referral_id} → ${user_id}`);
+    return res.status(200).json({ success: true, message: 'Реферал уже существует' });
+  }
+
+  // 2. Добавим новую запись
+  const { error: insertError } = await supabase
+    .from('referrals')
+    .insert([{ user_id, referral_id }]);
+
+  if (insertError) {
+    console.error('❌ Ошибка при добавлении реферала:', insertError);
+    return res.status(500).json({ success: false, error: 'Ошибка вставки' });
+  }
+
+  // 3. Обновим счётчик у пригласившего
   const { error: updateError } = await supabase
     .from('users')
-    .update({ referrals: supabase.raw('referrals + 1') })
+    .update({ referrals: supabase.rpc('increment', { x: 1 }) }) // используй raw, если нет RPC
     .eq('user_id', referral_id);
 
   if (updateError) {
-    return res.status(500).json({ error: updateError.message });
+    console.error('❌ Ошибка при обновлении счётчика:', updateError);
+    return res.status(500).json({ success: false, error: 'Ошибка обновления счётчика' });
   }
 
-  // Всё прошло успешно
-  res.status(200).json({ message: 'Referral recorded successfully' });
-}
+  console.log(`✅ Добавлен новый реферал: ${referral_id} → ${user_id}`);
+  return res.status(200).json({ success: true, message: 'Referral added successfully' });
 }
