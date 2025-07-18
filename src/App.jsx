@@ -441,30 +441,17 @@ const handleTaskClick = async (task) => {
 
   // 4. Instagram и другие действия: "Перейти" → затем "Выполнить"
    // 👉 Instagram, лайк, коммент, реакция — логика: Перейти → Выполнить
-  if (
-    task.key === 'subscribeInstagram' ||
-    task.key === 'likePost' ||
-    task.key === 'leaveComment' ||
-    task.key === 'shareProject'
-  ) {
-    if (action === 'go') {
-      try {
-        window.open(task.link, '_blank');
-      } catch {
-        alert('❌ Не удалось открыть ссылку');
-      }
-
-      const updated = { ...clickedTasks, [task.key]: true };
-      setClickedTasks(updated);
-      localStorage.setItem('clickedTasks', JSON.stringify(updated));
+  if (isActionType) {
+    if (!task.visited) {
+      // Сначала "Перейти"
+      alert('🔗 Сначала нажми "Перейти", затем возвращайся и нажми "Выполнить"');
       return;
     }
 
-    if (action === 'check') {
-      completeTask(task);
-      return;
-    }
-    }
+    // После перехода — разрешаем выполнить
+    completeTask(task);
+    return;
+  }
     };
     // Для прочих заданий
     completeTask(task);
@@ -570,11 +557,8 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
           </div>
             )}
             
-             {/* Instagram и другие действия — логика "Перейти → Выполнить" */}
-          {(task.key === 'subscribeInstagram' ||
-            task.key === 'likePost' ||
-            task.key === 'leaveComment' ||
-            task.key === 'shareProject') && !completedTasks[task.key] && (
+              {/* Action-задания: лайк, комментарий, Instagram */}
+          {task.type === 'action' && task.link && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               {!task.visited ? (
                 <button
