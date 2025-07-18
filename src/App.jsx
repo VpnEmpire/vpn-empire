@@ -235,44 +235,42 @@ useEffect(() => {
     const res = await fetch('/api/check-referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId }),
+      body: JSON.stringify({
+        user_id: userId,
+        task_key: task.key,
+        required_count: task.requiresReferralCount,
+      }),
     });
 
     const data = await res.json();
-    const invited = data.count ?? 0;
+    const invited = data.invited ?? 0;
     setReferrals(invited);
 
     console.log('👥 Приглашено друзей:', invited);
 
-    if (!task.requiresReferralCount) {
-      alert('❗ Не указано, сколько друзей нужно пригласить.');
-      return;
-    }
-
-    if (invited >= task.requiresReferralCount) {
+    if (data.success) {
       completeTask(task);
+
+      // ✅ Проверим, все ли реф. задания выполнены
+      const allReferralDone = tasks
+        .filter(t => t.type === 'referral')
+        .every(t => completedTasks[t.key] || t.key === task.key);
+
+      if (allReferralDone) {
+        const updated = { ...completedTasks };
+        tasks.forEach(t => {
+          if (t.type === 'referral') delete updated[t.key];
+        });
+        setCompletedTasks(updated);
+        localStorage.setItem('completedTasks', JSON.stringify(updated));
+        alert('🎉 Все реферальные задания выполнены! Они сброшены и доступны снова.');
+      }
     } else {
       alert(`❌ Недостаточно приглашений: ${invited}/${task.requiresReferralCount}`);
-      return;
-    }
-
-    // ✅ Проверим, все ли реферальные задания выполнены
-    const allReferralDone = tasks
-      .filter(t => t.type === 'referral')
-      .every(t => completedTasks[t.key] || t.key === task.key);
-
-    if (allReferralDone) {
-      const updated = { ...completedTasks };
-      tasks.forEach(t => {
-        if (t.type === 'referral') delete updated[t.key];
-      });
-      setCompletedTasks(updated);
-      localStorage.setItem('completedTasks', JSON.stringify(updated));
-      alert('🎉 Все реферальные задания выполнены! Они сброшены и доступны снова.');
     }
   } catch (err) {
-    console.error('❌ Ошибка при проверке рефералов:', err);
-    alert('Ошибка при проверке приглашений. Попробуй позже.');
+    console.error('❌ Ошибка при запросе /api/check-referral:', err);
+    alert('Ошибка при проверке рефералов. Попробуй позже.');
   }
 
   return;
