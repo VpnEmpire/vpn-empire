@@ -446,8 +446,8 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
                   {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
                 </button>
               )}
- 
-              {task.type === 'subscribe' && task.link && (
+
+{task.type === 'subscribe' && task.key !== 'subscribeInstagram' && task.link && (
                 <a href={task.link} target="_blank" rel="noopener noreferrer">
                   <button className="task-button"> Перейти </button>
                 </a>
