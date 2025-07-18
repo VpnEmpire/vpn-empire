@@ -253,6 +253,7 @@ if (task.type === 'referral') {
       .eq('user_id', userId);
 
     console.log('👥 Найдено приглашений:', count);
+
     if (error) {
       console.error('Ошибка Supabase:', error);
       alert('Ошибка при проверке приглашений.');
@@ -267,8 +268,8 @@ if (task.type === 'referral') {
     } else {
       alert(`Приглашено ${invited}/${task.requiresReferralCount} друзей`);
     }
-
-    // Если все задания выполнены — сбрасываем
+    
+   // Если все задания выполнены — сбрасываем
     const allReferralDone = tasks
       .filter(t => t.type === 'referral')
       .every(t => completedTasks[t.key] || t.key === task.key);
