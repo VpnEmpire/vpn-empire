@@ -247,7 +247,7 @@ useEffect(() => {
     if (invited >= task.requiresReferralCount) {
       completeTask(task);
     } else {
-      alert(`Приглашено ${invited}/${task.requiresReferralCount} друзей`);
+      alert(`❗ Недостаточно приглашённых друзей: ${invited}/${task.requiresReferralCount}`);
       return; // 🔒 Остановка, чтобы не пошёл дальше
     }
 
