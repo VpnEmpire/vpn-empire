@@ -37,9 +37,9 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
     { key: 'subscribeInstagram', label: '📸 Подписаться на Instagram', reward: 100, type: 'subscribe', link: 
 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
     { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
-    { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50 },
-    { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50 },
+    { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50, type: 'action', link: 'https://www.instagram.com/reel/DKG__6wtbee/?igsh=MXI4bXZ6emJucmFnMg==' },
     { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
+    { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50, type: 'action', link: 'https://t.me/OrdoHereticusVPN/38' },
     { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, type: 'vpn', link: 'https://t.me/OrdoHereticus_bot', bonus: 'x2 кликов', requiresPayment: true }
   ]);
 
@@ -315,28 +315,104 @@ const handleTaskClick = async (task) => {
 
   return;
 }
-    if (task.requiresSubscription) {
-  try {
-    if (window.Telegram?.WebApp?.openTelegramLink) {
-      window.Telegram.WebApp.openTelegramLink(task.link);
-    } else {
-      window.open(task.link, '_blank');
-    }
-  } catch {
-    alert('❌ Не удалось открыть ссылку');
+    const handleTaskClick = async (task) => {
+  if (completedTasks[task.key]) {
+    alert('✅ Это задание уже выполнено!');
     return;
   }
 
-  // ручная проверка для Instagram
-  if (task.key === 'subscribeInstagram') {
-    const confirmed = window.confirm('✅ Подпишись на Instagram, затем нажми OK, чтобы получить награду');
-    if (confirmed) {
-      completeTask(task);
+  // 1. Реферальные задания
+  if (task.type === 'referral') {
+    const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+    try {
+      if (window.Telegram?.WebApp?.clipboard?.writeText) {
+        await window.Telegram.WebApp.clipboard.writeText(refLink);
+      } else {
+        await navigator.clipboard.writeText(refLink);
+      }
+      setCopiedLink(refLink);
+      setShowReferralModal(true);
+    } catch (e) {
+      alert(`Скопируй вручную:\n${refLink}`);
     }
+
+    try {
+      const { data, error } = await supabase
+        .from('referrals')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+
+      const count = data?.count || 0;
+      setReferrals(count);
+
+      if (count >= task.requiresReferralCount) {
+        completeTask(task);
+      } else {
+        alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
+      }
+
+      // Если все реферальные задания выполнены — сбрасываем
+      const allReferralDone = tasks
+        .filter(t => t.type === 'referral')
+        .every(t => completedTasks[t.key] || t.key === task.key);
+
+      if (allReferralDone) {
+        const updated = { ...completedTasks };
+        tasks.forEach(t => {
+          if (t.type === 'referral') delete updated[t.key];
+        });
+        setCompletedTasks(updated);
+        localStorage.setItem('completedTasks', JSON.stringify(updated));
+        alert('Все реферальные задания выполнены — они сброшены и доступны снова!');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Ошибка при проверке приглашений.');
+    }
+    return;
   }
 
-  // авто-проверка Telegram
+  // 2. Задания с оплатой VPN
+  if (task.type === 'vpn' && task.requiresPayment) {
+    const stringUserId = String(userId).trim();
+
+    try {
+      const res = await fetch('/api/check-vpn-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: stringUserId, task_key: task.key }),
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        completeTask(task);
+        if (task.key === 'activateVpn') {
+          setClickMultiplier(2);
+          localStorage.setItem('clickMultiplier', 2);
+        }
+      } else {
+        alert('❌ Оплата не найдена. Попробуй позже.');
+      }
+    } catch (error) {
+      alert('Ошибка при проверке оплаты. Попробуй позже.');
+    }
+    return;
+  }
+
+  // 3. Подписка на Telegram (через Supabase)
   if (task.key === 'subscribeTelegram') {
+    try {
+      if (window.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(task.link);
+      } else {
+        window.open(task.link, '_blank');
+      }
+    } catch {
+      alert('❌ Не удалось открыть ссылку');
+      return;
+    }
+
     setTimeout(async () => {
       try {
         await fetch('/api/add-subscription', {
@@ -344,8 +420,8 @@ const handleTaskClick = async (task) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             user_id: userId,
-            channel: 'telegram'
-          })
+            channel: 'telegram',
+          }),
         });
 
         const res = await fetch(`/api/check-subscription?user_id=${userId}&channel=telegram`);
@@ -360,10 +436,27 @@ const handleTaskClick = async (task) => {
         alert('❌ Ошибка при проверке подписки');
       }
     }, 3000);
+    return;
   }
 
-  return;
-}
+  // 4. Instagram и другие действия: "Перейти" → затем "Выполнить"
+  if (task.type === 'action') {
+    try {
+      if (window.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(task.link);
+      } else {
+        window.open(task.link, '_blank');
+      }
+
+      const confirmed = window.confirm('✅ Выполни задание (лайк/коммент) и нажми OK для получения награды');
+      if (confirmed) {
+        completeTask(task);
+      }
+    } catch {
+      alert('❌ Ошибка при открытии ссылки');
+    }
+    return;
+  }
     };
     // Для прочих заданий
     completeTask(task);
