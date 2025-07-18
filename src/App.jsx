@@ -223,98 +223,6 @@ useEffect(() => {
     alert(`🎁 Ты получил ${task.reward || 0} монет!`);
   };
 
-const handleTaskClick = async (task) => {
-  if (completedTasks[task.key]) {
-    alert('✅ Это задание уже выполнено!');
-    return;
-  }
-
-  // 1. Реферальные задания
-  if (task.type === 'referral') {
-    const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
-    try {
-      if (window.Telegram?.WebApp?.clipboard?.writeText) {
-        await window.Telegram.WebApp.clipboard.writeText(refLink);
-      } else {
-        await navigator.clipboard.writeText(refLink);
-      }
-      setCopiedLink(refLink);
-      setShowReferralModal(true);
-    } catch (e) {
-      alert(`Скопируй вручную:\n${refLink}`);
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('referrals')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId);
-
-      const count = data?.count || 0;
-      setReferrals(count);
-
-      if (count >= task.requiresReferralCount) {
-        completeTask(task);
-      } else {
-        alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
-      }
-      
-      // Сброс реферальных заданий, если все выполнены
-      const allReferralDone = tasks
-        .filter(t => t.type === 'referral')
-        .every(t => completedTasks[t.key] || t.key === task.key);
-
-      if (allReferralDone) {
-        const updated = { ...completedTasks };
-        tasks.forEach(t => {
-          if (t.type === 'referral') delete updated[t.key];
-        });
-        setCompletedTasks(updated);
-        localStorage.setItem('completedTasks', JSON.stringify(updated));
-        alert('Все реферальные задания выполнены — они сброшены и доступны снова!');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('Ошибка при проверке приглашений.');
-    }
-    return;
-  }
-
-  if (task.type === 'vpn' && task.requiresPayment) {
-  console.log('🟡 Повторный клик: запускаем проверку оплаты');
-
-  const stringUserId = String(userId).trim();
-  console.log('👁 userId перед fetch-запросом:', stringUserId);
-
-  try {
-    const res = await fetch('/api/check-vpn-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: stringUserId, task_key: task.key }),
-    });
-
-    const result = await res.json();
-    console.log('🔄 Ответ от /api/check-vpn-payment:', result);
-
-    if (result.success) {
-      console.log('✅ Оплата найдена. Начисляем награду!');
-      completeTask(task);
-
-      if (task.key === 'activateVpn') {
-        setClickMultiplier(2);
-        localStorage.setItem('clickMultiplier', 2);
-      }
-    } else {
-      console.warn('❌ Оплата не найдена');
-      alert('❌ Оплата не найдена. Попробуй позже.');
-    }
-  } catch (error) {
-    console.error('💥 Ошибка в блоке try/fetch:', error);
-    alert('Ошибка при проверке оплаты. Попробуй позже.');
-  }
-
-  return;
-}
     const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) {
     alert('✅ Это задание уже выполнено!');
@@ -374,8 +282,11 @@ const handleTaskClick = async (task) => {
 
   // 2. Задания с оплатой VPN
   if (task.type === 'vpn' && task.requiresPayment) {
-    const stringUserId = String(userId).trim();
+  console.log('🟡 Повторный клик: запускаем проверку оплаты');
 
+  const stringUserId = String(userId).trim();
+  console.log('👁 userId перед fetch-запросом:', stringUserId);
+  
     try {
       const res = await fetch('/api/check-vpn-payment', {
         method: 'POST',
