@@ -446,7 +446,23 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
                   {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
                 </button>
               )}
+    {task.link && (
+      <a href={task.link} target="_blank" rel="noopener noreferrer">
+        <button className="task-button">Перейти</button>
+      </a>
+    )}
 
+    {!completedTasks[task.key] && (
+      <button
+        onClick={() => handleTaskClick(task)}
+        disabled={isDisabled}
+        className="task-button"
+      >
+        Выполнить
+      </button>
+    )}
+  </div>
+)}
 
 {/* Подписка на Telegram — Перейти → Выполнить */}
 {task.key === 'subscribeTelegram' && (
