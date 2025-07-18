@@ -465,33 +465,36 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
             )}
             
                {/* Подписка на Instagram — Перейти → Выполнить */}
-          {task.key === 'subscribeInstagram' && (
-            <div className="task-buttons-vertical">
-              {!task.visited && (
-                <a href={task.link} target="_blank" rel="noopener noreferrer">
-                  <button
-                    className="task-button"
-                    onClick={() => {
-                      setTasks(prev =>
-                        prev.map(t => t.key === task.key ? { ...t, visited: true } : t)
-                        );
-                 }, 5000); // ⏱ Ждём 5 секунд перед тем, как разрешить "Выполнить"
-                  }}
-                  >
-                   Перейти
-                  </button>
-                </a>
-              )}
-              {task.visited && !completedTasks[task.key] && (
-                <button
-                  onClick={() => handleTaskClick(task)}
-                  className="task-button"
-                >
-                  Выполнить
-                </button>
-              )}
-            </div>
-          )}
+{task.key === 'subscribeInstagram' && (
+  <div className="task-buttons-vertical">
+    {!task.visited && (
+      <a href={task.link} target="_blank" rel="noopener noreferrer">
+        <button
+          className="task-button"
+          onClick={() => {
+            setTimeout(() => {
+              setTasks(prev =>
+                prev.map(t =>
+                  t.key === task.key ? { ...t, visited: true } : t
+                )
+              );
+            }, 5000); // ⏱ Ждём 5 секунд перед тем, как показать кнопку "Выполнить"
+          }}
+        >
+          Перейти
+        </button>
+      </a>
+    )}
+    {task.visited && !completedTasks[task.key] && (
+      <button
+        onClick={() => handleTaskClick(task)}
+        className="task-button"
+      >
+        Выполнить
+      </button>
+    )}
+  </div>
+)}
             
               {/* Action: лайки, комментарии, Instagram и др — логика «Перейти → Выполнить» */}
           {task.type === 'action' && task.link && !completedTasks[task.key] && (
