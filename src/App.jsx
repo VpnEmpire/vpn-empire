@@ -38,7 +38,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
 'https://www.instagram.com/internet.bot.001?igsh=MXRhdzRhdmc1aGhybg==' },
     { key: 'shareSocial', label: '📢 Расскажи о нас в соцсетях', reward: 100 },
     { key: 'commentPost', label: '💬 Оставить комментарий', reward: 50, type: 'action', link: 'https://www.instagram.com/reel/DKG__6wtbee/?igsh=MXI4bXZ6emJucmFnMg==' },
-    { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 },
+    { key: 'dailyVpn', label: '🛡 Заходить в VPN каждый день', reward: 100 }, 
     { key: 'reactPost', label: '❤️ Поставить реакцию', reward: 50, type: 'action', link: 'https://t.me/OrdoHereticusVPN/38' },
     { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 1000, type: 'vpn', link: 'https://t.me/OrdoHereticus_bot', bonus: 'x2 кликов', requiresPayment: true }
   ]);
