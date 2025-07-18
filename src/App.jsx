@@ -441,22 +441,21 @@ const handleTaskClick = async (task) => {
 
   // 4. Instagram и другие действия: "Перейти" → затем "Выполнить"
    // 👉 Instagram, лайк, коммент, реакция — логика: Перейти → Выполнить
-  if (action === 'go') {
-  const url = task.link.includes('instagram.com')
-    ? task.link + (task.link.includes('?') ? '&' : '?') + 'utm_source=telegram'
-    : task.link;
-
+  if (task.key === 'leaveComment') {
   try {
-    window.open(url, '_blank', 'noopener,noreferrer');
-
-    // фиксируем переход
-    setTasks(prev =>
-      prev.map(t => t.key === task.key ? { ...t, visited: true } : t)
-    );
-  } catch (e) {
-    alert('❌ Не удалось открыть ссылку');
+    const win = window.open(task.link, '_blank');
+    if (!win) {
+      alert('⚠️ Telegram может блокировать ссылку. Нажми ⋯ и выбери «Открыть в браузере»');
+    } else {
+      setTimeout(() => {
+        setTasks(prev =>
+          prev.map(t => t.key === task.key ? { ...t, visited: true } : t)
+        );
+      }, 5000);
+    }
+  } catch {
+    alert('❌ Не удалось открыть ссылку.');
   }
-
   return;
 }
     };
