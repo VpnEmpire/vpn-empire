@@ -1,5 +1,3 @@
-// /api/check-referral.js
-
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -16,15 +14,20 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'user_id обязателен' });
   }
 
-  const { count, error } = await supabase
-    .from('referrals')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user_id);
+  try {
+    const { count, error } = await supabase
+      .from('referrals')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user_id);
 
-  if (error) {
-    console.error('❌ Ошибка Supabase:', error);
-    return res.status(500).json({ error: 'Ошибка Supabase' });
+    if (error) {
+      console.error('❌ Supabase error:', error);
+      return res.status(500).json({ error: 'Ошибка при проверке рефералов' });
+    }
+
+    return res.status(200).json({ count: count || 0 });
+  } catch (err) {
+    console.error('❌ Ошибка сервера:', err);
+    return res.status(500).json({ error: 'Серверная ошибка' });
   }
-
-  res.status(200).json({ count });
 }
