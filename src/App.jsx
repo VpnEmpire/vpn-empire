@@ -224,16 +224,6 @@ useEffect(() => {
   };
 
     const handleTaskClick = async (task) => {
-  if (!task || !task.key) {
-    console.error('❌ Задание невалидно:', task);
-    return;
-  }
-
-  if (!task.type) {
-    console.error('❌ Задание без типа. Прерываем:', task);
-    return;
-  }
-
   if (completedTasks[task.key]) {
     alert('✅ Это задание уже выполнено!');
     return;
