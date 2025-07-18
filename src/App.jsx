@@ -447,7 +447,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
                 </button>
               )}
  
-              {task.type === 'subscribeTelegram' && task.link && (
+              {task.type === 'subscribe' && task.link && (
                 <a href={task.link} target="_blank" rel="noopener noreferrer">
                   <button className="task-button"> Перейти </button>
                 </a>
