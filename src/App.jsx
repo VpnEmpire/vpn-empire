@@ -452,7 +452,6 @@ const handleTaskClick = async (task) => {
     completeTask(task);
     return;
   }
-    };
     // Для прочих заданий
     completeTask(task);
  };
