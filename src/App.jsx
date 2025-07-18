@@ -561,6 +561,37 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
               )}
           </div>
             )}
+            
+             {/* Action: лайки, комментарии, Instagram и др */}
+          {task.type === 'action' && task.link && !completedTasks[task.key] && (
+            <div className="task-buttons-vertical">
+              {!task.visited && (
+                <button
+                  className="task-button"
+                  onClick={() => {
+                    if (window.Telegram?.WebApp?.openTelegramLink) {
+                      window.Telegram.WebApp.openTelegramLink(task.link);
+                    } else {
+                      window.open(task.link, '_blank');
+                    }
+                    setTasks(prev =>
+                      prev.map(t => t.key === task.key ? { ...t, visited: true } : t)
+                    );
+                  }}
+                >
+                  Перейти
+                </button>
+              )}
+              {task.visited && (
+                <button
+                  className="task-button"
+                  onClick={() => handleTaskClick(task)}
+                >
+                  Выполнить
+                </button>
+              )}
+            </div>
+          )}
           
           {!['referral', 'subscribe', 'vpn'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
