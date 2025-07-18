@@ -231,6 +231,8 @@ useEffect(() => {
 
   // 1. Реферальные задания
 if (task.type === 'referral') {
+  console.log('📌 Реферальное задание:', task.key);
+
   const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
   try {
     if (window.Telegram?.WebApp?.clipboard?.writeText) {
@@ -250,6 +252,13 @@ if (task.type === 'referral') {
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId);
 
+    console.log('👥 Найдено приглашений:', count);
+    if (error) {
+      console.error('Ошибка Supabase:', error);
+      alert('Ошибка при проверке приглашений.');
+      return;
+    }
+
     const invited = count || 0;
     setReferrals(invited);
 
@@ -259,7 +268,7 @@ if (task.type === 'referral') {
       alert(`Приглашено ${invited}/${task.requiresReferralCount} друзей`);
     }
 
-    // Если все реферальные задания выполнены — сбрасываем
+    // Если все задания выполнены — сбрасываем
     const allReferralDone = tasks
       .filter(t => t.type === 'referral')
       .every(t => completedTasks[t.key] || t.key === task.key);
@@ -271,12 +280,14 @@ if (task.type === 'referral') {
       });
       setCompletedTasks(updated);
       localStorage.setItem('completedTasks', JSON.stringify(updated));
-      alert('Все реферальные задания выполнены — они сброшены и доступны снова!');
+      alert('🎉 Все реферальные задания выполнены — они сброшены и доступны снова!');
     }
-  } catch (error) {
-    console.error(error);
-    alert('Ошибка при проверке приглашений.');
+
+  } catch (err) {
+    console.error(err);
+    alert('❌ Ошибка при обработке приглашений.');
   }
+
   return;
 }
 
