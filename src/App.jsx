@@ -226,6 +226,7 @@ useEffect(() => {
     const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) {
     alert('✅ Это задание уже выполнено!');
+  console.log('🧪 Нажатое задание:', task); // ← вот это
     return;
   }
 
