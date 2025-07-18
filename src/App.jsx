@@ -440,23 +440,31 @@ const handleTaskClick = async (task) => {
   }
 
   // 4. Instagram и другие действия: "Перейти" → затем "Выполнить"
-  if (task.type === 'action') {
-    try {
-      if (window.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-      } else {
+   // 👉 Instagram, лайк, коммент, реакция — логика: Перейти → Выполнить
+  if (
+    task.key === 'subscribeInstagram' ||
+    task.key === 'likePost' ||
+    task.key === 'leaveComment' ||
+    task.key === 'shareProject'
+  ) {
+    if (action === 'go') {
+      try {
         window.open(task.link, '_blank');
+      } catch {
+        alert('❌ Не удалось открыть ссылку');
       }
 
-      const confirmed = window.confirm('✅ Выполни задание (лайк/коммент) и нажми OK для получения награды');
-      if (confirmed) {
-        completeTask(task);
-      }
-    } catch {
-      alert('❌ Ошибка при открытии ссылки');
+      const updated = { ...clickedTasks, [task.key]: true };
+      setClickedTasks(updated);
+      localStorage.setItem('clickedTasks', JSON.stringify(updated));
+      return;
     }
-    return;
-  }
+
+    if (action === 'check') {
+      completeTask(task);
+      return;
+    }
+    }
     };
     // Для прочих заданий
     completeTask(task);
@@ -562,10 +570,13 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
           </div>
             )}
             
-             {/* Action: лайки, комментарии, Instagram и др */}
-          {task.type === 'action' && task.link && !completedTasks[task.key] && (
+             {/* Instagram и другие действия — логика "Перейти → Выполнить" */}
+          {(task.key === 'subscribeInstagram' ||
+            task.key === 'likePost' ||
+            task.key === 'leaveComment' ||
+            task.key === 'shareProject') && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
-              {!task.visited && (
+              {!task.visited ? (
                 <button
                   className="task-button"
                   onClick={() => {
@@ -581,8 +592,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
                 >
                   Перейти
                 </button>
-              )}
-              {task.visited && (
+              ) : (
                 <button
                   className="task-button"
                   onClick={() => handleTaskClick(task)}
