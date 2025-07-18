@@ -216,6 +216,7 @@ useEffect(() => {
    // 1. Реферальные задания
    if (task.type === 'referral') {
   console.log('📌 Реферальное задание:', task.key);
+  console.log('🧪 Требуется пригласить:', task.requiresReferralCount);
 
   const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
   try {
@@ -231,7 +232,6 @@ useEffect(() => {
   }
 
   try {
-    // ✅ Новый backend-запрос
     const res = await fetch('/api/check-referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -239,19 +239,24 @@ useEffect(() => {
     });
 
     const data = await res.json();
-    const invited = data.count || 0;
+    const invited = data.count ?? 0;
     setReferrals(invited);
 
-    console.log('👥 Найдено приглашений:', invited);
+    console.log('👥 Приглашено друзей:', invited);
+
+    if (!task.requiresReferralCount) {
+      alert('❗ Не указано, сколько друзей нужно пригласить.');
+      return;
+    }
 
     if (invited >= task.requiresReferralCount) {
       completeTask(task);
     } else {
-      alert(`❗ Недостаточно приглашённых друзей: ${invited}/${task.requiresReferralCount}`);
-      return; // 🔒 Остановка, чтобы не пошёл дальше
+      alert(`❌ Недостаточно приглашений: ${invited}/${task.requiresReferralCount}`);
+      return;
     }
 
-    // ✅ Если все реф. задания выполнены — сбрасываем
+    // ✅ Проверим, все ли реферальные задания выполнены
     const allReferralDone = tasks
       .filter(t => t.type === 'referral')
       .every(t => completedTasks[t.key] || t.key === task.key);
@@ -263,12 +268,11 @@ useEffect(() => {
       });
       setCompletedTasks(updated);
       localStorage.setItem('completedTasks', JSON.stringify(updated));
-      alert('🎉 Все реферальные задания выполнены — они сброшены и доступны снова!');
+      alert('🎉 Все реферальные задания выполнены! Они сброшены и доступны снова.');
     }
-
   } catch (err) {
-    console.error('❌ Ошибка при запросе /api/check-referral:', err);
-    alert('Ошибка при проверке рефералов');
+    console.error('❌ Ошибка при проверке рефералов:', err);
+    alert('Ошибка при проверке приглашений. Попробуй позже.');
   }
 
   return;
