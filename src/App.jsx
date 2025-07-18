@@ -552,9 +552,9 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
             </div>
           )}
           
-         {!completedTasks[task.key] &&
+        {task.type &&
   !['referral', 'subscribe', 'vpn', 'action'].includes(task.type) &&
-  task.type && (
+  !completedTasks[task.key] && (
     <div className="task-buttons-vertical">
       <button
         onClick={() => handleTaskClick(task)}
