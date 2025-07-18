@@ -446,6 +446,41 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
                   {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
                 </button>
               )}
+              
+                 {/* 👉 Instagram подписка: Перейти → Выполнить */}
+              {task.key === 'subscribeInstagram' && !completedTasks[task.key] && (
+                <>
+                  {!task.visited && (
+                    <button
+                      className="task-button"
+                      onClick={() => {
+                        if (window.Telegram?.WebApp?.openTelegramLink) {
+                          window.Telegram.WebApp.openTelegramLink(task.link);
+                        } else {
+                          window.open(task.link, '_blank');
+                        }
+                        setTimeout(() => {
+                          setTasks(prev =>
+                            prev.map(t =>
+                              t.key === task.key ? { ...t, visited: true } : t
+                            )
+                          );
+                        }, 4000);
+                      }}
+                    >
+                      Перейти
+                    </button>
+                  )}
+                  {task.visited && (
+                    <button
+                      onClick={() => handleTaskClick(task)}
+                      className="task-button"
+                    >
+                      Выполнить
+                    </button>
+                  )}
+                </>
+              )}
  
               {task.type === 'subscribe' && task.link && (
                 <a href={task.link} target="_blank" rel="noopener noreferrer">
