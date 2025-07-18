@@ -447,7 +447,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
                 </button>
               )}
  
-              {task.type === 'subscribe' && task.link && (
+              {task.type === 'subscribeTelegram' && task.link && (
                 <a href={task.link} target="_blank" rel="noopener noreferrer">
                   <button className="task-button"> Перейти </button>
                 </a>
@@ -529,7 +529,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
             </div>
           )}
           
-          {!['referral', 'subscribe', 'vpn','action', 'subscribeInstagram'].includes(task.type) && !completedTasks[task.key] && (
+          {!['referral', 'subscribeTelegram', 'vpn', 'action', 'subscribeInstagram'].includes(task.type) && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
               <button
                 onClick={() => handleTaskClick(task)}
