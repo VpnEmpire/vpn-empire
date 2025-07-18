@@ -448,6 +448,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
               )}
 
 
+{/* Подписка на Telegram — Перейти → Выполнить */}
 {task.key === 'subscribeTelegram' && (
   <div className="task-buttons-vertical">
     {!task.visited && (
