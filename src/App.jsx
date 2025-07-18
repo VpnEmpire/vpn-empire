@@ -311,42 +311,9 @@ useEffect(() => {
     return;
   }
 
-  // 3. Подписка на Telegram (через Supabase)
+  // 3.  Подписка Telegram — логика Перейти → Выполнить
   if (task.key === 'subscribeTelegram') {
-    try {
-      if (window.Telegram?.WebApp?.openTelegramLink) {
-        window.Telegram.WebApp.openTelegramLink(task.link);
-      } else {
-        window.open(task.link, '_blank');
-      }
-    } catch {
-      alert('❌ Не удалось открыть ссылку');
-      return;
-    }
-
-    setTimeout(async () => {
-      try {
-        await fetch('/api/add-subscription', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: userId,
-            channel: 'telegram',
-          }),
-        });
-
-        const res = await fetch(`/api/check-subscription?user_id=${userId}&channel=telegram`);
-        const result = await res.json();
-
-        if (result.success) {
-          completeTask(task);
-        } else {
-          alert('❌ Подписка не подтверждена. Подпишись и попробуй снова.');
-        }
-      } catch {
-        alert('❌ Ошибка при проверке подписки');
-      }
-    }, 3000);
+    alert('🔗 Сначала нажми «Перейти», подпишись, затем возвращайся и нажми «Выполнить»');
     return;
   }
 
