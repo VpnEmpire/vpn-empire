@@ -441,17 +441,24 @@ const handleTaskClick = async (task) => {
 
   // 4. Instagram и другие действия: "Перейти" → затем "Выполнить"
    // 👉 Instagram, лайк, коммент, реакция — логика: Перейти → Выполнить
-  if (isActionType) {
-    if (!task.visited) {
-      // Сначала "Перейти"
-      alert('🔗 Сначала нажми "Перейти", затем возвращайся и нажми "Выполнить"');
-      return;
-    }
+  if (action === 'go') {
+  const url = task.link.includes('instagram.com')
+    ? task.link + (task.link.includes('?') ? '&' : '?') + 'utm_source=telegram'
+    : task.link;
 
-    // После перехода — разрешаем выполнить
-    completeTask(task);
-    return;
+  try {
+    window.open(url, '_blank', 'noopener,noreferrer');
+
+    // фиксируем переход
+    setTasks(prev =>
+      prev.map(t => t.key === task.key ? { ...t, visited: true } : t)
+    );
+  } catch (e) {
+    alert('❌ Не удалось открыть ссылку');
   }
+
+  return;
+}
     };
     // Для прочих заданий
     completeTask(task);
