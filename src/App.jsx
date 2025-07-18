@@ -475,7 +475,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
                       setTasks(prev =>
                         prev.map(t => t.key === task.key ? { ...t, visited: true } : t)
                         );
-                 }, 3000); // ⏱ Ждём 3 секунды перед тем, как разрешить "Выполнить"
+                 }, 5000); // ⏱ Ждём 5 секунд перед тем, как разрешить "Выполнить"
                   }}
                   >
                    Перейти
