@@ -229,10 +229,9 @@ useEffect(() => {
   console.log('🧪 Нажатое задание:', task); // ← вот это
     return;
   }
-
-  // 1. Реферальные задания
-// 1. Реферальные задания
-if (task.type === 'referral') {
+ 
+   // 1. Реферальные задания
+   if (task.type === 'referral') {
   console.log('📌 Реферальное задание:', task.key);
 
   const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
