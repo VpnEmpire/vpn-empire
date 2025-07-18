@@ -423,7 +423,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
       </div>
           )}
           
-         {(task.type === 'referral' || (task.type === 'subscribe' && task.key !== 'subscribeInstagram')) && (
+        {(task.type === 'referral' || (task.type === 'subscribe' && task.key !== 'subscribeInstagram' && task.key !== 'subscribeTelegram')) && (
             <div className="task-buttons-vertical">
               {task.type === 'referral' && (
                 <button
