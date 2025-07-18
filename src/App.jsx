@@ -264,7 +264,7 @@ if (task.type === 'referral') {
         alert(`Приглашено ${invited}/${task.requiresReferralCount} друзей`);
       }
 
-  // Если все задания выполнены — сбрасываем
+      // ✅ // Если все задания выполнены — сбрасываем
       const allReferralDone = tasks
         .filter(t => t.type === 'referral')
         .every(t => completedTasks[t.key] || t.key === task.key);
@@ -280,8 +280,8 @@ if (task.type === 'referral') {
       }
 
     } catch (err) {
-      console.error('❌ Ошибка при запросе /api/check-referral:', err);
-      alert('Ошибка при проверке рефералов');
+      console.error('❌ Ошибка при проверке рефералов:', err);
+      alert('Ошибка при проверке приглашений');
     }
 
     return;
