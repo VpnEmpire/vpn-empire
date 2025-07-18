@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     const { count, error } = await supabase
       .from('referrals')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', user_id);
+      .eq('referral_id', user_id);
 
     if (error) {
       console.error('❌ Supabase error:', error);
