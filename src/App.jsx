@@ -557,10 +557,10 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
           </div>
             )}
             
-              {/* Action-задания: лайк, комментарий, Instagram */}
+              {/* Action: лайки, комментарии, Instagram и др — логика «Перейти → Выполнить» */}
           {task.type === 'action' && task.link && !completedTasks[task.key] && (
             <div className="task-buttons-vertical">
-              {!task.visited ? (
+              {!task.visited && (
                 <button
                   className="task-button"
                   onClick={() => {
@@ -569,14 +569,17 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
                     } else {
                       window.open(task.link, '_blank');
                     }
-                    setTasks(prev =>
-                      prev.map(t => t.key === task.key ? { ...t, visited: true } : t)
-                    );
+                    setTimeout(() => {
+                      setTasks(prev =>
+                        prev.map(t => t.key === task.key ? { ...t, visited: true } : t)
+                      );
+                    }, 5000); // ⏱ Задержка перед «Выполнить»
                   }}
                 >
                   Перейти
                 </button>
-              ) : (
+              )}
+              {task.visited && (
                 <button
                   className="task-button"
                   onClick={() => handleTaskClick(task)}
