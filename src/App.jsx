@@ -230,55 +230,55 @@ useEffect(() => {
   }
 
   // 1. Реферальные задания
-  if (task.type === 'referral') {
-    const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
-    try {
-      if (window.Telegram?.WebApp?.clipboard?.writeText) {
-        await window.Telegram.WebApp.clipboard.writeText(refLink);
-      } else {
-        await navigator.clipboard.writeText(refLink);
-      }
-      setCopiedLink(refLink);
-      setShowReferralModal(true);
-    } catch (e) {
-      alert(`Скопируй вручную:\n${refLink}`);
+if (task.type === 'referral') {
+  const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+  try {
+    if (window.Telegram?.WebApp?.clipboard?.writeText) {
+      await window.Telegram.WebApp.clipboard.writeText(refLink);
+    } else {
+      await navigator.clipboard.writeText(refLink);
     }
-
-    try {
-      const { data, error } = await supabase
-        .from('referrals')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId);
-
-      const count = data?.count || 0;
-      setReferrals(count);
-
-      if (count >= task.requiresReferralCount) {
-        completeTask(task);
-      } else {
-        alert(`Приглашено ${count}/${task.requiresReferralCount} друзей`);
-      }
-
-      // Если все реферальные задания выполнены — сбрасываем
-      const allReferralDone = tasks
-        .filter(t => t.type === 'referral')
-        .every(t => completedTasks[t.key] || t.key === task.key);
-
-      if (allReferralDone) {
-        const updated = { ...completedTasks };
-        tasks.forEach(t => {
-          if (t.type === 'referral') delete updated[t.key];
-        });
-        setCompletedTasks(updated);
-        localStorage.setItem('completedTasks', JSON.stringify(updated));
-        alert('Все реферальные задания выполнены — они сброшены и доступны снова!');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('Ошибка при проверке приглашений.');
-    }
-    return;
+    setCopiedLink(refLink);
+    setShowReferralModal(true);
+  } catch (e) {
+    alert(`Скопируй вручную:\n${refLink}`);
   }
+
+  try {
+    const { count, error } = await supabase
+      .from('referrals')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
+    const invited = count || 0;
+    setReferrals(invited);
+
+    if (invited >= task.requiresReferralCount) {
+      completeTask(task);
+    } else {
+      alert(`Приглашено ${invited}/${task.requiresReferralCount} друзей`);
+    }
+
+    // Если все реферальные задания выполнены — сбрасываем
+    const allReferralDone = tasks
+      .filter(t => t.type === 'referral')
+      .every(t => completedTasks[t.key] || t.key === task.key);
+
+    if (allReferralDone) {
+      const updated = { ...completedTasks };
+      tasks.forEach(t => {
+        if (t.type === 'referral') delete updated[t.key];
+      });
+      setCompletedTasks(updated);
+      localStorage.setItem('completedTasks', JSON.stringify(updated));
+      alert('Все реферальные задания выполнены — они сброшены и доступны снова!');
+    }
+  } catch (error) {
+    console.error(error);
+    alert('Ошибка при проверке приглашений.');
+  }
+  return;
+}
 
   // 2. Задания с оплатой VPN
   if (task.type === 'vpn' && task.requiresPayment) {
