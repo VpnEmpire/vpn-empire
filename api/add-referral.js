@@ -24,6 +24,7 @@ export default async function handler(req, res) {
     .select('*')
     .eq('user_id', user_id)
     .eq('referral_id', referral_id)
+    .eq('source', 'game')
     .maybeSingle();
 
   if (fetchError) {
