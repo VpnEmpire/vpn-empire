@@ -36,7 +36,8 @@ export default async function handler(req, res) {
     const { count, error: countError } = await supabase
       .from('referrals')
       .select('*', { count: 'exact', head: true })
-      .eq('referral_id', user_id); // 👈 Кто пригласил
+      .eq('referral_id', user_id) // 👈 Кто пригласил
+      .eq('source', 'game');
 
     if (countError) {
       console.error('❌ Ошибка подсчёта рефералов:', countError.message);
