@@ -389,48 +389,48 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
           )}
           
         {/* Реферальные задания */}
-{task.type === 'referral' && (
+{task.type === 'referral' && !completedTasks[task.key] && (
   <>
-    {!completedTasks[task.key] && (
-      <div className="task-buttons-vertical">
-        {/* Кнопка "Скопировать" */}
-        <button
-          className={`task-button copy-button ${copiedLink === task.key ? 'copied' : ''}`}
-          onClick={async () => {
-            const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
-            try {
-              if (window.Telegram?.WebApp?.clipboard?.writeText) {
-                await window.Telegram.WebApp.clipboard.writeText(refLink);
-              } else {
-                await navigator.clipboard.writeText(refLink);
-              }
-              setCopiedLink(task.key);
-              setTimeout(() => setCopiedLink(null), 2000);
-            } catch (e) {
-              alert(`Скопируй вручную:\n${refLink}`);
+    <p>👥 Пригласи друзей по ссылке. После этого нажми «Выполнить»</p>
+    <div className="task-buttons-vertical">
+      <button
+        className={`task-button copy-button ${copiedLink === task.key ? 'copied' : ''}`}
+        onClick={async () => {
+          const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+          try {
+            if (window.Telegram?.WebApp?.clipboard?.writeText) {
+              await window.Telegram.WebApp.clipboard.writeText(refLink);
+            } else {
+              await navigator.clipboard.writeText(refLink);
             }
-          }}
-        >
-          {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
-        </button>
+            setCopiedLink(task.key);
+            setTimeout(() => setCopiedLink(null), 2000);
+            console.log('🔗 Скопирована реферальная ссылка:', refLink);
+          } catch (e) {
+            alert(`Скопируй вручную:\n${refLink}`);
+          }
+        }}
+      >
+        {copiedLink === task.key ? '✅ Скопировано' : '🔗 Скопировать'}
+      </button>
 
-        {/* Кнопка "Выполнить" */}
-        <button
-          className="task-button"
-          onClick={() => handleTaskClick(task)}
-        >
-          Выполнить
-        </button>
-      </div>
-    )}
-
-    {/* Если задание уже выполнено */}
-    {completedTasks[task.key] && (
-      <div className="task-completed" style={{ marginTop: '10px' }}>
-        🎉 Задание выполнено!
-      </div>
-    )}
+      <button
+        className="task-button"
+        onClick={() => {
+          console.log('▶️ Клик по кнопке "Выполнить" — реферальное задание:', task.key);
+          handleTaskClick(task);
+        }}
+      >
+        Выполнить
+      </button>
+    </div>
   </>
+)}
+
+{task.type === 'referral' && completedTasks[task.key] && (
+  <div className="task-completed" style={{ marginTop: '10px' }}>
+    🎉 Задание выполнено!
+  </div>
 )}
 
 {/* Подписка на Telegram — Перейти → Выполнить */}
