@@ -24,8 +24,6 @@ export default async function handler(req, res) {
     .select('*')
     .eq('user_id', user_id)
     .eq('referral_id', referral_id)
-    .order('created_at', { ascending: false })
-    .limit(1)
     .maybeSingle();
 
   if (fetchError) {
@@ -48,10 +46,10 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: 'Ошибка вставки' });
   }
 
-  // 3. Обновим счётчик у пригласившего
+  // 3. Увеличим счётчик рефералов у пригласившего
   const { error: updateError } = await supabase
     .from('users')
-    .update({ referrals: supabase.rpc('increment', { x: 1 }) }) // используй raw, если нет RPC
+    .update({ referrals: supabase.raw('referrals + 1') }) // ✅ корректно
     .eq('user_id', referral_id);
 
   if (updateError) {
