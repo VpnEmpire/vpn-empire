@@ -270,7 +270,7 @@ useEffect(() => {
     }
   } catch (err) {
     console.error('❌ Ошибка при запросе /api/check-referral:', err);
-    alert('❌ Ты ещё не выполнил это задание. Пригласи друзей по своей ссылке и возвращайся!');
+    alert(`❌ У тебя пока ${invited}/${task.requiresReferralCount} приглашений. Пригласи друга по ссылке и возвращайся!`);
   }
 
   return;
