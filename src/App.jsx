@@ -313,7 +313,6 @@ useEffect(() => {
     body: JSON.stringify({
       user_id: userId,
       channel: '@OrdoHereticusVPN';
-',
     }),
   });
   const result = await res.json();
