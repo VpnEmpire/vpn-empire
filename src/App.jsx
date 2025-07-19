@@ -312,7 +312,7 @@ useEffect(() => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       user_id: userId,
-      channel: '@OrdoHereticusVPN',
+      channel: '@telegram',
     }),
   });
   const result = await res.json();
