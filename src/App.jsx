@@ -307,13 +307,23 @@ useEffect(() => {
 
   // 3.  Подписка Telegram — логика Перейти → Выполнить
   if (task.key === 'subscribeTelegram') {
-    if (!task.visited) {
-    alert('🔗 Сначала нажми «Перейти», подпишись, затем возвращайся и нажми «Выполнить»');
-    return;
+  const res = await fetch('/api/check-subscription', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_id: userId,
+      channel: '@OrdoHereticusVPN',
+    }),
+  });
+  const result = await res.json();
+
+  if (result.success) {
+    completeTask(task);
+  } else {
+    alert('❌ Ты ещё не подписан на канал. Подпишись и попробуй снова.');
   }
-  completeTask(task);
-    return;
-  }
+  return;
+}
 
   // 4. Instagram и другие действия: "Перейти" → затем "Выполнить"
    // 👉 Instagram, лайк, коммент, реакция — логика: Перейти → Выполнить
