@@ -7,63 +7,86 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '1mb',
+    },
+  },
+};
+
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+  console.log('📥 [check-referral] Запрос получен');
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Метод не поддерживается. Используй POST.' });
+  }
 
   const { user_id, task_key, required_count } = req.body;
+  console.log('🔹 user_id:', user_id);
+  console.log('🔹 task_key:', task_key);
+  console.log('🔹 required_count:', required_count);
 
   if (!user_id || !task_key || required_count === undefined) {
-    return res.status(400).json({ error: 'user_id, task_key и required_count обязательны' });
+    return res.status(400).json({ error: 'Не хватает параметров (user_id, task_key, required_count)' });
   }
 
-  // 🔍 Получим количество приглашённых
-  const { count, error } = await supabase
-    .from('referrals')
-    .select('*', { count: 'exact', head: true })
-    .eq('referral_id', user_id);
+  try {
+    // 1. Получаем количество приглашённых
+    const { count, error: countError } = await supabase
+      .from('referrals')
+      .select('*', { count: 'exact', head: true })
+      .eq('referral_id', user_id); // 👈 Кто пригласил
 
-  if (error) {
-    console.error('❌ Ошибка при подсчёте рефералов:', error);
-    return res.status(500).json({ error: 'Ошибка при подсчёте рефералов' });
+    if (countError) {
+      console.error('❌ Ошибка подсчёта рефералов:', countError.message);
+      return res.status(500).json({ success: false, error: 'Ошибка при подсчёте' });
+    }
+
+    console.log(`👥 Найдено ${count} приглашённых`);
+
+    // 2. Проверяем, хватает ли рефералов
+    if (count < required_count) {
+      return res.status(200).json({
+        success: false,
+        invited: count,
+        error: `Недостаточно рефералов: ${count}/${required_count}`,
+      });
+    }
+
+    // 3. Проверяем, не выполнено ли уже это задание
+    const { data: existing, error: existingError } = await supabase
+      .from('referral_tasks')
+      .select('*')
+      .eq('user_id', user_id)
+      .eq('task_key', task_key)
+      .maybeSingle();
+
+    if (existingError) {
+      console.error('❌ Ошибка проверки выполнения:', existingError.message);
+      return res.status(500).json({ success: false, error: 'Ошибка Supabase' });
+    }
+
+    if (existing) {
+      console.warn(`⚠️ Задание ${task_key} уже выполнено`);
+      return res.status(200).json({ success: false, alreadyCompleted: true });
+    }
+
+    // 4. Сохраняем выполнение задания
+    const { error: insertError } = await supabase
+      .from('referral_tasks')
+      .insert([{ user_id, task_key }]);
+
+    if (insertError) {
+      console.error('❌ Ошибка при сохранении выполнения:', insertError.message);
+      return res.status(500).json({ success: false, error: 'Не удалось сохранить выполнение' });
+    }
+
+    console.log(`✅ Задание ${task_key} успешно засчитано`);
+    return res.status(200).json({ success: true, invited: count });
+
+  } catch (e) {
+    console.error('❌ Внутренняя ошибка:', e);
+    return res.status(500).json({ success: false, error: 'Ошибка сервера' });
   }
-
-  console.log(`👥 Найдено ${count} приглашённых у ${user_id}`);
-
-  if (count < required_count) {
-    console.warn(`⛔ Недостаточно рефералов (${count}/${required_count})`);
-    return res.status(200).json({ success: false, invited: count });
-  }
-
-  // 🔒 Проверим, не выполнено ли уже это задание
-  const { data: existing, error: checkError } = await supabase
-    .from('referral_tasks')
-    .select('*')
-    .eq('user_id', user_id)
-    .eq('task_key', task_key)
-    .order('created_at', { ascending: false }) // ⬅ как в vpn-проверке
-    .limit(1)
-    .maybeSingle();
-
-  if (checkError) {
-    console.error('❌ Ошибка при проверке выполнения:', checkError);
-    return res.status(500).json({ error: 'Ошибка при проверке задания' });
-  }
-
-  if (existing) {
-    console.warn(`⚠️ Задание ${task_key} уже выполнено`);
-    return res.status(200).json({ success: false, alreadyCompleted: true });
-  }
-
-  // ✅ Сохраняем выполнение задания
-  const { error: insertError } = await supabase
-    .from('referral_tasks')
-    .insert([{ user_id, task_key }]);
-
-  if (insertError) {
-    console.error('❌ Ошибка при сохранении задания:', insertError);
-    return res.status(500).json({ error: 'Ошибка при сохранении выполнения' });
-  }
-
-  console.log(`✅ Реферальное задание ${task_key} успешно засчитано`);
-  return res.status(200).json({ success: true, invited: count });
 }
