@@ -43,15 +43,17 @@ export default async function handler(req, res) {
       return res.status(500).json({ success: false, error: 'Ошибка Supabase' });
     }
 
-    const isSubscribed = data?.is_subscribed === true;
+      const isSubscribed = data?.is_subscribed;
 
-    if (isSubscribed) {
+    if (isSubscribed === true) {
       console.log('✅ Пользователь подписан');
-    } else {
+    } else if (isSubscribed === false) {
       console.log('⛔️ Пользователь НЕ подписан');
+    } else {
+      console.log('🤷 Запись о подписке не найдена');
     }
 
-    return res.status(200).json({ success: isSubscribed });
+    return res.status(200).json({ success: isSubscribed === true });
   } catch (e) {
     console.error('❌ Внутренняя ошибка:', e);
     return res.status(500).json({ success: false, error: 'Ошибка сервера' });
