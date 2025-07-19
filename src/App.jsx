@@ -307,13 +307,10 @@ useEffect(() => {
 
   // 3.  Подписка Telegram — логика Перейти → Выполнить
   if (task.key === 'subscribeTelegram') {
-  const res = await fetch('/api/check-subscription', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      user_id: userId,
-      channel: '@OrdoHereticusVPN',
-    }),
+  const res = await fetch('/api/add-subscription', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ user_id: userId, channel: 'telegram' }),
   });
   const result = await res.json();
 
