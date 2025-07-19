@@ -57,15 +57,15 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   setUserId(id);
   localStorage.setItem('user_id', id);
 
+  useEffect(() => {
   const ref = initData.start_param;
   if (ref && ref !== String(id)) {
-    // Отправляем в Supabase инфу о реферале
     fetch('/api/add-referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: ref,
-        referred_id: String(id),
+        user_id: String(id),   // текущий пользователь (новый)
+        referral_id: ref,      // тот, кто пригласил
       }),
     })
       .then((res) => res.json())
@@ -75,6 +75,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
       .catch((err) => console.error('❌ Ошибка записи реферала:', err));
   }
 }, []);
+
 
 useEffect(() => {
   if (!userId) return;
