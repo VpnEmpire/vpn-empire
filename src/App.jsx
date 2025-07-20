@@ -50,6 +50,13 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [spinResult, setSpinResult] = useState(null);
 
   useEffect(() => {
+  // Проверка: есть ли уже user_id в localStorage
+  const existingId = localStorage.getItem('user_id');
+  if (existingId) {
+    setUserId(existingId);
+    return;
+  }
+
   const initData = window.Telegram?.WebApp?.initDataUnsafe;
   if (!initData || !initData.user) return;
 
@@ -57,9 +64,10 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   setUserId(id);
   localStorage.setItem('user_id', id);
 
-  // ✅ Проверка: если ссылка была из мини-приложения
   const ref = initData.start_param;
-  const isFromMiniApp = window.Telegram.WebApp.initData.includes('startapp');
+  console.log('🔗 Получен start_param:', ref);
+
+  const isFromMiniApp = window.Telegram?.WebApp?.initData?.includes('startapp');
 
   if (isFromMiniApp && ref && ref !== String(id)) {
     fetch('/api/add-referral', {
@@ -216,7 +224,12 @@ useEffect(() => {
   }
  
    // 1. Реферальные задания
-   if (task.type === 'referral') {
+if (task.type === 'referral') {
+  if (!userId) {
+    alert('⛔ Не удалось определить твой ID. Попробуй позже.');
+    return;
+  }
+
   console.log('📌 Реферальное задание:', task.key);
   console.log('🧪 Требуется пригласить:', task.requiresReferralCount);
 
