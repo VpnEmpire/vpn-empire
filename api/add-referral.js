@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   // 1. Проверим, не существует ли уже такая пара
   const { data: existing, error: fetchError } = await supabase
     .from('referrals')
-    .select('*')
+    .select('id')
     .eq('user_id', user_id)
     .eq('referral_id', referral_id)
     .eq('source', 'game')
