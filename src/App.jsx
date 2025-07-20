@@ -50,7 +50,6 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [spinResult, setSpinResult] = useState(null);
 
   useEffect(() => {
-  // Проверка: есть ли уже user_id в localStorage
   const existingId = localStorage.getItem('user_id');
   if (existingId) {
     setUserId(existingId);
@@ -74,8 +73,8 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: ref,
-        referral_id: String(id),
+        user_id: ref,          // кто пригласил
+        referral_id: String(id), // кто зашёл
       }),
     })
       .then((res) => res.json())
