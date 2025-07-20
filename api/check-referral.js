@@ -36,7 +36,7 @@ export default async function handler(req, res) {
     const { count, error: countError } = await supabase
       .from('referrals')
       .select('*', { count: 'exact', head: true })
-      .eq('referral_id', user_id) // 👈 Кто пригласил
+      .eq('user_id', user_id) // 👈 Кто пригласил
       .eq('source', 'game');
 
     if (countError) {
