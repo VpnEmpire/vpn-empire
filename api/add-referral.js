@@ -40,7 +40,7 @@ export default async function handler(req, res) {
   // 2. Добавим новую запись
   const { error: insertError } = await supabase
     .from('referrals')
-    .insert([{ user_id, referral_id }]);
+    .insert([{ user_id, referral_id, source: 'game' }]);
 
   if (insertError) {
     console.error('❌ Ошибка при добавлении реферала:', insertError);
