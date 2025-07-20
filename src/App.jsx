@@ -57,9 +57,11 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   setUserId(id);
   localStorage.setItem('user_id', id);
 
+  // ✅ Проверка: если ссылка была из мини-приложения
   const ref = initData.start_param;
-  if (ref && ref !== String(id)) {
-    // Отправляем в Supabase инфу о реферале
+  const isFromMiniApp = window.Telegram.WebApp.initData.includes('startapp');
+
+  if (isFromMiniApp && ref && ref !== String(id)) {
     fetch('/api/add-referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -70,7 +72,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log('📥 Реферал записан:', result);
+        console.log('📥 Реферал записан через mini app:', result);
       })
       .catch((err) => console.error('❌ Ошибка записи реферала:', err));
   }
@@ -404,7 +406,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
         <button
           className={`task-button copy-button ${copiedLink === task.key ? 'copied' : ''}`}
           onClick={async () => {
-            const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+            const refLink = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
             try {
               if (window.Telegram?.WebApp?.clipboard?.writeText) {
                 await window.Telegram.WebApp.clipboard.writeText(refLink);
