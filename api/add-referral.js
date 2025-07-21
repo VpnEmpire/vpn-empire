@@ -55,10 +55,15 @@ export default async function handler(req, res) {
     .eq('user_id', referral_id)
     .maybeSingle();
 
-  if (fetchUserError || !userData) {
-    console.error('❌ Ошибка при получении текущего счётчика:', fetchUserError);
-    return res.status(500).json({ success: false, error: 'Ошибка получения счётчика' });
-  }
+  if (fetchUserError) {
+  console.error('❌ Ошибка Supabase:', fetchUserError);
+  return res.status(500).json({ success: false, error: 'Ошибка при получении счётчика' });
+}
+
+if (!userData || userData.referrals === undefined) {
+  console.error('❌ Не удалось получить поле referrals:', userData);
+  return res.status(500).json({ success: false, error: 'Счётчик не найден' });
+}
 
   const newCount = (userData.referrals || 0) + 1;
 
