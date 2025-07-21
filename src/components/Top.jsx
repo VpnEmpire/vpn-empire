@@ -16,17 +16,17 @@ function Top({ username }) {
         .order('coins', { ascending: false });
 
       if (error) {
-        console.error('Ошибка при загрузке топ игроков:', error);
+        console.error('❌ Ошибка при загрузке топ игроков:', error);
         return;
       }
 
-      const formatted = data
-        .filter(player => player.coins > 0)
-        .map(player => ({
-          name: player.user_id === userId ? currentUserName : player.user_id,
-          coins: player.coins,
-          isCurrentUser: player.user_id === userId,
-        }));
+      console.log('👥 Получены игроки из Supabase:', data);
+
+      const formatted = data.map(player => ({
+        name: player.user_id === userId ? currentUserName : player.user_id,
+        coins: player.coins,
+        isCurrentUser: player.user_id === userId,
+      }));
 
       setTopPlayers(formatted.slice(0, 10));
     };
