@@ -70,13 +70,13 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
 
   if (isFromMiniApp && ref && ref !== String(id)) {
     fetch('/api/add-referral', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: ref,          // кто пригласил
-        referral_id: String(id), // кто зашёл
-      }),
-    })
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    user_id: String(id),     // кто зашёл 👈 ПРАВИЛЬНО
+    referral_id: ref         // кто пригласил 👈 ПРАВИЛЬНО
+  }),
+})
       .then((res) => res.json())
       .then((result) => {
         console.log('📥 Реферал записан через mini app:', result);
