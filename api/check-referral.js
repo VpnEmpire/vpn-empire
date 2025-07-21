@@ -80,7 +80,7 @@ export default async function handler(req, res) {
       .eq('user_id', user_id)
       .maybeSingle();
 
-    if (referralFetchError || !referralData?.referral_by) {
+    if (referralFetchError || !referralData?.referrals_by) {
       console.error('❌ Не найден referrals_by');
       return res.status(400).json({ success: false, error: 'referrals_by отсутствует' });
     }
