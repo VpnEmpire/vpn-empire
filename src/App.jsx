@@ -51,7 +51,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [spinResult, setSpinResult] = useState(null);
 
 useEffect(() => {
-  localStorage.removeItem('referral_id'); // 👈 Удалим пригласившего
+  localStorage.clear(); // полностью очищает всё
 }, []);
 
 useEffect(() => {
