@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
 import './Top.css';
+
+// ВАЖНО: supabase импортируем прямо здесь
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_KEY
+);
 
 function Top({ username }) {
   const [topPlayers, setTopPlayers] = useState([]);
@@ -36,9 +43,10 @@ function Top({ username }) {
   const currentUserId = localStorage.getItem('user_id');
 
   const allPlayers = topPlayers.map((player, index) => ({
-    name: player.user_id === currentUserId
-      ? username?.trim() || 'Ты'
-      : `Player ${index + 1}`,
+    name:
+      player.user_id === currentUserId
+        ? username?.trim() || 'Ты'
+        : `Player ${index + 1}`,
     coins: player.coins,
     color:
       index === 0
