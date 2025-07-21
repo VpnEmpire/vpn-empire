@@ -149,48 +149,26 @@ useEffect(() => {
   }, []);
 
  useEffect(() => {
-  const syncCoinsToSupabase = async () => {
-    const storedUserId = localStorage.getItem('user_id');
-    const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
-    if (!storedUserId) return;
+  const storedUserId = localStorage.getItem('user_id');
+  const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
 
-    const { data: existingUser, error: selectError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('user_id', storedUserId)
-      .single();
+  if (!storedUserId) return;
 
-    if (selectError && selectError.code !== 'PGRST116') {
-      console.error('❌ Ошибка выборки:', selectError.message);
-      return;
-    }
-
-    if (!existingUser) {
-      const { error: insertError } = await supabase.from('users').insert([
-        { user_id: storedUserId, coins: storedCoins }
-      ]);
-      if (insertError) {
-        console.error('❌ Ошибка вставки:', insertError.message);
-      } else {
-        console.log('✅ Пользователь создан с монетами:', storedCoins);
-      }
+  fetch('/api/update-coins', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_id: storedUserId,
+      coins: storedCoins
+    })
+  }).then(res => res.json()).then(res => {
+    if (res.success) {
+      console.log('✅ Coins обновлены через API:', storedCoins);
     } else {
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ coins: storedCoins })
-        .eq('user_id', storedUserId);
-      if (updateError) {
-        console.error('❌ Ошибка обновления монет:', updateError.message);
-      } else {
-        console.log('✅ Монеты обновлены:', storedCoins);
-      }
+      console.error('❌ Ошибка обновления монет через API:', res.error);
     }
-  };
-
-  // Обновлять монеты каждые 5 секунд
-  const interval = setInterval(syncCoinsToSupabase, 5000);
-  return () => clearInterval(interval);
-}, []);
+  });
+}, [coins]);
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
