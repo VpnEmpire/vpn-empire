@@ -51,7 +51,7 @@ export default async function handler(req, res) {
   // 3. Получим текущий счётчик у пригласившего
   const { data: userData, error: fetchUserError } = await supabase
     .from('users')
-    .select('referrals')
+    .select('referrals_by')
     .eq('user_id', referral_id)
     .maybeSingle();
 
