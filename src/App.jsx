@@ -63,8 +63,8 @@ useEffect(() => {
   setUserId(id);
   localStorage.setItem('user_id', id);
 
-  const ref = initData.start_param;
-  console.log('🔗 Получен start_param:', ref);
+  const urlParams = new URLSearchParams(window.Telegram?.WebApp?.initData || '');
+  const ref = urlParams.get('startapp');
 
   const isFromMiniApp = window.Telegram?.WebApp?.initData?.includes('startapp');
 
