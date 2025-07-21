@@ -7,16 +7,17 @@ function Top({ username }) {
 
   useEffect(() => {
     const fetchTopPlayers = async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('user_id, coins')
-        .order('coins', { ascending: false })
-        .limit(10);
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('user_id, coins')
+          .order('coins', { ascending: false })
+          .limit(50); // ✅ лимит 50
 
-      if (error) {
-        console.error('❌ Ошибка при загрузке топа:', error.message);
-      } else {
-        setTopPlayers(data);
+        if (error) throw error;
+        if (data) setTopPlayers(data);
+      } catch (err) {
+        console.error('❌ Ошибка при загрузке топа:', err.message);
       }
     };
 
@@ -27,7 +28,7 @@ function Top({ username }) {
   const currentUserCoins = parseInt(localStorage.getItem('coins')) || 0;
 
   const playersWithNames = topPlayers.map((player) => ({
-    name: player.user_id === storedUserId ? 'Ты' : `ID ${player.user_id.slice(-4)}`,
+    name: player.user_id === storedUserId ? 'Ты' : `ID ${player.user_id?.slice(-4) || '0000'}`,
     coins: player.coins,
     color: player.user_id === storedUserId ? 'cyan' : 'gray'
   }));
