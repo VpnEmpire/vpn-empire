@@ -199,7 +199,7 @@ useEffect(() => {
   };
 
   const completeTask = (task) => {
-    if (completedTasks[task.key] && !force) return;
+    if (completedTasks[task.key]) return;
 
     setCompletedTasks(prev => {
       const updated = { ...prev, [task.key]: true };
