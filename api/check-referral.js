@@ -73,7 +73,20 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: false, alreadyCompleted: true });
     }
 
-    // 4. Сохраняем выполнение задания
+     // 4. Сохраняем выполнение задания
+    const { data: referralData, error: referralFetchError } = await supabase
+      .from('users')
+      .select('referral_by')
+      .eq('user_id', user_id)
+      .maybeSingle();
+
+    if (referralFetchError || !referralData?.referral_by) {
+      console.error('❌ Не найден referral_by');
+      return res.status(400).json({ success: false, error: 'referral_by отсутствует' });
+    }
+
+    const referral_id = referralData.referral_by;
+
     const { error: insertError } = await supabase
       .from('referrals')
       .insert([{ user_id, referral_id, task_key, source: 'game' }]);
