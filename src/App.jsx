@@ -51,6 +51,10 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [spinResult, setSpinResult] = useState(null);
 
 useEffect(() => {
+  localStorage.removeItem('referral_id'); // 👈 Удалим пригласившего
+}, []);
+
+useEffect(() => {
   const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
   const currentUser = initDataUnsafe?.user?.id;
   const ref = initDataUnsafe?.start_param;
