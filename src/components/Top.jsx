@@ -15,6 +15,12 @@ function Top({ username }) {
         .order('coins', { ascending: false })
         .limit(10);
 
+console.log('🟢 Supabase ответ:', data);
+  if (error) {
+    console.error('❌ Ошибка Supabase:', error);
+    return;
+  }
+
       if (error) {
         console.error('Ошибка при загрузке топ игроков:', error);
         return;
