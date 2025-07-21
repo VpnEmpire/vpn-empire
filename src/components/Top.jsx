@@ -1,60 +1,66 @@
 import React, { useEffect, useState } from 'react';
 import './Top.css';
 
-function Top() {
+function Top({ username }) {
   const [topPlayers, setTopPlayers] = useState([]);
-  const userCoins = parseInt(localStorage.getItem('coins')) || 0;
-  const userId = localStorage.getItem('user_id');
-  const username = 'Ты';
 
   useEffect(() => {
     const fetchTop = async () => {
       try {
-        const response = await fetch('/api/top');
-        const result = await response.json();
-        if (result.top) {
-          let players = result.top.map(player => ({
-            name: player.user_id,
-            coins: player.coins,
-            color: 'blue',
-          }));
+        const res = await fetch('/api/top');
+        const json = await res.json();
+        const data = json.top || [];
 
-          // Добавим текущего пользователя
-          const currentUser = {
-            name: username,
-            coins: userCoins,
-            color: 'cyan',
-            user_id: userId,
-          };
+        const localUserId = localStorage.getItem('user_id');
+        const localCoins = parseInt(localStorage.getItem('coins')) || 0;
+        const alreadyInTop = data.find(p => p.user_id === localUserId);
 
-          // Если пользователь уже есть в списке — заменим
-          const existingIndex = players.findIndex(p => p.user_id === userId);
-          if (existingIndex !== -1) {
-            players[existingIndex] = currentUser;
-          } else {
-            players.push(currentUser);
-          }
-
-          const sorted = players
-            .sort((a, b) => b.coins - a.coins)
-            .slice(0, 10);
-
-          setTopPlayers(sorted);
+        if (!alreadyInTop && localUserId) {
+          data.push({ user_id: localUserId, coins: localCoins });
         }
-      } catch (error) {
-        console.error('Ошибка загрузки топа:', error);
+
+        const sorted = [...data]
+          .sort((a, b) => b.coins - a.coins)
+          .slice(0, 10);
+
+        setTopPlayers(sorted);
+      } catch (err) {
+        console.error('❌ Ошибка загрузки топа:', err);
       }
     };
 
     fetchTop();
   }, []);
 
+  const currentUserId = localStorage.getItem('user_id');
+
+  const allPlayers = topPlayers.map((player, index) => ({
+    name:
+      player.user_id === currentUserId
+        ? username?.trim() || 'Ты'
+        : `Player ${index + 1}`,
+    coins:
+      player.user_id === currentUserId
+        ? parseInt(localStorage.getItem('coins')) || 0
+        : player.coins,
+    color:
+      index === 0
+        ? 'gold'
+        : index === 1
+        ? 'blue'
+        : index === 2
+        ? 'silver'
+        : player.user_id === currentUserId
+        ? 'cyan'
+        : 'purple'
+  }));
+
   return (
     <div className="top-container">
       <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2>
       <img src="/robot.png" alt="Робот" className="top-robot" />
       <div className="top-list">
-        {topPlayers.map((player, index) => (
+        {allPlayers.map((player, index) => (
           <div key={index} className={`top-player ${player.color}`}>
             <div className="rank-number">{index + 1}</div>
             <div className="player-name">{player.name}</div>
