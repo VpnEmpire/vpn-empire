@@ -151,10 +151,11 @@ useEffect(() => {
  useEffect(() => {
   const syncCoinsToSupabase = async () => {
     const storedUserId = localStorage.getItem('user_id');
+    const currentCoins = parseInt(localStorage.getItem('coins')) || 0;
     if (!storedUserId) return;
 
     try {
-      // Проверяем, существует ли пользователь
+      // Проверяем: есть ли уже пользователь с таким user_id
       const { data: existingUser, error: selectError } = await supabase
         .from('users')
         .select('*')
@@ -162,40 +163,41 @@ useEffect(() => {
         .single();
 
       if (selectError && selectError.code !== 'PGRST116') {
-        console.error('❌ Ошибка запроса пользователя:', selectError.message);
+        console.error('❌ Ошибка при получении пользователя:', selectError.message);
         return;
       }
 
       if (!existingUser) {
-        // Если нет — создать с текущим количеством монет
+        // Создаём нового пользователя
         const { error: insertError } = await supabase.from('users').insert([
-          { user_id: storedUserId, coins }
+          {
+            user_id: storedUserId,
+            coins: currentCoins
+          }
         ]);
         if (insertError) {
-          console.error('❌ Ошибка вставки пользователя:', insertError.message);
+          console.error('❌ Ошибка при создании пользователя:', insertError.message);
         } else {
-          console.log('✅ Пользователь создан с монетами:', coins);
+          console.log('✅ Новый пользователь добавлен в Supabase');
         }
       } else {
-        // Если есть — обновить количество монет
+        // Обновляем существующего пользователя
         const { error: updateError } = await supabase
           .from('users')
-          .update({ coins })
+          .update({ coins: currentCoins })
           .eq('user_id', storedUserId);
         if (updateError) {
-          console.error('❌ Ошибка обновления монет:', updateError.message);
+          console.error('❌ Ошибка при обновлении монет:', updateError.message);
         } else {
-          console.log('✅ Монеты успешно обновлены в Supabase:', coins);
+          console.log(`✅ Монеты пользователя ${storedUserId} обновлены: ${currentCoins}`);
         }
       }
-    } catch (e) {
-      console.error('❌ Ошибка syncCoinsToSupabase:', e.message);
+    } catch (err) {
+      console.error('❌ Ошибка syncCoinsToSupabase:', err);
     }
   };
 
-  if (coins >= 0) {
-    syncCoinsToSupabase();
-  }
+  syncCoinsToSupabase();
 }, [coins]);
 
   const updateRank = (totalCoins) => {
