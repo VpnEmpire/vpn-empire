@@ -151,54 +151,46 @@ useEffect(() => {
  useEffect(() => {
   const syncCoinsToSupabase = async () => {
     const storedUserId = localStorage.getItem('user_id');
-    const currentCoins = parseInt(localStorage.getItem('coins')) || 0;
+    const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
     if (!storedUserId) return;
 
-    try {
-      // Проверяем: есть ли уже пользователь с таким user_id
-      const { data: existingUser, error: selectError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('user_id', storedUserId)
-        .single();
+    const { data: existingUser, error: selectError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('user_id', storedUserId)
+      .single();
 
-      if (selectError && selectError.code !== 'PGRST116') {
-        console.error('❌ Ошибка при получении пользователя:', selectError.message);
-        return;
-      }
+    if (selectError && selectError.code !== 'PGRST116') {
+      console.error('❌ Ошибка выборки:', selectError.message);
+      return;
+    }
 
-      if (!existingUser) {
-        // Создаём нового пользователя
-        const { error: insertError } = await supabase.from('users').insert([
-          {
-            user_id: storedUserId,
-            coins: currentCoins
-          }
-        ]);
-        if (insertError) {
-          console.error('❌ Ошибка при создании пользователя:', insertError.message);
-        } else {
-          console.log('✅ Новый пользователь добавлен в Supabase');
-        }
+    if (!existingUser) {
+      const { error: insertError } = await supabase.from('users').insert([
+        { user_id: storedUserId, coins: storedCoins }
+      ]);
+      if (insertError) {
+        console.error('❌ Ошибка вставки:', insertError.message);
       } else {
-        // Обновляем существующего пользователя
-        const { error: updateError } = await supabase
-          .from('users')
-          .update({ coins: currentCoins })
-          .eq('user_id', storedUserId);
-        if (updateError) {
-          console.error('❌ Ошибка при обновлении монет:', updateError.message);
-        } else {
-          console.log(`✅ Монеты пользователя ${storedUserId} обновлены: ${currentCoins}`);
-        }
+        console.log('✅ Пользователь создан с монетами:', storedCoins);
       }
-    } catch (err) {
-      console.error('❌ Ошибка syncCoinsToSupabase:', err);
+    } else {
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ coins: storedCoins })
+        .eq('user_id', storedUserId);
+      if (updateError) {
+        console.error('❌ Ошибка обновления монет:', updateError.message);
+      } else {
+        console.log('✅ Монеты обновлены:', storedCoins);
+      }
     }
   };
 
-  syncCoinsToSupabase();
-}, [coins]);
+  // Обновлять монеты каждые 5 секунд
+  const interval = setInterval(syncCoinsToSupabase, 5000);
+  return () => clearInterval(interval);
+}, []);
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
