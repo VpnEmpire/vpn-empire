@@ -44,7 +44,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
     { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 2000, type: 'vpn', link: 'https://t.me/OrdoHereticus_bot', bonus: 'x2 кликов', requiresPayment: true }
   ]);
 
-  const maxClicksPerDay = 100;
+  const maxClicksPerDay = 1000;
   const spinSoundRef = useRef(null);
   const winSoundRef = useRef(null);
   const [canSpin, setCanSpin] = useState(true);
