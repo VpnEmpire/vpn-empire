@@ -76,7 +76,7 @@ export default async function handler(req, res) {
      // 4. Сохраняем выполнение задания
     const { data: referralData, error: referralFetchError } = await supabase
       .from('users')
-      .select('referral_by')
+      .select('referrals_by')
       .eq('user_id', user_id)
       .maybeSingle();
 
