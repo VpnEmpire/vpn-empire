@@ -81,11 +81,11 @@ export default async function handler(req, res) {
       .maybeSingle();
 
     if (referralFetchError || !referralData?.referral_by) {
-      console.error('❌ Не найден referral_by');
-      return res.status(400).json({ success: false, error: 'referral_by отсутствует' });
+      console.error('❌ Не найден referrals_by');
+      return res.status(400).json({ success: false, error: 'referrals_by отсутствует' });
     }
 
-    const referral_id = referralData.referral_by;
+    const referral_id = referralData.referrals_by;
 
     const { error: insertError } = await supabase
       .from('referrals')
