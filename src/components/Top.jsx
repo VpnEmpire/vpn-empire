@@ -1,60 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import './Top.css'; 
+import React from 'react';
+import './Top.css';
 
-const TopTab = () => {
-  const [topPlayers, setTopPlayers] = useState([]);
-  const [userId, setUserId] = useState(null);
-  const [userCoins, setUserCoins] = useState(0);
+const mockTopPlayers = [
+  { name: 'Player1', coins: 1500, color: 'gold' },
+  { name: 'Player2', coins: 1200, color: 'blue' },
+  { name: 'Player3', coins: 1000, color: 'silver' },
+  { name: 'Player4', coins: 800, color: 'purple' }
+];
 
-  useEffect(() => {
-    const fetchTop = async () => {
-      try {
-        const response = await fetch('/api/top');
-        const result = await response.json();
-        if (result.top) {
-          setTopPlayers(result.top);
-        }
-      } catch (error) {
-        console.error('Ошибка при загрузке топа:', error);
-      }
-    };
+function Top({ username }) {
+  const userCoins = parseInt(localStorage.getItem('coins')) || 0;
+  const currentUser = {
+    name: username?.trim() || 'Ты',
+    coins: userCoins,
+    color: 'cyan'
+  };
 
-    const storedUserId = localStorage.getItem('user_id');
-    const storedCoins = localStorage.getItem('coins');
-    setUserId(storedUserId);
-    if (storedCoins) setUserCoins(parseInt(storedCoins));
-
-    fetchTop();
-  }, []);
-
+  const allPlayers = [...mockTopPlayers, currentUser];
+  const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 10);
+  
   return (
     <div className="top-container">
       <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2>
+      <img src="/robot.png" alt="Робот" className="top-robot" />
       <div className="top-list">
-        {topPlayers.length === 0 && (
-          <img src={robotImage} alt="robot" className="top-robot" />
-        )}
-        {topPlayers.map((player, index) => {
-          const isCurrentUser = player.user_id === userId;
-          const displayCoins = isCurrentUser ? userCoins : player.coins;
-
-          return (
-            <div
-              key={player.user_id}
-              className={`top-card ${isCurrentUser ? 'top-card-current' : ''}`}
-            >
-              <div className="top-rank">#{index + 1}</div>
-              <img src={robotImage} alt="robot" className="top-avatar" />
-              <div className="top-info">
-                <div className="top-user">ID: {player.user_id}</div>
-                <div className="top-coins">💰 {displayCoins} монет</div>
-              </div>
+        {sorted.map((player, index) => (
+          <div key={index} className={`top-player ${player.color}`}>
+            <div className="rank-number">{index + 1}</div>
+            <div className="player-name">{player.name}</div>
+            <div className="player-coins">
+              <img src="/trophy.png" alt="Кубок" className="trophy-icon" />
+              {player.coins}
             </div>
-          );
-        })}
+          </div>
+                  ))}
       </div>
     </div>
   );
-};
+}
 
-export default TopTab;
+export default Top;
