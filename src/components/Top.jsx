@@ -25,7 +25,7 @@ function Top({ username }) {
       <img src="/robot.png" alt="Робот" className="top-robot" />
       <div className="top-list">
         {sorted.map((player, index) => (
-          <div key={index} className={top-player ${player.color}}>
+          <div key={index} className={`top-player ${player.color}`}>
             <div className="rank-number">{index + 1}</div>
             <div className="player-name">{player.name}</div>
             <div className="player-coins">
@@ -33,10 +33,10 @@ function Top({ username }) {
               {player.coins}
             </div>
           </div>
-        ))}
+                  ))}
       </div>
     </div>
-      );
+  );
 }
 
 export default Top;
