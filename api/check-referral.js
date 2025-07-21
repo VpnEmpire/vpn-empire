@@ -57,7 +57,7 @@ export default async function handler(req, res) {
 
     // 3. Проверяем, не выполнено ли уже это задание
     const { data: existing, error: existingError } = await supabase
-      .from('referral_tasks')
+      .from('referrals')
       .select('*')
       .eq('user_id', user_id)
       .eq('task_key', task_key)
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
 
     // 4. Сохраняем выполнение задания
     const { error: insertError } = await supabase
-      .from('referral_tasks')
+      .from('referrals')
       .insert([{ user_id, task_key }]);
 
     if (insertError) {
