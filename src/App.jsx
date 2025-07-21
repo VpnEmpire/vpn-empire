@@ -153,7 +153,9 @@ useEffect(() => {
     const storedUserId = localStorage.getItem('user_id');
     if (!storedUserId) return;
 
-    // Проверка, существует ли уже пользователь в Supabase
+    console.log('🔁 Синхронизация монет:', storedUserId, coins);
+
+    // Проверка: существует ли пользователь
     const { data, error } = await supabase
       .from('users')
       .select('id')
@@ -166,26 +168,27 @@ useEffect(() => {
     }
 
     if (!data) {
-      // Если пользователь не найден — создаём нового
+      // Пользователя нет — создаём
       const { error: insertError } = await supabase.from('users').insert([
         { user_id: storedUserId, coins }
       ]);
       if (insertError) {
         console.error('❌ Ошибка при создании пользователя в Supabase:', insertError.message);
-        return;
+      } else {
+        console.log('✅ Новый пользователь создан в Supabase');
       }
-      console.log('✅ Новый пользователь создан в Supabase');
     } else {
-      // Если уже есть — просто обновляем coins
+      // Пользователь есть — обновляем монеты
       const { error: updateError } = await supabase
         .from('users')
         .update({ coins })
         .eq('user_id', storedUserId);
+
       if (updateError) {
         console.error('❌ Ошибка при обновлении монет в Supabase:', updateError.message);
-        return;
+      } else {
+        console.log('✅ Монеты обновлены в Supabase:', coins);
       }
-      console.log('✅ Монеты обновлены в Supabase');
     }
   };
 
