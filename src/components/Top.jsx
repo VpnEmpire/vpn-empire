@@ -1,30 +1,62 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Top.css';
 
-const mockTopPlayers = [
-  { name: 'Player1', coins: 1500, color: 'gold' },
-  { name: 'Player2', coins: 1200, color: 'blue' },
-  { name: 'Player3', coins: 1000, color: 'silver' },
-  { name: 'Player4', coins: 800, color: 'purple' }
-];
-
 function Top({ username }) {
-  const userCoins = parseInt(localStorage.getItem('coins')) || 0;
-  const currentUser = {
-    name: username?.trim() || 'Ты',
-    coins: userCoins,
-    color: 'cyan'
-  };
+  const [topPlayers, setTopPlayers] = useState([]);
 
-  const allPlayers = [...mockTopPlayers, currentUser];
-  const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 10);
-  
+  useEffect(() => {
+    const fetchTop = async () => {
+      try {
+        const response = await fetch('/api/top');
+        const result = await response.json();
+        if (result?.top) {
+          const localUserId = localStorage.getItem('user_id');
+          const localCoins = parseInt(localStorage.getItem('coins')) || 0;
+
+          const alreadyInTop = result.top.find(p => p.user_id === localUserId);
+          if (!alreadyInTop && localUserId) {
+            result.top.push({ user_id: localUserId, coins: localCoins });
+          }
+
+          const sorted = [...result.top]
+            .sort((a, b) => b.coins - a.coins)
+            .slice(0, 10);
+
+          setTopPlayers(sorted);
+        }
+      } catch (err) {
+        console.error('Ошибка загрузки топа:', err);
+      }
+    };
+
+    fetchTop();
+  }, []);
+
+  const currentUserId = localStorage.getItem('user_id');
+
+  const allPlayers = topPlayers.map((player, index) => ({
+    name: player.user_id === currentUserId
+      ? username?.trim() || 'Ты'
+      : `Player ${index + 1}`,
+    coins: player.coins,
+    color:
+      index === 0
+        ? 'gold'
+        : index === 1
+        ? 'blue'
+        : index === 2
+        ? 'silver'
+        : player.user_id === currentUserId
+        ? 'cyan'
+        : 'purple'
+  }));
+
   return (
     <div className="top-container">
       <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2>
       <img src="/robot.png" alt="Робот" className="top-robot" />
       <div className="top-list">
-        {sorted.map((player, index) => (
+        {allPlayers.map((player, index) => (
           <div key={index} className={`top-player ${player.color}`}>
             <div className="rank-number">{index + 1}</div>
             <div className="player-name">{player.name}</div>
@@ -36,7 +68,7 @@ function Top({ username }) {
         ))}
       </div>
     </div>
-      );
+  );
 }
 
 export default Top;
