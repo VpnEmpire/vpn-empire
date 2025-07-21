@@ -51,37 +51,31 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [spinResult, setSpinResult] = useState(null);
 
 useEffect(() => {
-  const initDataRaw = window.Telegram?.WebApp?.initData;
   const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
-
-  // Получаем user_id того, кто зашёл
   const currentUser = initDataUnsafe?.user?.id;
-  if (!currentUser) return;
+  const ref = initDataUnsafe?.start_param;
 
-  setUserId(currentUser);
-  localStorage.setItem('user_id', currentUser);
+  if (currentUser) {
+    setUserId(currentUser);
+    localStorage.setItem('user_id', currentUser);
+  }
 
-  // Получаем ref — пригласивший
-  const query = new URLSearchParams(window.location.search);
-  const ref = query.get('startapp') || new URLSearchParams(initDataRaw || '').get('startapp');
+  setReferralInfo({ ref, currentUser }); // 👈 сохраняем для вывода на экран
 
   console.log('📦 Получено из Telegram:', { ref, currentUser });
 
-  // Если переход был по ссылке с рефералом, и пользователь не сам себя пригласил
-  const isFromMiniApp = initDataRaw?.includes('startapp');
-
-  if (isFromMiniApp && ref && ref !== String(currentUser)) {
+  if (ref && ref !== String(currentUser)) {
     console.log('👥 Реферальный переход:', {
-      user_id: String(currentUser),   // тот, кто зашёл
-      referral_id: ref                // тот, кто пригласил
+      user_id: String(currentUser),
+      referral_id: ref
     });
 
     fetch('/api/add-referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: String(currentUser), // кто зашёл
-        referral_id: ref              // кто пригласил
+        user_id: String(currentUser),
+        referral_id: ref
       }),
     })
       .then(res => res.json())
@@ -618,6 +612,13 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
         <div className="coins">💰 Монет: {coins} $RICH</div>
         <div className="rank">🎖 Звание: {rank}</div>
     </div>
+    
+     {/* 🔍 Отладочная информация */}
+    <div style={{ fontSize: '12px', color: '#888', marginBottom: 12 }}>
+      👤 Текущий ID: {referralInfo?.currentUser || '—'} <br />
+      🧲 Пригласивший: {referralInfo?.ref || '—'}
+    </div>
+
       <div className="robot-container">
        <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
          <div className="clicks-left">
