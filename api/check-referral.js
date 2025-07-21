@@ -57,7 +57,7 @@ export default async function handler(req, res) {
 
     // 3. Проверяем, не выполнено ли уже это задание
     const { data: existing, error: existingError } = await supabase
-      .from('referrals_by')
+      .from('referrals')
       .select('*')
       .eq('user_id', user_id)
       .eq('task_key', task_key)
