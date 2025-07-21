@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import './Top.css'; 
-import robotImage from './assets/robot-top.png';
 
 const TopTab = () => {
   const [topPlayers, setTopPlayers] = useState([]);
