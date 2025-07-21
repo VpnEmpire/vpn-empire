@@ -78,7 +78,7 @@ export default async function handler(req, res) {
 
     const { error: updateError } = await supabase
       .from('users')
-      .update({ referrals: newCount })
+      .update({ referrals_by: newCount })
       .eq('user_id', referral_id);
 
     if (updateError) {
