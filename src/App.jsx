@@ -50,41 +50,43 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [spinResult, setSpinResult] = useState(null);
 
 useEffect(() => {
-  const existingId = localStorage.getItem('user_id');
-  if (existingId) {
-    setUserId(existingId);
-    return;
-  }
+  const initDataRaw = window.Telegram?.WebApp?.initData;
+  const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
 
-  const initData = window.Telegram?.WebApp?.initDataUnsafe;
-  if (!initData || !initData.user) return;
+  const urlParams = new URLSearchParams(initDataRaw || '');
+  const ref = urlParams.get('startapp'); // пригласивший
+  const currentUser = initDataUnsafe?.user?.id; // зашедший
 
-  const id = initData.user.id;
-  setUserId(id);
-  localStorage.setItem('user_id', id);
+  console.log('📦 Получено из Telegram:', { ref, currentUser });
 
-  const urlParams = new URLSearchParams(window.Telegram?.WebApp?.initData || '');
-const ref = urlParams.get('startapp');
-console.log('📦 ref =', ref);
-alert('📦 ref = ' + ref);
+  if (!currentUser) return;
 
-  const isFromMiniApp = window.Telegram?.WebApp?.initData?.includes('startapp');
+  setUserId(currentUser);
+  localStorage.setItem('user_id', currentUser);
 
-  if (isFromMiniApp && ref && ref !== String(id)) {
-    console.log("👥 Реферальный переход:", { user_id: String(id), referral_id: ref });
+  const isFromMiniApp = initDataRaw?.includes('startapp');
+
+  if (isFromMiniApp && ref && ref !== String(currentUser)) {
+    console.log('👥 Реферальный переход:', {
+      user_id: String(currentUser),
+      referral_id: ref
+    });
+
     fetch('/api/add-referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: String(id), // 👤 кто зашёл
-        referral_id: ref     // 🔗 кто пригласил
+        user_id: String(currentUser), // кто ЗАШЁЛ
+        referral_id: ref              // кто ПРИГЛАСИЛ
       }),
     })
-      .then((res) => res.json())
-      .then((result) => {
-        console.log('📥 Реферал записан через mini app:', result);
+      .then(res => res.json())
+      .then(data => {
+        console.log('✅ Ответ от add-referral:', data);
       })
-      .catch((err) => console.error('❌ Ошибка записи реферала:', err));
+      .catch(err => {
+        console.error('❌ Ошибка add-referral:', err);
+      });
   }
 }, []);
 
