@@ -149,66 +149,35 @@ useEffect(() => {
   }, []);
 
  useEffect(() => {
-  const storedUserId = localStorage.getItem('user_id');
-  const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
+  const syncCoinsPeriodically = async () => {
+    const storedUserId = localStorage.getItem('user_id');
+    const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
 
-  if (!storedUserId) return;
+    if (!storedUserId) return;
 
-  // 1. Обновление через API при каждом изменении coins
-  fetch('/api/update-coins', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      user_id: storedUserId,
-      coins: storedCoins
-    })
-  })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        console.log('✅ Coins обновлены через API:', storedCoins);
-      } else {
-        console.error('❌ Ошибка обновления монет через API:', res.error);
-      }
-    });
+    const { data: existingUser, error: selectError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('user_id', storedUserId)
+      .single();
 
-  // 2. Периодическая синхронизация напрямую через Supabase
-  const syncCoinsDirectly = async () => {
-    try {
-      const { data: existingUser, error: selectError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('user_id', storedUserId)
-        .single();
+    if (selectError && selectError.code !== 'PGRST116') {
+      console.error('❌ Ошибка при проверке пользователя:', selectError.message);
+      return;
+    }
 
-      if (selectError && selectError.code !== 'PGRST116') {
-        console.error('❌ Ошибка при проверке пользователя:', selectError.message);
-        return;
-      }
-
-      if (existingUser) {
-        await supabase
-          .from('users')
-          .update({ coins: storedCoins })
-          .eq('user_id', storedUserId);
-        console.log('🔁 Монеты синхронизированы через Supabase:', storedCoins);
-      } else {
-        await supabase
-          .from('users')
-          .insert([{ user_id: storedUserId, coins: storedCoins }]);
-        console.log('➕ Новый пользователь добавлен в Supabase');
-      }
-    } catch (err) {
-      console.error('❌ Ошибка прямой синхронизации монет:', err.message);
+    if (existingUser) {
+      await supabase.from('users').update({ coins: storedCoins }).eq('user_id', storedUserId);
+    } else {
+      await supabase.from('users').insert([{ user_id: storedUserId, coins: storedCoins }]);
     }
   };
 
-  // Первый запуск + каждые 2 часа
-  syncCoinsDirectly();
-  const interval = setInterval(syncCoinsDirectly, 2 * 60 * 60 * 1000);
+  syncCoinsPeriodically();
 
+  const interval = setInterval(syncCoinsPeriodically, 2 * 60 * 60 * 1000);
   return () => clearInterval(interval);
-}, [coins]);
+}, []); // ✅ пустой массив — работает только 1 раз и по таймеру
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
