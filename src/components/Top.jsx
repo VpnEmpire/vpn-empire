@@ -1,52 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import './Top.css';
 
-function Top({ username }) {
+function Top() {
   const [topPlayers, setTopPlayers] = useState([]);
+  const userCoins = parseInt(localStorage.getItem('coins')) || 0;
+  const userId = localStorage.getItem('user_id');
+  const username = 'Ты';
 
   useEffect(() => {
-    fetch('/api/top')
-      .then(res => res.json())
-      .then(data => {
-        if (data?.top) {
-          const localUserId = localStorage.getItem('user_id');
-          const localCoins = parseInt(localStorage.getItem('coins')) || 0;
+    const fetchTop = async () => {
+      try {
+        const response = await fetch('/api/top');
+        const result = await response.json();
+        if (result.top) {
+          let players = result.top.map(player => ({
+            name: player.user_id,
+            coins: player.coins,
+            color: 'blue',
+          }));
 
-          // Заменяем монеты для текущего пользователя из localStorage
-          const updatedList = data.top.map(player => {
-            if (player.user_id === localUserId) {
-              return {
-                ...player,
-                coins: localCoins,
-                name: username?.trim() || 'Ты',
-                color: 'cyan'
-              };
-            }
-            return {
-              ...player,
-              name: `Player`,
-              color: 'purple'
-            };
-          });
+          // Добавим текущего пользователя
+          const currentUser = {
+            name: username,
+            coins: userCoins,
+            color: 'cyan',
+            user_id: userId,
+          };
 
-          const isUserIncluded = updatedList.some(p => p.user_id === localUserId);
-          if (!isUserIncluded && localUserId) {
-            updatedList.push({
-              user_id: localUserId,
-              coins: localCoins,
-              name: username?.trim() || 'Ты',
-              color: 'cyan'
-            });
+          // Если пользователь уже есть в списке — заменим
+          const existingIndex = players.findIndex(p => p.user_id === userId);
+          if (existingIndex !== -1) {
+            players[existingIndex] = currentUser;
+          } else {
+            players.push(currentUser);
           }
 
-          const sorted = updatedList.sort((a, b) => b.coins - a.coins).slice(0, 10);
+          const sorted = players
+            .sort((a, b) => b.coins - a.coins)
+            .slice(0, 10);
+
           setTopPlayers(sorted);
         }
-      })
-      .catch(err => {
-        console.error('Ошибка при загрузке топа:', err);
-      });
-  }, [username]);
+      } catch (error) {
+        console.error('Ошибка загрузки топа:', error);
+      }
+    };
+
+    fetchTop();
+  }, []);
 
   return (
     <div className="top-container">
@@ -54,7 +55,7 @@ function Top({ username }) {
       <img src="/robot.png" alt="Робот" className="top-robot" />
       <div className="top-list">
         {topPlayers.map((player, index) => (
-          <div key={index} className={`top-player ${player.color || ''}`}>
+          <div key={index} className={`top-player ${player.color}`}>
             <div className="rank-number">{index + 1}</div>
             <div className="player-name">{player.name}</div>
             <div className="player-coins">
