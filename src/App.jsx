@@ -49,7 +49,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [canSpin, setCanSpin] = useState(true);
   const [spinResult, setSpinResult] = useState(null);
 
-  useEffect(() => {
+useEffect(() => {
   const existingId = localStorage.getItem('user_id');
   if (existingId) {
     setUserId(existingId);
@@ -69,14 +69,15 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const isFromMiniApp = window.Telegram?.WebApp?.initData?.includes('startapp');
 
   if (isFromMiniApp && ref && ref !== String(id)) {
+    console.log("👥 Реферальный переход:", { user_id: String(id), referral_id: ref });
     fetch('/api/add-referral', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    user_id: String(id),     // кто зашёл 👈 ПРАВИЛЬНО
-    referral_id: ref         // кто пригласил 👈 ПРАВИЛЬНО
-  }),
-})
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: String(id), // 👤 кто зашёл
+        referral_id: ref     // 🔗 кто пригласил
+      }),
+    })
       .then((res) => res.json())
       .then((result) => {
         console.log('📥 Реферал записан через mini app:', result);
