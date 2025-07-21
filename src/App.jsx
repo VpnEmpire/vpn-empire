@@ -149,23 +149,47 @@ useEffect(() => {
   }, []);
 
  useEffect(() => {
-  const storedUserId = localStorage.getItem('user_id');
-  if (!storedUserId || coins === undefined || coins === null) return;
+  const syncUserCoins = async () => {
+    const storedUserId = localStorage.getItem('user_id');
+    if (!storedUserId) return;
 
-  // Только если coins число
-  const parsedCoins = parseInt(coins, 10);
-  if (isNaN(parsedCoins)) return;
+    // Проверка, существует ли уже пользователь в Supabase
+    const { data, error } = await supabase
+      .from('users')
+      .select('id')
+      .eq('user_id', storedUserId)
+      .single();
 
-  supabase
-    .from('users')
-    .upsert({ user_id: storedUserId, coins: parsedCoins })
-    .then(({ error }) => {
-      if (error) {
-        console.error('❌ Ошибка при записи монет в Supabase:', error.message);
-      } else {
-        console.log('✅ Монеты успешно записаны в Supabase:', parsedCoins);
+    if (error && error.code !== 'PGRST116') {
+      console.error('❌ Ошибка при проверке пользователя в Supabase:', error.message);
+      return;
+    }
+
+    if (!data) {
+      // Если пользователь не найден — создаём нового
+      const { error: insertError } = await supabase.from('users').insert([
+        { user_id: storedUserId, coins }
+      ]);
+      if (insertError) {
+        console.error('❌ Ошибка при создании пользователя в Supabase:', insertError.message);
+        return;
       }
-    });
+      console.log('✅ Новый пользователь создан в Supabase');
+    } else {
+      // Если уже есть — просто обновляем coins
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ coins })
+        .eq('user_id', storedUserId);
+      if (updateError) {
+        console.error('❌ Ошибка при обновлении монет в Supabase:', updateError.message);
+        return;
+      }
+      console.log('✅ Монеты обновлены в Supabase');
+    }
+  };
+
+  syncUserCoins();
 }, [coins]);
 
   const updateRank = (totalCoins) => {
