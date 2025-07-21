@@ -7,15 +7,15 @@ function Top({ username }) {
   useEffect(() => {
     const fetchTop = async () => {
       try {
-        const res = await fetch('/api/top');
-        const json = await res.json();
-        const data = json.top || [];
+        const response = await fetch('/api/top');
+        const result = await response.json();
+        const data = result.top || [];
 
         const localUserId = localStorage.getItem('user_id');
         const localCoins = parseInt(localStorage.getItem('coins')) || 0;
-        const alreadyInTop = data.find(p => p.user_id === localUserId);
 
-        if (!alreadyInTop && localUserId) {
+        const alreadyExists = data.some(p => p.user_id === localUserId);
+        if (!alreadyExists && localUserId) {
           data.push({ user_id: localUserId, coins: localCoins });
         }
 
@@ -35,14 +35,10 @@ function Top({ username }) {
   const currentUserId = localStorage.getItem('user_id');
 
   const allPlayers = topPlayers.map((player, index) => ({
-    name:
-      player.user_id === currentUserId
-        ? username?.trim() || 'Ты'
-        : `Player ${index + 1}`,
-    coins:
-      player.user_id === currentUserId
-        ? parseInt(localStorage.getItem('coins')) || 0
-        : player.coins,
+    name: player.user_id === currentUserId
+      ? username?.trim() || 'Ты'
+      : `Игрок ${index + 1}`,
+    coins: player.coins,
     color:
       index === 0
         ? 'gold'
