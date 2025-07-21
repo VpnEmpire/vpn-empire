@@ -50,34 +50,29 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [spinResult, setSpinResult] = useState(null);
 
 useEffect(() => {
-  const initDataRaw = window.Telegram?.WebApp?.initData;
   const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
+  const currentUser = initDataUnsafe?.user?.id?.toString();
+  const referralId = initDataUnsafe?.start_param;
 
-  const urlParams = new URLSearchParams(initDataRaw || '');
-  const ref = urlParams.get('startapp'); // пригласивший
-  const currentUser = initDataUnsafe?.user?.id; // зашедший
-
-  console.log('📦 Получено из Telegram:', { ref, currentUser });
+  console.log('📦 Получено из Telegram:', { referralId, currentUser });
 
   if (!currentUser) return;
 
   setUserId(currentUser);
   localStorage.setItem('user_id', currentUser);
 
-  const isFromMiniApp = initDataRaw?.includes('startapp');
-
-  if (isFromMiniApp && ref && ref !== String(currentUser)) {
+  if (referralId && referralId !== currentUser) {
     console.log('👥 Реферальный переход:', {
-      user_id: String(currentUser),
-      referral_id: ref
+      user_id: currentUser,
+      referral_id: referralId
     });
 
     fetch('/api/add-referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: String(currentUser), // кто ЗАШЁЛ
-        referral_id: ref              // кто ПРИГЛАСИЛ
+        user_id: currentUser,      // кто зашёл
+        referral_id: referralId    // кто пригласил
       }),
     })
       .then(res => res.json())
