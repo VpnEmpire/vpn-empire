@@ -48,10 +48,24 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: 'Ошибка вставки' });
   }
 
-  // 3. Увеличим счётчик рефералов у пригласившего
+   // 3. Получим текущий счётчик у пригласившего
+  const { data: userData, error: fetchUserError } = await supabase
+    .from('users')
+    .select('referrals')
+    .eq('user_id', referral_id)
+    .maybeSingle();
+
+  if (fetchUserError || !userData) {
+    console.error('❌ Ошибка при получении текущего счётчика:', fetchUserError);
+    return res.status(500).json({ success: false, error: 'Ошибка получения счётчика' });
+  }
+
+  const newCount = (userData.referrals || 0) + 1;
+
+  // 4. Обновим счётчик у пригласившего
   const { error: updateError } = await supabase
     .from('users')
-    .update({ referrals: supabase.raw('referrals + 1') }) // ✅ корректно
+    .update({ referrals: newCount })
     .eq('user_id', referral_id);
 
   if (updateError) {
