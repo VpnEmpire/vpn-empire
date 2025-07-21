@@ -64,7 +64,7 @@ export default async function handler(req, res) {
   if (!userData) {
     const { error: createError } = await supabase
       .from('users')
-      .insert([{ user_id: referral_id, referrals: 1 }]);
+      .insert([{ user_id: referral_id, referrals_by: 1 }]);
 
     if (createError) {
       console.error('❌ Ошибка при создании пользователя:', createError);
