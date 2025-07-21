@@ -1,73 +1,61 @@
 import React, { useEffect, useState } from 'react';
-import './Top.css';
+import './styles/TopTab.css';
+import robotImage from './assets/robot-top.png';
 
-function Top({ username }) {
+const TopTab = () => {
   const [topPlayers, setTopPlayers] = useState([]);
-  const localUserId = localStorage.getItem('user_id');
-  const localCoins = parseInt(localStorage.getItem('coins')) || 0;
+  const [userId, setUserId] = useState(null);
+  const [userCoins, setUserCoins] = useState(0);
 
   useEffect(() => {
     const fetchTop = async () => {
       try {
         const response = await fetch('/api/top');
         const result = await response.json();
-        const data = result.top || [];
-
-        // Добавляем текущего пользователя в список, если его ещё нет
-        const alreadyExists = data.some(p => p.user_id === localUserId);
-        if (!alreadyExists && localUserId) {
-          data.push({ user_id: localUserId, coins: localCoins });
+        if (result.top) {
+          setTopPlayers(result.top);
         }
-
-        const sorted = [...data]
-          .sort((a, b) => b.coins - a.coins)
-          .slice(0, 10);
-
-        setTopPlayers(sorted);
-      } catch (err) {
-        console.error('❌ Ошибка загрузки топа:', err);
+      } catch (error) {
+        console.error('Ошибка при загрузке топа:', error);
       }
     };
+
+    const storedUserId = localStorage.getItem('user_id');
+    const storedCoins = localStorage.getItem('coins');
+    setUserId(storedUserId);
+    if (storedCoins) setUserCoins(parseInt(storedCoins));
 
     fetchTop();
   }, []);
 
-  const allPlayers = topPlayers.map((player, index) => {
-    const isCurrentUser = player.user_id === localUserId;
-    return {
-      name: isCurrentUser ? username?.trim() || 'Ты' : `Игрок ${index + 1}`,
-      coins: isCurrentUser ? localCoins : player.coins,
-      color:
-        index === 0
-          ? 'gold'
-          : index === 1
-          ? 'blue'
-          : index === 2
-          ? 'silver'
-          : isCurrentUser
-          ? 'cyan'
-          : 'purple'
-    };
-  });
-
   return (
     <div className="top-container">
       <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2>
-      <img src="/robot.png" alt="Робот" className="top-robot" />
       <div className="top-list">
-        {allPlayers.map((player, index) => (
-          <div key={index} className={`top-player ${player.color}`}>
-            <div className="rank-number">{index + 1}</div>
-            <div className="player-name">{player.name}</div>
-            <div className="player-coins">
-              <img src="/trophy.png" alt="Кубок" className="trophy-icon" />
-              {player.coins}
+        {topPlayers.length === 0 && (
+          <img src={robotImage} alt="robot" className="top-robot" />
+        )}
+        {topPlayers.map((player, index) => {
+          const isCurrentUser = player.user_id === userId;
+          const displayCoins = isCurrentUser ? userCoins : player.coins;
+
+          return (
+            <div
+              key={player.user_id}
+              className={`top-card ${isCurrentUser ? 'top-card-current' : ''}`}
+            >
+              <div className="top-rank">#{index + 1}</div>
+              <img src={robotImage} alt="robot" className="top-avatar" />
+              <div className="top-info">
+                <div className="top-user">ID: {player.user_id}</div>
+                <div className="top-coins">💰 {displayCoins} монет</div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
-}
+};
 
-export default Top;
+export default TopTab;
