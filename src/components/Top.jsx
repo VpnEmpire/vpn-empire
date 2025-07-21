@@ -1,39 +1,55 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../supabaseClient';
+import './Top.css';
 
 function Top({ username }) {
   const [topPlayers, setTopPlayers] = useState([]);
 
   useEffect(() => {
-    const fetchTopPlayers = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('user_id, coins')
-          .order('coins', { ascending: false })
-          .limit(50); // ✅ лимит 50
+    const fetchPlayers = async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('user_id, coins')
+        .order('coins', { ascending: false })
+        .limit(50);
 
-        if (error) throw error;
-        if (data) setTopPlayers(data);
-      } catch (err) {
-        console.error('❌ Ошибка при загрузке топа:', err.message);
+      if (error) {
+        console.error('❌ Ошибка загрузки топа:', error.message);
+        return;
       }
+
+      const localUserId = localStorage.getItem('user_id');
+      const localCoins = parseInt(localStorage.getItem('coins')) || 0;
+
+      const alreadyInList = data.find(p => p.user_id === localUserId);
+      if (!alreadyInList && localUserId) {
+        data.push({ user_id: localUserId, coins: localCoins });
+      }
+
+      const sorted = [...data].sort((a, b) => b.coins - a.coins).slice(0, 10);
+      setTopPlayers(sorted);
     };
 
-    fetchTopPlayers();
+    fetchPlayers();
   }, []);
 
-  const storedUserId = localStorage.getItem('user_id');
-  const currentUserCoins = parseInt(localStorage.getItem('coins')) || 0;
+  const currentUserId = localStorage.getItem('user_id');
 
-  const playersWithNames = topPlayers.map((player) => ({
-    name: player.user_id === storedUserId ? 'Ты' : `ID ${player.user_id?.slice(-4) || '0000'}`,
+  const allPlayers = topPlayers.map((player, index) => ({
+    name: player.user_id === currentUserId
+      ? username?.trim() || 'Ты'
+      : `Player ${index + 1}`,
     coins: player.coins,
-    color: player.user_id === storedUserId ? 'cyan' : 'gray'
+    color:
+      index === 0
+        ? 'gold'
+        : index === 1
+        ? 'blue'
+        : index === 2
+        ? 'silver'
+        : player.user_id === currentUserId
+        ? 'cyan'
+        : 'purple'
   }));
 
   return (
@@ -41,7 +57,7 @@ function Top({ username }) {
       <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2>
       <img src="/robot.png" alt="Робот" className="top-robot" />
       <div className="top-list">
-        {playersWithNames.map((player, index) => (
+        {allPlayers.map((player, index) => (
           <div key={index} className={`top-player ${player.color}`}>
             <div className="rank-number">{index + 1}</div>
             <div className="player-name">{player.name}</div>
