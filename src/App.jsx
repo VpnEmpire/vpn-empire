@@ -234,17 +234,36 @@ if (task.type === 'referral') {
     return;
   }
 
-  console.log('📌 Реферальное задание:', task.key);
-  console.log('🧪 Требуется пригласить:', task.requiresReferralCount);
+  const urlParams = new URLSearchParams(window.Telegram?.WebApp?.initData || '');
+  const ref = urlParams.get('startapp'); // ID пригласившего
 
-  const refLink = `https://t.me/OrdoHereticus_bot?start=${userId}`;
+  if (ref && ref !== String(userId)) {
+    // 🔁 Повторная попытка отправить реферала
+    try {
+      const res = await fetch('/api/add-referral', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: String(userId),
+          referral_id: ref,
+        }),
+      });
+      const result = await res.json();
+      console.log('🔄 add-referral повторно:', result);
+    } catch (e) {
+      console.error('❌ Ошибка повторного add-referral:', e);
+    }
+  }
+
+  // Копируем ссылку и открываем окно
+  const refLink = `https://t.me/OrdoHereticus_bot/vpnempire?startapp=${userId}`;
   try {
     if (window.Telegram?.WebApp?.clipboard?.writeText) {
       await window.Telegram.WebApp.clipboard.writeText(refLink);
     } else {
       await navigator.clipboard.writeText(refLink);
     }
-    setCopiedLink(refLink);
+    setCopiedLink(task.key);
     setShowReferralModal(true);
   } catch (e) {
     alert(`Скопируй вручную:\n${refLink}`);
@@ -265,12 +284,9 @@ if (task.type === 'referral') {
     const invited = data.invited ?? 0;
     setReferrals(invited);
 
-    console.log('👥 Приглашено друзей:', invited);
-
     if (data.success) {
       completeTask(task);
 
-      // ✅ Проверим, все ли реф. задания выполнены
       const allReferralDone = tasks
         .filter(t => t.type === 'referral')
         .every(t => completedTasks[t.key] || t.key === task.key);
@@ -291,6 +307,7 @@ if (task.type === 'referral') {
     console.error('❌ Ошибка при запросе /api/check-referral:', err);
     alert('❌ Ты ещё не выполнил это задание. Пригласи друзей по своей ссылке и возвращайся!');
   }
+
   return;
 }
 
