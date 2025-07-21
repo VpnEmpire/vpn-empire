@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
-import './Top.css';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 function Top({ username }) {
   const [topPlayers, setTopPlayers] = useState([]);
