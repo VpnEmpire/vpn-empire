@@ -3,6 +3,8 @@ import './Top.css';
 
 function Top({ username }) {
   const [topPlayers, setTopPlayers] = useState([]);
+  const localUserId = localStorage.getItem('user_id');
+  const localCoins = parseInt(localStorage.getItem('coins')) || 0;
 
   useEffect(() => {
     const fetchTop = async () => {
@@ -11,9 +13,7 @@ function Top({ username }) {
         const result = await response.json();
         const data = result.top || [];
 
-        const localUserId = localStorage.getItem('user_id');
-        const localCoins = parseInt(localStorage.getItem('coins')) || 0;
-
+        // Добавляем текущего пользователя в список, если его ещё нет
         const alreadyExists = data.some(p => p.user_id === localUserId);
         if (!alreadyExists && localUserId) {
           data.push({ user_id: localUserId, coins: localCoins });
@@ -32,24 +32,23 @@ function Top({ username }) {
     fetchTop();
   }, []);
 
-  const currentUserId = localStorage.getItem('user_id');
-
-  const allPlayers = topPlayers.map((player, index) => ({
-    name: player.user_id === currentUserId
-      ? username?.trim() || 'Ты'
-      : `Игрок ${index + 1}`,
-    coins: player.coins,
-    color:
-      index === 0
-        ? 'gold'
-        : index === 1
-        ? 'blue'
-        : index === 2
-        ? 'silver'
-        : player.user_id === currentUserId
-        ? 'cyan'
-        : 'purple'
-  }));
+  const allPlayers = topPlayers.map((player, index) => {
+    const isCurrentUser = player.user_id === localUserId;
+    return {
+      name: isCurrentUser ? username?.trim() || 'Ты' : `Игрок ${index + 1}`,
+      coins: isCurrentUser ? localCoins : player.coins,
+      color:
+        index === 0
+          ? 'gold'
+          : index === 1
+          ? 'blue'
+          : index === 2
+          ? 'silver'
+          : isCurrentUser
+          ? 'cyan'
+          : 'purple'
+    };
+  });
 
   return (
     <div className="top-container">
