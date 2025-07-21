@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: 'Ошибка вставки' });
   }
 
-   // 3. Получим текущий счётчик у пригласившего
+  // 3. Получим текущий счётчик у пригласившего
   const { data: userData, error: fetchUserError } = await supabase
     .from('users')
     .select('referrals')
@@ -56,26 +56,37 @@ export default async function handler(req, res) {
     .maybeSingle();
 
   if (fetchUserError) {
-  console.error('❌ Ошибка Supabase:', fetchUserError);
-  return res.status(500).json({ success: false, error: 'Ошибка при получении счётчика' });
-}
+    console.error('❌ Ошибка Supabase:', fetchUserError);
+    return res.status(500).json({ success: false, error: 'Ошибка при получении счётчика' });
+  }
 
-if (!userData || userData.referrals === undefined) {
-  console.error('❌ Не удалось получить поле referrals:', userData);
-  return res.status(500).json({ success: false, error: 'Счётчик не найден' });
-}
+  // 3.1 Если пользователя нет — создаём
+  if (!userData) {
+    const { error: createError } = await supabase
+      .from('users')
+      .insert([{ user_id: referral_id, referrals: 1 }]);
 
-  const newCount = (userData.referrals || 0) + 1;
+    if (createError) {
+      console.error('❌ Ошибка при создании пользователя:', createError);
+      return res.status(500).json({ success: false, error: 'Ошибка создания пользователя' });
+    }
 
-  // 4. Обновим счётчик у пригласившего
-  const { error: updateError } = await supabase
-    .from('users')
-    .update({ referrals: newCount })
-    .eq('user_id', referral_id);
+    console.log(`✅ Пользователь ${referral_id} создан с 1 рефералом`);
+  } else {
+    // 3.2 Если есть — увеличим счётчик
+    const newCount = (userData.referrals || 0) + 1;
 
-  if (updateError) {
-    console.error('❌ Ошибка при обновлении счётчика:', updateError);
-    return res.status(500).json({ success: false, error: 'Ошибка обновления счётчика' });
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ referrals: newCount })
+      .eq('user_id', referral_id);
+
+    if (updateError) {
+      console.error('❌ Ошибка при обновлении счётчика:', updateError);
+      return res.status(500).json({ success: false, error: 'Ошибка обновления счётчика' });
+    }
+
+    console.log(`✅ Обновлён счётчик: ${referral_id} → ${newCount}`);
   }
 
   console.log(`✅ Добавлен новый реферал: ${referral_id} → ${user_id}`);
