@@ -76,7 +76,7 @@ export default async function handler(req, res) {
     // 4. Сохраняем выполнение задания
     const { error: insertError } = await supabase
       .from('referrals')
-      .insert([{ user_id, task_key }]);
+      .insert([{ user_id, referral_id, task_key, source: 'game' }]);
 
     if (insertError) {
       console.error('❌ Ошибка при сохранении выполнения:', insertError.message);
