@@ -13,31 +13,22 @@ function Top({ username }) {
       const { data, error } = await supabase
         .from('users')
         .select('user_id, coins')
-        .order('coins', { ascending: false })
-        .limit(10);
+        .order('coins', { ascending: false });
 
       if (error) {
         console.error('Ошибка при загрузке топ игроков:', error);
         return;
       }
 
-      const formatted = data.map((player, index) => ({
-        name: player.user_id === userId ? currentUserName : player.user_id,
-        coins: player.coins,
-        isCurrentUser: player.user_id === userId,
-      }));
+      const formatted = data
+        .filter(player => player.coins > 0)
+        .map(player => ({
+          name: player.user_id === userId ? currentUserName : player.user_id,
+          coins: player.coins,
+          isCurrentUser: player.user_id === userId,
+        }));
 
-      const isInTop = formatted.some(p => p.isCurrentUser);
-      if (!isInTop) {
-        formatted.push({
-          name: currentUserName,
-          coins: userCoins,
-          isCurrentUser: true,
-        });
-      }
-
-      const sorted = formatted.sort((a, b) => b.coins - a.coins).slice(0, 10);
-      setTopPlayers(sorted);
+      setTopPlayers(formatted.slice(0, 10));
     };
 
     fetchTopPlayers();
