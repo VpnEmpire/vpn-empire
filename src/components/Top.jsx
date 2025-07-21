@@ -4,7 +4,6 @@ import supabase from '../supabaseClient';
 
 function Top({ username }) {
   const [topPlayers, setTopPlayers] = useState([]);
-  const userCoins = parseInt(localStorage.getItem('coins')) || 0;
   const userId = localStorage.getItem('user_id') || '';
   const currentUserName = username?.trim() || 'Ты';
 
@@ -13,26 +12,25 @@ function Top({ username }) {
       const { data, error } = await supabase
         .from('users')
         .select('user_id, coins')
-        .order('coins', { ascending: false });
+        .order('coins', { ascending: false })
+        .limit(10);
 
       if (error) {
-        console.error('❌ Ошибка при загрузке топ игроков:', error);
+        console.error('Ошибка при загрузке топ игроков:', error);
         return;
       }
 
-      console.log('👥 Получены игроки из Supabase:', data);
-
-      const formatted = data.map(player => ({
+      const formatted = data.map((player, index) => ({
         name: player.user_id === userId ? currentUserName : player.user_id,
         coins: player.coins,
         isCurrentUser: player.user_id === userId,
       }));
 
-      setTopPlayers(formatted.slice(0, 10));
+      setTopPlayers(formatted);
     };
 
     fetchTopPlayers();
-  }, [userId, userCoins]);
+  }, [userId]);
 
   return (
     <div className="top-container">
