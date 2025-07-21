@@ -149,15 +149,24 @@ useEffect(() => {
   }, []);
 
  useEffect(() => {
-    if (!userId) return;
-    supabase
-      .from('users')
-      .update({ coins })
-      .eq('user_id', String(userId))
-      .then(({ error }) => {
-        if (error) console.error('❌ Ошибка обновления монет в Supabase:', error);
-      });
-  }, [coins, userId]);
+  const storedUserId = localStorage.getItem('user_id');
+  if (!storedUserId || coins === undefined || coins === null) return;
+
+  // Только если coins число
+  const parsedCoins = parseInt(coins, 10);
+  if (isNaN(parsedCoins)) return;
+
+  supabase
+    .from('users')
+    .upsert({ user_id: storedUserId, coins: parsedCoins })
+    .then(({ error }) => {
+      if (error) {
+        console.error('❌ Ошибка при записи монет в Supabase:', error.message);
+      } else {
+        console.log('✅ Монеты успешно записаны в Supabase:', parsedCoins);
+      }
+    });
+}, [coins]);
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
