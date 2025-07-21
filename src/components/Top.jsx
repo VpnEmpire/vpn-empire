@@ -1,30 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../supabaseClient';
 import './Top.css';
 
-const mockTopPlayers = [
-  { name: 'Player1', coins: 1500, color: 'gold' },
-  { name: 'Player2', coins: 1200, color: 'blue' },
-  { name: 'Player3', coins: 1000, color: 'silver' },
-  { name: 'Player4', coins: 800, color: 'purple' }
-];
-
 function Top({ username }) {
-  const userCoins = parseInt(localStorage.getItem('coins')) || 0;
-  const currentUser = {
-    name: username?.trim() || 'Ты',
-    coins: userCoins,
-    color: 'cyan'
-  };
+  const [topPlayers, setTopPlayers] = useState([]);
 
-  const allPlayers = [...mockTopPlayers, currentUser];
-  const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 10);
-  
+  useEffect(() => {
+    const fetchTopPlayers = async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('user_id, coins')
+        .order('coins', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error('❌ Ошибка при загрузке топа:', error.message);
+      } else {
+        setTopPlayers(data);
+      }
+    };
+
+    fetchTopPlayers();
+  }, []);
+
+  const storedUserId = localStorage.getItem('user_id');
+  const currentUserCoins = parseInt(localStorage.getItem('coins')) || 0;
+
+  const playersWithNames = topPlayers.map((player) => ({
+    name: player.user_id === storedUserId ? 'Ты' : `ID ${player.user_id.slice(-4)}`,
+    coins: player.coins,
+    color: player.user_id === storedUserId ? 'cyan' : 'gray'
+  }));
+
   return (
     <div className="top-container">
       <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2>
       <img src="/robot.png" alt="Робот" className="top-robot" />
       <div className="top-list">
-        {sorted.map((player, index) => (
+        {playersWithNames.map((player, index) => (
           <div key={index} className={`top-player ${player.color}`}>
             <div className="rank-number">{index + 1}</div>
             <div className="player-name">{player.name}</div>
@@ -36,7 +49,7 @@ function Top({ username }) {
         ))}
       </div>
     </div>
-      );
+  );
 }
 
 export default Top;
