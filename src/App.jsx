@@ -50,50 +50,46 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [spinResult, setSpinResult] = useState(null);
 
 useEffect(() => {
-  const onReady = () => {
-    const initDataRaw = window.Telegram?.WebApp?.initData;
-    const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
-    const currentUser = initDataUnsafe?.user?.id;
+  const initDataRaw = window.Telegram?.WebApp?.initData;
+  const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
 
-    const urlParams = new URLSearchParams(initDataRaw || '');
-    const query = new URLSearchParams(window.location.search);
+  // Получаем user_id того, кто зашёл
+  const currentUser = initDataUnsafe?.user?.id;
+  if (!currentUser) return;
 
-    const ref = query.get('startapp') || urlParams.get('startapp');
+  setUserId(currentUser);
+  localStorage.setItem('user_id', currentUser);
 
-    console.log('📦 Получено из Telegram:', { ref, currentUser });
+  // Получаем ref — пригласивший
+  const query = new URLSearchParams(window.location.search);
+  const ref = query.get('startapp') || new URLSearchParams(initDataRaw || '').get('startapp');
 
-    if (!currentUser) return;
+  console.log('📦 Получено из Telegram:', { ref, currentUser });
 
-    setUserId(currentUser);
-    localStorage.setItem('user_id', currentUser);
+  // Если переход был по ссылке с рефералом, и пользователь не сам себя пригласил
+  const isFromMiniApp = initDataRaw?.includes('startapp');
 
-    if (ref && ref !== String(currentUser)) {
-      console.log('👥 Реферальный переход:', {
-        user_id: String(currentUser),
-        referral_id: ref
-      });
+  if (isFromMiniApp && ref && ref !== String(currentUser)) {
+    console.log('👥 Реферальный переход:', {
+      user_id: String(currentUser),   // тот, кто зашёл
+      referral_id: ref                // тот, кто пригласил
+    });
 
-      fetch('/api/add-referral', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: String(currentUser),
-          referral_id: ref
-        }),
+    fetch('/api/add-referral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: String(currentUser), // кто зашёл
+        referral_id: ref              // кто пригласил
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log('✅ Ответ от add-referral:', data);
       })
-        .then(res => res.json())
-        .then(data => {
-          console.log('✅ Ответ от add-referral:', data);
-        })
-        .catch(err => {
-          console.error('❌ Ошибка add-referral:', err);
-        });
-    }
-  };
-
-  if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.ready(); // обязательно!
-    setTimeout(onReady, 100); // короткая задержка — Telegram успевает отдать initData
+      .catch(err => {
+        console.error('❌ Ошибка add-referral:', err);
+      });
   }
 }, []);
 
