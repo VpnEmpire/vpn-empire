@@ -149,6 +149,23 @@ useEffect(() => {
     }
   }, []);
 
+useEffect(() => {
+  async function fetchPlayers() {
+    try {
+      const res = await fetch('/api/top');
+      if (!res.ok) throw new Error('Ошибка сети');
+      const data = await res.json();
+      setRealPlayers(data.players || []);
+    } catch (error) {
+      console.error('Ошибка загрузки игроков:', error);
+    }
+  }
+  fetchPlayers();
+
+  const interval = setInterval(fetchPlayers, 7200000); // обновлять каждые 2 часа
+  return () => clearInterval(interval);
+}, []);
+
  useEffect(() => {
   const syncCoinsPeriodically = async () => {
     const storedUserId = localStorage.getItem('user_id');
