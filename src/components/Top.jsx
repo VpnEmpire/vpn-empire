@@ -30,20 +30,30 @@ function Top({ username }) {
     return () => clearInterval(interval);
   }, []);
 
-  // Используем реальные имена и цвета без замены
+  // Копируем список игроков из Supabase
   let allPlayers = realPlayers.map(p => ({
-  name: p.name || `Пользователь ${p.user_id}`, // p.name, если есть
-  coins: p.coins,
-  user_id: p.user_id,
-  color: 'blue' // фиксируем синий цвет, если нет данных
-}));
+    ...p,
+    name: p.name || `Пользователь ${p.user_id}`,
+    color: p.color || 'blue'
+  }));
 
-  const currentInList = allPlayers.some(p => p.user_id === currentUser.user_id);
+  // Находим текущего игрока в списке
+  const currentIndex = allPlayers.findIndex(p => p.user_id === currentUser.user_id);
 
-  if (!currentInList) {
-    allPlayers = [...allPlayers, currentUser];
+  if (currentIndex !== -1) {
+    // Заменяем монеты текущего игрока на актуальные из localStorage
+    allPlayers[currentIndex] = {
+      ...allPlayers[currentIndex],
+      coins: currentUser.coins,
+      name: currentUser.name,
+      color: currentUser.color
+    };
+  } else {
+    // Если текущего игрока нет в списке, добавляем его
+    allPlayers.push(currentUser);
   }
 
+  // Сортируем и берём топ 10
   const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 10);
 
   return (
