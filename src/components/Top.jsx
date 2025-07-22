@@ -4,9 +4,11 @@ import './Top.css';
 function Top({ username }) {
   const [realPlayers, setRealPlayers] = useState([]);
   const userCoins = parseInt(localStorage.getItem('coins')) || 0;
+  const currentUserId = localStorage.getItem('user_id') || 'current_user';
+
   const currentUser = {
     name: username?.trim() || 'Ты',
-    user_id: 'current_user', // уникальный id для текущего игрока (можно из localStorage, если есть)
+    user_id: currentUserId,
     coins: userCoins,
     color: 'cyan'
   };
@@ -28,22 +30,20 @@ function Top({ username }) {
     return () => clearInterval(interval);
   }, []);
 
-  // Объединяем реальных игроков с текущим (если он не в списке)
+  // Используем реальные имена и цвета без замены
   let allPlayers = realPlayers.map(p => ({
-    name: `Пользователь ${p.user_id}`,
+    name: p.name || `Пользователь ${p.user_id}`,
     coins: p.coins,
     user_id: p.user_id,
-    color: 'blue' // цвет для реальных игроков
+    color: p.color || 'blue' // если нет цвета, синий по умолчанию
   }));
 
-  // Проверяем, есть ли текущий игрок в списке
   const currentInList = allPlayers.some(p => p.user_id === currentUser.user_id);
 
   if (!currentInList) {
     allPlayers = [...allPlayers, currentUser];
   }
 
-  // Сортируем и берём топ 10
   const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 10);
 
   return (
