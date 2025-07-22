@@ -1,9 +1,10 @@
 // /api/top.js
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.VITE_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 export default async function handler(req, res) {
   try {
