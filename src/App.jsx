@@ -633,16 +633,6 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
     <div className="task-card disabled-task">
       <span>🔒 <strong>Скоро новое задание</strong> — 🔜 Ожидай обновлений</span>
     </div>
- 
-    <button
-      style={{ marginTop: 20 }}
-      onClick={() => {
-        localStorage.clear();
-        window.location.reload();
-      }}
-    >
-      🔄 Сбросить данные (тест)
-    </button>
   </div>
 );
  
