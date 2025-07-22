@@ -54,7 +54,7 @@ function Top({ username }) {
   }
 
   // Сортируем и берём топ 10
-  const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 10);
+  const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 100);
 
   return (
     <div className="top-container">
