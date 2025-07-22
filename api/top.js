@@ -1,4 +1,3 @@
-// /api/top.js
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -10,7 +9,7 @@ export default async function handler(req, res) {
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('user_id,coins')
+      .select('user_id, coins, name, color') // добавь name и color, если есть
       .order('coins', { ascending: false })
       .limit(50);
 
@@ -19,7 +18,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Ошибка при получении топа' });
     }
 
-    return res.status(200).json({ top: data });
+    return res.status(200).json({ players: data }); // Ключ должен быть players
   } catch (err) {
     console.error('❌ Ошибка при получении топа:', err);
     return res.status(500).json({ error: 'Internal Server Error' });
