@@ -652,12 +652,6 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
         <div className="coins">💰 Монет: {coins} $RICH</div>
         <div className="rank">🎖 Звание: {rank}</div>
     </div>
-    
-     {/* 🔍 Отладочная информация */}
-    <div style={{ fontSize: '12px', color: '#888', marginBottom: 12 }}>
-      👤 Текущий ID: {referralInfo?.currentUser || '—'} <br />
-      🧲 Пригласивший: {referralInfo?.ref || '—'}
-    </div>
 
       <div className="robot-container">
        <img src="/robot.png" alt="robot" className="robot" onClick={handleClick} />
