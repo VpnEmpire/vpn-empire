@@ -32,11 +32,11 @@ function Top({ username }) {
 
   // Используем реальные имена и цвета без замены
   let allPlayers = realPlayers.map(p => ({
-    name: p.name || `Пользователь ${p.user_id}`,
-    coins: p.coins,
-    user_id: p.user_id,
-    color: p.color || 'blue' // если нет цвета, синий по умолчанию
-  }));
+  name: p.name || `Пользователь ${p.user_id}`, // p.name, если есть
+  coins: p.coins,
+  user_id: p.user_id,
+  color: 'blue' // фиксируем синий цвет, если нет данных
+}));
 
   const currentInList = allPlayers.some(p => p.user_id === currentUser.user_id);
 
