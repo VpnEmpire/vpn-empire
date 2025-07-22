@@ -50,10 +50,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const winSoundRef = useRef(null);
   const [canSpin, setCanSpin] = useState(true);
   const [spinResult, setSpinResult] = useState(null);
-
-useEffect(() => {
-  localStorage.clear(); // полностью очищает всё
-}, []);
+  
 
 useEffect(() => {
   const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
