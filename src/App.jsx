@@ -218,10 +218,6 @@ useEffect(() => {
     }, 300);
   };
 
-const renderTop = () => {
-  return <TopTab userId={userId} />;
-};
-
   const completeTask = (task) => {
     if (completedTasks[task.key]) return;
 
