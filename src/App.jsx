@@ -20,6 +20,7 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [copiedLink, setCopiedLink] = useState('');
   const [referralInfo, setReferralInfo] = useState({ ref: '', currentUser: '' });
+  const [realPlayers, setRealPlayers] = useState([]);
   const [vpnActivated, setVpnActivated] = useState(false);
   const [vpnPaid, setVpnPaid] = useState(false);
   const [clickMultiplier, setClickMultiplier] = useState (() => Number(localStorage.getItem('clickMultiplier')) || 1);
