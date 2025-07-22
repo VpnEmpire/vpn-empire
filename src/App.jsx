@@ -166,6 +166,7 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
 
+
  useEffect(() => {
   const syncCoinsPeriodically = async () => {
     const storedUserId = localStorage.getItem('user_id');
@@ -678,7 +679,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
     </div>
   );
  
-  const renderTop = () => <TopTab coins={coins} />;
+  const renderTop = () => <TopTab coins={coins} players={realPlayers} />;
   const renderRoulette = () => <Roulette setCoins={setCoins} />;
   const renderWithdraw = () => (
   <div className="withdraw-tab">
