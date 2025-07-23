@@ -164,9 +164,9 @@ useEffect(() => {
     }
   };
 
-  syncCoinsPeriodically();
+  syncCoinsPeriodically(); // 👉 первый запуск
 
-  const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000);
+  const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000); // 👉 каждые 5 минут
   return () => clearInterval(interval);
 }, []);
 
