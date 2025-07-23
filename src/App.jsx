@@ -143,54 +143,52 @@ useEffect(() => {
       setCanSpin(false);
     }
   }, []);
+    
+        // 📤 Синхронизация монет в Supabase один раз при загрузке
+  useEffect(() => {
+    if (!userId) return;
 
-useEffect(() => {
-  async function fetchPlayers() {
-    try {
-      const res = await fetch('/api/top');
-      if (!res.ok) throw new Error('Ошибка сети');
-      const data = await res.json();
-      setRealPlayers(data.players || []);
-    } catch (error) {
-      console.error('Ошибка загрузки игроков:', error);
+    const updateCoins = async () => {
+      const coins = parseInt(localStorage.getItem('coins')) || 0;
+
+      try {
+        const res = await fetch('/api/update-coins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: String(userId), coins }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          console.log('💰 Монеты обновлены в Supabase:', coins);
+        } else {
+          console.error('❌ Ошибка обновления монет:', data.error);
+        }
+      } catch (err) {
+        console.error('❌ Ошибка при fetch /api/update-coins:', err);
+      }
+    };
+
+    updateCoins();
+  }, [userId]);
+
+  // 🔁 Загрузка топа игроков (осталась как есть)
+  useEffect(() => {
+    async function fetchPlayers() {
+      try {
+        const res = await fetch('/api/top');
+        if (!res.ok) throw new Error('Ошибка сети');
+        const data = await res.json();
+        setRealPlayers(data.players || []);
+      } catch (error) {
+        console.error('Ошибка загрузки игроков:', error);
+      }
     }
-  }
-  fetchPlayers();
-
-  const interval = setInterval(fetchPlayers, 7200000); // обновлять каждые 2 часа
-  return () => clearInterval(interval);
-}, []);
-
- useEffect(() => {
-  const syncCoinsPeriodically = async () => {
-    const storedUserId = localStorage.getItem('user_id');
-    const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
-
-    if (!storedUserId) return;
-
-    const { data: existingUser, error: selectError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('user_id', storedUserId)
-      .single();
-      
-    if (selectError && selectError.code !== 'PGRST116') {
-      console.error('❌ Ошибка при проверке пользователя:', selectError.message);
-      return;
-    }
-
-    if (existingUser) {
-      await supabase.from('users').update({ coins: storedCoins }).eq('user_id', storedUserId);
-    } else {
-      await supabase.from('users').insert([{ user_id: storedUserId, coins: storedCoins }]);
-    }
-  };
-  syncCoinsPeriodically();
-
-  const interval = setInterval(syncCoinsPeriodically, 2 * 60 * 60 * 1000);
-  return () => clearInterval(interval);
-}, []); // ✅ пустой массив — работает только 1 раз и по таймеру
-
+    fetchPlayers();
+    const interval = setInterval(fetchPlayers, 7200000);
+    return () => clearInterval(interval);
+  }, []);
+           
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
