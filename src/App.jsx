@@ -144,19 +144,6 @@ useEffect(() => {
   }, []);
 
 useEffect(() => {
-  // 🟢 Получаем user_id из Telegram WebApp SDK
-  const tg = window.Telegram?.WebApp;
-  const userId = tg?.initDataUnsafe?.user?.id;
-
-  if (userId) {
-    localStorage.setItem('user_id', userId);
-    console.log('✅ user_id сохранён из Telegram:', userId);
-  } else {
-    console.warn('⚠️ Не удалось получить user_id из Telegram SDK');
-  }
-}, []);
-
-useEffect(() => {
   const syncCoinsPeriodically = async () => {
     const storedUserId = localStorage.getItem('user_id');
     const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
