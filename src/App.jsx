@@ -145,30 +145,51 @@ useEffect(() => {
   }, []);
 
 useEffect(() => {
-  const syncCoinsPeriodically = async () => {
-    const user_id = localStorage.getItem('user_id');
-    const coins = parseInt(localStorage.getItem('coins')) || 0;
-
-    if (!user_id) return;
-
+  async function fetchPlayers() {
     try {
-      const res = await fetch('/api/update-coins', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id, coins }),
-      });
-      const result = await res.json();
-      console.log('✅ Монеты отправлены через API:', result);
-    } catch (err) {
-      console.error('❌ Ошибка при fetch /api/update-coins:', err);
+      const res = await fetch('/api/top');
+      if (!res.ok) throw new Error('Ошибка сети');
+      const data = await res.json();
+      setRealPlayers(data.players || []);
+    } catch (error) {
+      console.error('Ошибка загрузки игроков:', error);
     }
-  };
+  }
+  fetchPlayers();
 
-  syncCoinsPeriodically(); // 👉 первый запуск
-
-  const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000); // 👉 каждые 5 минут
+  const interval = setInterval(fetchPlayers, 7200000); // обновлять каждые 2 часа
   return () => clearInterval(interval);
 }, []);
+
+ useEffect(() => {
+  const syncCoinsPeriodically = async () => {
+    const storedUserId = localStorage.getItem('user_id');
+    const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
+
+    if (!storedUserId) return;
+
+    const { data: existingUser, error: selectError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('user_id', storedUserId)
+      .single();
+      
+    if (selectError && selectError.code !== 'PGRST116') {
+      console.error('❌ Ошибка при проверке пользователя:', selectError.message);
+      return;
+    }
+
+    if (existingUser) {
+      await supabase.from('users').update({ coins: storedCoins }).eq('user_id', storedUserId);
+    } else {
+      await supabase.from('users').insert([{ user_id: storedUserId, coins: storedCoins }]);
+    }
+  };
+  syncCoinsPeriodically();
+
+  const interval = setInterval(syncCoinsPeriodically, 2 * 60 * 60 * 1000);
+  return () => clearInterval(interval);
+}, []); // ✅ пустой массив — работает только 1 раз и по таймеру
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
