@@ -198,9 +198,6 @@ useEffect(() => {
 
 // --- Добавь сюда этот useEffect с дебаунсом ---
 
-import { useRef } from 'react';
-const debounceTimeoutRef = useRef(null);
-
 useEffect(() => {
   if (!userId) return;
 
