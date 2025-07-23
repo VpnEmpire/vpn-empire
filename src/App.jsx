@@ -159,7 +159,7 @@ useEffect(() => {
   }
   fetchPlayers();
 
-  const interval = setInterval(fetchPlayers, 120000); // обновлять каждые 2 минуты
+  const interval = setInterval(fetchPlayers, 700000); // обновлять каждые 2 минуты
   return () => clearInterval(interval);
 }, []);
 
