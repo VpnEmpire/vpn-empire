@@ -222,6 +222,23 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
 
+useEffect(() => {
+  let debounceTimer;
+
+  const syncCoins = async () => {
+    // код синхронизации с Supabase, аналогичный твоему
+  };
+
+  if (coins !== undefined) {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      syncCoins();
+    }, 5000); // обновляем через 5 секунд после последнего клика
+  }
+
+  return () => clearTimeout(debounceTimer);
+}, [coins]);
+
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
