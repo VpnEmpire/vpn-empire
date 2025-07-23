@@ -170,7 +170,7 @@ useEffect(() => {
 
     if (!storedUserId) return;
 
-    const { data: existingUser, error: selectError } = await supabase
+    const { data: existing, error: selectError } = await supabase
       .from('users')
       .select('id')
       .eq('user_id', storedUserId)
