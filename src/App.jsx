@@ -163,36 +163,64 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
 
-useEffect(() => {
+  useEffect(() => {
   const syncCoinsPeriodically = async () => {
     const storedUserId = localStorage.getItem('user_id');
     const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
 
-    if (!storedUserId) return;
-
-    const { data: existingUser, error: selectError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('user_id', storedUserId)
-      .maybeSingle();
-
-      if (selectError && selectError.code !== 'PGRST116') {
-      console.error('❌ Ошибка при проверке пользователя:', selectError.message);
+    if (!storedUserId) {
+      console.log('Нет user_id в localStorage');
       return;
     }
 
-    if (existingUser) {
-      await supabase.from('users').update({ coins: storedCoins }).eq('user_id', storedUserId);
-    } else {
-      await supabase.from('users').insert([{ user_id: storedUserId, coins: storedCoins }]);
+    try {
+      const { data: existingUser, error: selectError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('user_id', storedUserId)
+        .maybeSingle();
+
+      if (selectError) {
+        console.error('Ошибка при проверке пользователя:', selectError.message);
+        return;
+      }
+
+      if (existingUser) {
+        const { error } = await supabase
+          .from('users')
+          .update({ coins: storedCoins })
+          .eq('user_id', storedUserId);
+
+        if (error) {
+          console.error('Ошибка при обновлении монет:', error.message);
+        } else {
+          console.log('Монеты успешно обновлены в Supabase');
+        }
+      } else {
+        const { error } = await supabase
+          .from('users')
+          .insert([{ user_id: storedUserId, coins: storedCoins }]);
+
+        if (error) {
+          console.error('Ошибка при вставке нового пользователя:', error.message);
+        } else {
+          console.log('Новый пользователь добавлен в Supabase');
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка синхронизации монет:', error);
     }
   };
 
+  // Запускаем сразу при монтировании
   syncCoinsPeriodically();
 
-  const interval = setInterval(syncCoinsPeriodically, 5  * 60 * 1000);
+  // Устанавливаем таймер на повторение каждые 5 минут
+  const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000);
+
+  // Очистка таймера при размонтировании компонента
   return () => clearInterval(interval);
-}, []); // ✅ пустой массив — работает только 1 раз и по таймеру
+}, []);
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
