@@ -174,7 +174,7 @@ useEffect(() => {
       .from('users')
       .select('id')
       .eq('user_id', storedUserId)
-      .single();
+      .maybeSingle();
 
       if (selectError && selectError.code !== 'PGRST116') {
       console.error('❌ Ошибка при проверке пользователя:', selectError.message);
