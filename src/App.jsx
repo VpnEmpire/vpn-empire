@@ -158,19 +158,37 @@ useEffect(() => {
   };
 
   const handleClick = (e) => {
-    if (clicksToday < maxClicksPerDay) {
-      const multiplier = hasVpnBoost ? 2 : 1;
-      setCoins(prev => prev + 1 * multiplier);
-      setClicksToday(prev => prev + 1);
-      triggerAnimation();
-      playClickSound();
-    }
-    const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
-    setFlashes(prev => [...prev, flash]);
-    setTimeout(() => {
-      setFlashes(prev => prev.filter(f => f.id !== flash.id));
-    }, 400);
-  };
+  if (clicksToday < maxClicksPerDay) {
+    const multiplier = hasVpnBoost ? 2 : 1;
+
+    setCoins(prev => {
+      const newCoins = prev + 1 * multiplier;
+      localStorage.setItem('coins', newCoins);
+
+      // 🔄 Обновляем Supabase
+      const userId = localStorage.getItem('user_id');
+      if (userId) {
+        fetch('/api/update-coins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: userId, coins: newCoins }),
+        }).catch(console.error);
+      }
+
+      return newCoins;
+    });
+
+    setClicksToday(prev => prev + 1);
+    triggerAnimation();
+    playClickSound();
+  }
+
+  const flash = { x: e.clientX, y: e.clientY, id: Date.now() };
+  setFlashes(prev => [...prev, flash]);
+  setTimeout(() => {
+    setFlashes(prev => prev.filter(f => f.id !== flash.id));
+  }, 400);
+};
 
   const triggerAnimation = () => {
     const flash = document.createElement('div');
