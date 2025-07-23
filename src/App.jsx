@@ -143,51 +143,6 @@ useEffect(() => {
       setCanSpin(false);
     }
   }, []);
-    
-        // 📤 Синхронизация монет в Supabase один раз при загрузке
-  useEffect(() => {
-    if (!userId) return;
-
-    const updateCoins = async () => {
-      const coins = parseInt(localStorage.getItem('coins')) || 0;
-
-      try {
-        const res = await fetch('/api/update-coins', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: String(userId), coins }),
-        });
-
-        const data = await res.json();
-        if (data.success) {
-          console.log('💰 Монеты обновлены в Supabase:', coins);
-        } else {
-          console.error('❌ Ошибка обновления монет:', data.error);
-        }
-      } catch (err) {
-        console.error('❌ Ошибка при fetch /api/update-coins:', err);
-      }
-    };
-
-    updateCoins();
-  }, [userId]);
-
-  // 🔁 Загрузка топа игроков (осталась как есть)
-  useEffect(() => {
-    async function fetchPlayers() {
-      try {
-        const res = await fetch('/api/top');
-        if (!res.ok) throw new Error('Ошибка сети');
-        const data = await res.json();
-        setRealPlayers(data.players || []);
-      } catch (error) {
-        console.error('Ошибка загрузки игроков:', error);
-      }
-    }
-    fetchPlayers();
-    const interval = setInterval(fetchPlayers, 7200000);
-    return () => clearInterval(interval);
-  }, []);
            
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
@@ -242,6 +197,19 @@ useEffect(() => {
       localStorage.setItem('coins', newCoins);
       return newCoins;
     });
+
+   // ✅ Отправка монет в Supabase
+    const userId = localStorage.getItem('user_id');
+    if (userId) {
+      fetch('/api/update-coins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, coins: newCoins }),
+      }).catch(console.error);
+    }
+
+    return newCoins;
+  });
 
     if (task.requiresPayment) {
       setClickMultiplier(2);
