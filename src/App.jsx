@@ -159,11 +159,17 @@ useEffect(() => {
   }
   fetchPlayers();
 
-  const interval = setInterval(fetchPlayers, 300000); // обновлять каждые 5 минут
+  const interval = setInterval(fetchPlayers, 300000); // обновлять каждые 2 часа
   return () => clearInterval(interval);
 }, []);
 
- if (!storedUserId) return;
+
+ useEffect(() => {
+  const syncCoinsPeriodically = async () => {
+    const storedUserId = localStorage.getItem('user_id');
+    const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
+
+    if (!storedUserId) return;
 
     const { data: existingUser, error: selectError } = await supabase
       .from('users')
@@ -182,29 +188,12 @@ useEffect(() => {
       await supabase.from('users').insert([{ user_id: storedUserId, coins: storedCoins }]);
     }
   };
+
   syncCoinsPeriodically();
 
   const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000);
   return () => clearInterval(interval);
 }, []); // ✅ пустой массив — работает только 1 раз и по таймеру
-  
-  
-useEffect(() => {
-  let debounceTimer;
-
-  const syncCoins = async () => {
-    // код синхронизации с Supabase, аналогичный твоему
-  };
-
-  if (coins !== undefined) {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      syncCoins();
-    }, 5000); // обновляем через 5 секунд после последнего клика
-  }
-
-  return () => clearTimeout(debounceTimer);
-}, [coins]);
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
