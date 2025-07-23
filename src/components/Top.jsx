@@ -26,7 +26,7 @@ function Top({ username }) {
     }
     fetchRealPlayers();
 
-    const interval = setInterval(fetchRealPlayers, 7200000);
+    const interval = setInterval(fetchRealPlayers, 300000);
     return () => clearInterval(interval);
   }, []);
 
