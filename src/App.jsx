@@ -157,43 +157,48 @@ useEffect(() => {
       console.error('Ошибка загрузки игроков:', error);
     }
   }
+
   fetchPlayers();
 
-  const interval = setInterval(fetchPlayers, 300000); // обновлять каждые 2 минуты
+  const interval = setInterval(fetchPlayers, 2 * 60 * 1000); // обновлять каждые 2 минуты
   return () => clearInterval(interval);
 }, []);
 
 
- useEffect(() => {
+useEffect(() => {
   const syncCoinsPeriodically = async () => {
-    const storedUserId = localStorage.getItem('user_id');
-    const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
+    try {
+      const storedUserId = localStorage.getItem('user_id');
+      const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
 
-    if (!storedUserId) return;
+      if (!storedUserId) return;
 
-    const { data: existingUser, error: selectError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('user_id', storedUserId)
-      .single();
+      const { data: existingUser, error: selectError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('user_id', storedUserId)
+        .single();
 
-    if (selectError && selectError.code !== 'PGRST116') {
-      console.error('❌ Ошибка при проверке пользователя:', selectError.message);
-      return;
-    }
+      if (selectError && selectError.code !== 'PGRST116') {
+        console.error('❌ Ошибка при проверке пользователя:', selectError.message);
+        return;
+      }
 
-    if (existingUser) {
-      await supabase.from('users').update({ coins: storedCoins }).eq('user_id', storedUserId);
-    } else {
-      await supabase.from('users').insert([{ user_id: storedUserId, coins: storedCoins }]);
+      if (existingUser) {
+        await supabase.from('users').update({ coins: storedCoins }).eq('user_id', storedUserId);
+      } else {
+        await supabase.from('users').insert([{ user_id: storedUserId, coins: storedCoins }]);
+      }
+    } catch (error) {
+      console.error('Ошибка синхронизации монет:', error);
     }
   };
 
   syncCoinsPeriodically();
 
-  const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000);
+  const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000); // обновлять раз в 5 минут
   return () => clearInterval(interval);
-}, []); // ✅ пустой массив — работает только 1 раз и по таймеру
+}, []);
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
