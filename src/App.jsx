@@ -202,7 +202,7 @@ useEffect(() => {
   const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000);
   return () => clearInterval(interval);
 }, []);
-
+ 
 const updateCoinsInSupabase = async () => {
   if (!userId) return;
   try {
