@@ -63,7 +63,6 @@ useEffect(() => {
   }
 
   setReferralInfo({ ref, currentUser }); // 👈 сохраняем для вывода на экран
-
   console.log('📦 Получено из Telegram:', { ref, currentUser });
 
   if (ref && ref !== String(currentUser)) {
@@ -108,8 +107,6 @@ useEffect(() => {
   fetchWithdrawPermission();
 }, [userId]);
 
-
-
 useEffect(() => {
     localStorage.setItem('coins', coins);
     localStorage.setItem('clicksToday', clicksToday);
@@ -145,6 +142,19 @@ useEffect(() => {
       setCanSpin(false);
     }
   }, []);
+
+useEffect(() => {
+  // 🟢 Получаем user_id из Telegram WebApp SDK
+  const tg = window.Telegram?.WebApp;
+  const userId = tg?.initDataUnsafe?.user?.id;
+
+  if (userId) {
+    localStorage.setItem('user_id', userId);
+    console.log('✅ user_id сохранён из Telegram:', userId);
+  } else {
+    console.warn('⚠️ Не удалось получить user_id из Telegram SDK');
+  }
+}, []);
 
 useEffect(() => {
   const syncCoinsPeriodically = async () => {
@@ -202,20 +212,6 @@ useEffect(() => {
   const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000);
   return () => clearInterval(interval);
 }, []);
- 
-const updateCoinsInSupabase = async () => {
-  if (!userId) return;
-  try {
-    const { error } = await supabase
-      .from('users')
-      .update({ coins })
-      .eq('user_id', userId);
-    if (error) throw error;
-    console.log('✅ Монеты обновлены в Supabase');
-  } catch (err) {
-    console.error('❌ Ошибка обновления монет в Supabase:', err);
-  }
-};
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
