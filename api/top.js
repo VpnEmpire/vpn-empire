@@ -11,7 +11,7 @@ export default async function handler(req, res) {
       .from('users')
       .select('user_id, coins') // добавь name и color, если есть
       .order('coins', { ascending: false })
-      .limit(100);
+      .limit(50);
 
     if (error) {
       console.error('Ошибка Supabase:', error);
