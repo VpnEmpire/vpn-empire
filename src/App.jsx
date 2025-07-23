@@ -184,22 +184,21 @@ useEffect(() => {
   };
 
   const completeTask = (task) => {
-    if (completedTasks[task.key]) return;
+  if (completedTasks[task.key]) return;
 
-    setCompletedTasks(prev => {
-      const updated = { ...prev, [task.key]: true };
-      localStorage.setItem('completedTasks', JSON.stringify(updated));
-      return updated;
-    });
+  setCompletedTasks(prev => {
+    const updated = { ...prev, [task.key]: true };
+    localStorage.setItem('completedTasks', JSON.stringify(updated));
+    return updated;
+  });
 
-    setCoins(prev => {
-      const newCoins = prev + (task.reward || 0);
-      localStorage.setItem('coins', newCoins);
-      return newCoins;
-    });
+  const userId = localStorage.getItem('user_id');
 
-   // ✅ Отправка монет в Supabase
-    const userId = localStorage.getItem('user_id');
+  setCoins(prev => {
+    const newCoins = prev + (task.reward || 0);
+    localStorage.setItem('coins', newCoins);
+
+    // ✅ Отправка монет в Supabase
     if (userId) {
       fetch('/api/update-coins', {
         method: 'POST',
@@ -211,15 +210,15 @@ useEffect(() => {
     return newCoins;
   });
 
-    if (task.requiresPayment) {
-      setClickMultiplier(2);
-      localStorage.setItem('clickMultiplier', '2');
-      setHasVpnBoost(true);
-      localStorage.setItem('hasVpnBoost', 'true');
-    }
+  if (task.requiresPayment) {
+    setClickMultiplier(2);
+    localStorage.setItem('clickMultiplier', '2');
+    setHasVpnBoost(true);
+    localStorage.setItem('hasVpnBoost', 'true');
+  }
 
-    alert(`🎁 Ты получил ${task.reward || 0} монет!`);
-  };
+  alert(`🎁 Ты получил ${task.reward || 0} монет!`);
+};
 
     const handleTaskClick = async (task) => {
   if (completedTasks[task.key]) {
