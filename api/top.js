@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('user_id, coins') // добавь name и color, если есть
+      .select('user_id, coins')
       .order('coins', { ascending: false })
       .limit(50);
 
