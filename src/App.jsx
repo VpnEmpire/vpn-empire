@@ -210,13 +210,12 @@ useEffect(() => {
     return updated;
   });
 
-  const userId = localStorage.getItem('user_id');
-
   setCoins(prev => {
     const newCoins = prev + (task.reward || 0);
     localStorage.setItem('coins', newCoins);
 
-    // ✅ Отправка монет в Supabase
+    // 👇 Добавим тут обновление Supabase
+    const userId = localStorage.getItem('user_id');
     if (userId) {
       fetch('/api/update-coins', {
         method: 'POST',
