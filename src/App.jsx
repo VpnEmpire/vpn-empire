@@ -147,29 +147,14 @@ useEffect(() => {
   }, []);
 
 useEffect(() => {
-  async function fetchPlayers() {
-    try {
-      const res = await fetch('/api/top');
-      if (!res.ok) throw new Error('Ошибка сети');
-      const data = await res.json();
-      setRealPlayers(data.players || []);
-    } catch (error) {
-      console.error('Ошибка загрузки игроков:', error);
-    }
-  }
-  fetchPlayers();
-
-  const interval = setInterval(fetchPlayers, 300000); // обновлять каждые 2 часа
-  return () => clearInterval(interval);
-}, []);
-
-
- useEffect(() => {
   const syncCoinsPeriodically = async () => {
     const storedUserId = localStorage.getItem('user_id');
     const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
 
-    if (!storedUserId) return;
+    if (!storedUserId) {
+      console.warn('⚠️ user_id отсутствует в localStorage');
+      return;
+    }
 
     const { data: existingUser, error: selectError } = await supabase
       .from('users')
@@ -183,9 +168,32 @@ useEffect(() => {
     }
 
     if (existingUser) {
-      await supabase.from('users').update({ coins: storedCoins }).eq('user_id', storedUserId);
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({ coins: storedCoins })
+          .eq('user_id', storedUserId);
+        if (error) {
+          console.error('❌ Ошибка при обновлении монет:', error.message);
+        } else {
+          console.log(`✅ Обновлены монеты для ${storedUserId}: ${storedCoins}`);
+        }
+      } catch (err) {
+        console.error('❌ Ошибка внутри try при обновлении:', err);
+      }
     } else {
-      await supabase.from('users').insert([{ user_id: storedUserId, coins: storedCoins }]);
+      try {
+        const { error } = await supabase
+          .from('users')
+          .insert([{ user_id: storedUserId, coins: storedCoins }]);
+        if (error) {
+          console.error('❌ Ошибка при создании пользователя:', error.message);
+        } else {
+          console.log(`✅ Добавлен новый пользователь ${storedUserId} с монетами: ${storedCoins}`);
+        }
+      } catch (err) {
+        console.error('❌ Ошибка внутри try при вставке:', err);
+      }
     }
   };
 
@@ -193,7 +201,21 @@ useEffect(() => {
 
   const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000);
   return () => clearInterval(interval);
-}, []); // ✅ пустой массив — работает только 1 раз и по таймеру
+}, []);
+
+const updateCoinsInSupabase = async () => {
+  if (!userId) return;
+  try {
+    const { error } = await supabase
+      .from('users')
+      .update({ coins })
+      .eq('user_id', userId);
+    if (error) throw error;
+    console.log('✅ Монеты обновлены в Supabase');
+  } catch (err) {
+    console.error('❌ Ошибка обновления монет в Supabase:', err);
+  }
+};
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
