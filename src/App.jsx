@@ -63,6 +63,7 @@ useEffect(() => {
   }
 
   setReferralInfo({ ref, currentUser }); // 👈 сохраняем для вывода на экран
+  
   console.log('📦 Получено из Telegram:', { ref, currentUser });
 
   if (ref && ref !== String(currentUser)) {
