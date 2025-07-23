@@ -146,48 +146,21 @@ useEffect(() => {
 
 useEffect(() => {
   const syncCoinsPeriodically = async () => {
-    console.log('⏳ [syncCoinsPeriodically] Старт функции');
+    const user_id = localStorage.getItem('user_id');
+    const coins = parseInt(localStorage.getItem('coins')) || 0;
 
-    const storedUserId = localStorage.getItem('user_id');
-    const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
+    if (!user_id) return;
 
-    console.log('📦 Данные из localStorage:', { storedUserId, storedCoins });
-
-    if (!storedUserId) {
-      console.warn('⚠️ Нет user_id в localStorage, прерываем sync');
-      return;
-    }
-
-    const { data: existingUser, error: selectError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('user_id', storedUserId)
-      .single();
-
-    if (selectError && selectError.code !== 'PGRST116') {
-      console.error('❌ Ошибка при проверке пользователя:', selectError.message);
-      return;
-    }
-
-    if (existingUser) {
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ coins: storedCoins })
-        .eq('user_id', storedUserId);
-      if (updateError) {
-        console.error('❌ Ошибка при обновлении монет:', updateError.message);
-      } else {
-        console.log('✅ Монеты обновлены в Supabase:', storedCoins);
-      }
-    } else {
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert([{ user_id: storedUserId, coins: storedCoins }]);
-      if (insertError) {
-        console.error('❌ Ошибка при создании пользователя в Supabase:', insertError.message);
-      } else {
-        console.log('✅ Новый пользователь добавлен в Supabase:', storedUserId);
-      }
+    try {
+      const res = await fetch('/api/update-coins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id, coins }),
+      });
+      const result = await res.json();
+      console.log('✅ Монеты отправлены через API:', result);
+    } catch (err) {
+      console.error('❌ Ошибка при fetch /api/update-coins:', err);
     }
   };
 
