@@ -159,7 +159,7 @@ useEffect(() => {
   }
   fetchPlayers();
 
-  const interval = setInterval(fetchPlayers, 700000); // обновлять каждые 2 минуты
+  const interval = setInterval(fetchPlayers, 300000); // обновлять каждые 2 минуты
   return () => clearInterval(interval);
 }, []);
 
@@ -191,7 +191,7 @@ useEffect(() => {
 
   syncCoinsPeriodically();
 
-  const interval = setInterval(syncCoinsPeriodically, 2 * 60 * 60 * 1000);
+  const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000);
   return () => clearInterval(interval);
 }, []); // ✅ пустой массив — работает только 1 раз и по таймеру
 
