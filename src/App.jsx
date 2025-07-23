@@ -160,7 +160,7 @@ useEffect(() => {
   }
   fetchPlayers();
 
-  const interval = setInterval(fetchPlayers, 7200000); // обновлять каждые 2 часа
+  const interval = setInterval(fetchPlayers, 120000); // обновлять каждые 2 минуты
   return () => clearInterval(interval);
 }, []);
 
@@ -195,39 +195,6 @@ useEffect(() => {
   const interval = setInterval(syncCoinsPeriodically, 2 * 60 * 60 * 1000);
   return () => clearInterval(interval);
 }, []); // ✅ пустой массив — работает только 1 раз и по таймеру
-
-// --- Добавь сюда этот useEffect с дебаунсом ---
-
-useEffect(() => {
-  if (!userId) return;
-
-  if (debounceTimeoutRef.current) {
-    clearTimeout(debounceTimeoutRef.current);
-  }
-
-  debounceTimeoutRef.current = setTimeout(async () => {
-    try {
-      const { error } = await supabase
-        .from('users')
-        .update({ coins })
-        .eq('user_id', userId);
-
-      if (error) {
-        console.error('Ошибка обновления монет:', error.message);
-      } else {
-        console.log('Монеты обновлены в Supabase:', coins);
-      }
-    } catch (err) {
-      console.error('Ошибка при синхронизации монет:', err);
-    }
-  }, 60000); // обновлять не чаще 1 раза в минуту
-
-  return () => {
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-  };
-}, [coins, userId]);
 
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
