@@ -146,11 +146,15 @@ useEffect(() => {
 
 useEffect(() => {
   const syncCoinsPeriodically = async () => {
+    console.log('⏳ [syncCoinsPeriodically] Старт функции');
+
     const storedUserId = localStorage.getItem('user_id');
     const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
 
+    console.log('📦 Данные из localStorage:', { storedUserId, storedCoins });
+
     if (!storedUserId) {
-      console.warn('⚠️ user_id отсутствует в localStorage');
+      console.warn('⚠️ Нет user_id в localStorage, прерываем sync');
       return;
     }
 
@@ -166,31 +170,23 @@ useEffect(() => {
     }
 
     if (existingUser) {
-      try {
-        const { error } = await supabase
-          .from('users')
-          .update({ coins: storedCoins })
-          .eq('user_id', storedUserId);
-        if (error) {
-          console.error('❌ Ошибка при обновлении монет:', error.message);
-        } else {
-          console.log(`✅ Обновлены монеты для ${storedUserId}: ${storedCoins}`);
-        }
-      } catch (err) {
-        console.error('❌ Ошибка внутри try при обновлении:', err);
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ coins: storedCoins })
+        .eq('user_id', storedUserId);
+      if (updateError) {
+        console.error('❌ Ошибка при обновлении монет:', updateError.message);
+      } else {
+        console.log('✅ Монеты обновлены в Supabase:', storedCoins);
       }
     } else {
-      try {
-        const { error } = await supabase
-          .from('users')
-          .insert([{ user_id: storedUserId, coins: storedCoins }]);
-        if (error) {
-          console.error('❌ Ошибка при создании пользователя:', error.message);
-        } else {
-          console.log(`✅ Добавлен новый пользователь ${storedUserId} с монетами: ${storedCoins}`);
-        }
-      } catch (err) {
-        console.error('❌ Ошибка внутри try при вставке:', err);
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert([{ user_id: storedUserId, coins: storedCoins }]);
+      if (insertError) {
+        console.error('❌ Ошибка при создании пользователя в Supabase:', insertError.message);
+      } else {
+        console.log('✅ Новый пользователь добавлен в Supabase:', storedUserId);
       }
     }
   };
