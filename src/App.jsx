@@ -159,69 +159,36 @@ useEffect(() => {
   }
   fetchPlayers();
 
-  const interval = setInterval(fetchPlayers, 300000); // обновлять каждые 2 часа
+  const interval = setInterval(fetchPlayers, 300000); // обновлять каждые 5 минут
   return () => clearInterval(interval);
 }, []);
 
-  useEffect(() => {
-  const syncCoinsPeriodically = async () => {
-    const storedUserId = localStorage.getItem('user_id');
-    const storedCoins = parseInt(localStorage.getItem('coins')) || 0;
+ if (!storedUserId) return;
 
-    if (!storedUserId) {
-      console.log('Нет user_id в localStorage');
+    const { data: existingUser, error: selectError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('user_id', storedUserId)
+      .single();
+
+    if (selectError && selectError.code !== 'PGRST116') {
+      console.error('❌ Ошибка при проверке пользователя:', selectError.message);
       return;
     }
 
-    try {
-      const { data: existingUser, error: selectError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('user_id', storedUserId)
-        .maybeSingle();
-
-      if (selectError) {
-        console.error('Ошибка при проверке пользователя:', selectError.message);
-        return;
-      }
-
-      if (existingUser) {
-        const { error } = await supabase
-          .from('users')
-          .update({ coins: storedCoins })
-          .eq('user_id', storedUserId);
-
-        if (error) {
-          console.error('Ошибка при обновлении монет:', error.message);
-        } else {
-          console.log('Монеты успешно обновлены в Supabase');
-        }
-      } else {
-        const { error } = await supabase
-          .from('users')
-          .insert([{ user_id: storedUserId, coins: storedCoins }]);
-
-        if (error) {
-          console.error('Ошибка при вставке нового пользователя:', error.message);
-        } else {
-          console.log('Новый пользователь добавлен в Supabase');
-        }
-      }
-    } catch (error) {
-      console.error('Ошибка синхронизации монет:', error);
+    if (existingUser) {
+      await supabase.from('users').update({ coins: storedCoins }).eq('user_id', storedUserId);
+    } else {
+      await supabase.from('users').insert([{ user_id: storedUserId, coins: storedCoins }]);
     }
   };
-
-  // Запускаем сразу при монтировании
   syncCoinsPeriodically();
 
-  // Устанавливаем таймер на повторение каждые 5 минут
   const interval = setInterval(syncCoinsPeriodically, 5 * 60 * 1000);
-
-  // Очистка таймера при размонтировании компонента
   return () => clearInterval(interval);
-}, []);
-
+}, []); // ✅ пустой массив — работает только 1 раз и по таймеру
+  
+  
 useEffect(() => {
   let debounceTimer;
 
