@@ -143,7 +143,39 @@ useEffect(() => {
       setCanSpin(false);
     }
   }, []);
-           
+  
+          
+          useEffect(() => {
+  const ensureUserExists = async () => {
+    const userId = localStorage.getItem('user_id');
+    if (!userId) return;
+
+    const { data, error } = await supabase
+      .from('users')
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('❌ Ошибка при проверке пользователя:', error.message);
+      return;
+    }
+
+    if (!data) {
+      const { error: insertError } = await supabase.from('users').insert([
+        { user_id: userId, coins: 0 }
+      ]);
+      if (insertError) {
+        console.error('❌ Ошибка при добавлении пользователя:', insertError.message);
+      } else {
+        console.log('✅ Пользователь успешно добавлен в Supabase');
+      }
+    }
+  };
+
+  ensureUserExists();
+}, []);
+          
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
