@@ -192,12 +192,13 @@ useEffect(() => {
   const handleClick = (e) => {
   if (clicksToday < maxClicksPerDay) {
     const multiplier = hasVpnBoost ? 2 : 1;
+    const earned = 1 * multiplier;
 
     setCoins(prev => {
-      const newCoins = prev + 1 * multiplier;
+      const newCoins = prev + earned;
       localStorage.setItem('coins', newCoins);
 
-      // 🔄 Обновляем Supabase
+      // ⬇️ Обновляем Supabase сразу
       const userId = localStorage.getItem('user_id');
       if (userId) {
         fetch('/api/update-coins', {
