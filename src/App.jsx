@@ -247,7 +247,7 @@ useEffect(() => {
     const newCoins = prev + (task.reward || 0);
     localStorage.setItem('coins', newCoins);
 
-    // 👇 Добавим тут обновление Supabase
+    // ⬇️ Автоматически обновляем Supabase
     const userId = localStorage.getItem('user_id');
     if (userId) {
       fetch('/api/update-coins', {
