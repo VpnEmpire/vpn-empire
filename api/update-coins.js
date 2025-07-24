@@ -10,26 +10,21 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { user_id, coins } = req.body;
-
   if (!user_id || coins == null) {
     return res.status(400).json({ error: 'user_id и coins обязательны' });
   }
 
   try {
-    // Проверим, существует ли пользователь
-    const { data: existingUser, error: fetchError } = await supabase
+    const { data: existing, error: fetchError } = await supabase
       .from('users')
       .select('id')
       .eq('user_id', user_id)
       .single();
 
-    if (fetchError && fetchError.code !== 'PGRST116') {
-      // PGRST116 — это Not Found
-      throw fetchError;
-    }
+    if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
 
-    if (existingUser) {
-      // Пользователь есть — обновляем
+    if (existing) {
+      // ✅ Обновление монет
       const { error: updateError } = await supabase
         .from('users')
         .update({ coins })
@@ -37,12 +32,18 @@ export default async function handler(req, res) {
 
       if (updateError) throw updateError;
     } else {
-      // Пользователя нет — создаём
+      // ✅ Создание нового пользователя (только один раз!)
       const { error: insertError } = await supabase
         .from('users')
         .insert([{ user_id, coins }]);
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        // 🔁 Если дублируется — ничего не делаем
+        if (insertError.code === '23505') {
+          return res.status(200).json({ success: true, note: 'duplicate skipped' });
+        }
+        throw insertError;
+      }
     }
 
     return res.status(200).json({ success: true });
