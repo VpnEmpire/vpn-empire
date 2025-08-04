@@ -53,8 +53,8 @@ function Top({ username }) {
     allPlayers.push(currentUser);
   }
 
-  // Сортируем и берём топ 15
-  const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 15);
+  // Сортируем и берём топ 10
+  const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 10);
 
   return (
     <div className="top-container">
