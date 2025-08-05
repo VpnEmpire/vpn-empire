@@ -322,7 +322,7 @@ if (task.type === 'referral') {
   }
 
   try {
-    const res = await fetch('/api/check-referra', {
+    const res = await fetch('/api/check-referral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
