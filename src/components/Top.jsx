@@ -53,12 +53,18 @@ function Top({ username }) {
     allPlayers.push(currentUser);
   }
 
-  // Сортируем и берём топ 20
-  const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 20);
+  // Сортируем и берём топ 10
+  const sorted = allPlayers.sort((a, b) => b.coins - a.coins).slice(0, 10);
 
+// Определяем, входит ли текущий пользователь в топ
+  const isCurrentInTop = sorted.some(p => p.user_id === currentUser.user_id);
+
+  // Определяем место текущего игрока
+  const currentUserRank = sortedAll.findIndex(p => p.user_id === currentUser.user_id) + 1;
+  
   return (
     <div className="top-container">
-      <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2>
+      <h2 className="top-title">🏆 ТОП ИГРОКОВ</h2> 
       <img src="/robot.png" alt="Робот" className="top-robot" />
       <div className="top-list">
         {sorted.map((player, index) => (
