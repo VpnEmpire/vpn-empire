@@ -13,7 +13,7 @@ export const config = {
       sizeLimit: '1mb',
     },
   },
-};
+}; 
 
 export default async function handler(req, res) {
   console.log('📥 [check-referral] Запрос получен');
