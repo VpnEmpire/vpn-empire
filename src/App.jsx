@@ -148,6 +148,34 @@ useEffect(() => {
   
           
           useEffect(() => {
+  const fetchCoinsFromSupabase = async () => {
+    const storedUserId = localStorage.getItem('user_id');
+    if (!storedUserId) return;
+
+    try {
+      const res = await fetch('/api/get-coins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: storedUserId }),
+      });
+
+      const data = await res.json();
+      if (res.ok && typeof data.coins === 'number') {
+        setCoins(data.coins);
+        localStorage.setItem('coins', data.coins.toString());
+      } else {
+        console.warn('⚠️ Не удалось получить монеты из Supabase:', data);
+      }
+    } catch (err) {
+      console.error('❌ Ошибка при получении монет из Supabase:', err);
+    }
+  };
+
+  fetchCoinsFromSupabase();
+}, []);
+
+          
+          useEffect(() => {
   const ensureUserExists = async () => {
     const userId = localStorage.getItem('user_id');
     if (!userId) return;
