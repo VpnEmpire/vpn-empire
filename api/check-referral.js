@@ -32,32 +32,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    
-    // ✅ Сброс, если все 7 invite-заданий уже выполнены
-    const inviteKeys = ['invite1', 'invite2', 'invite3', 'invite4', 'invite5', 'invite6', 'invite7'];
-
-    const { data: doneInvites, error: inviteError } = await supabase
-      .from('referrals')
-      .select('task_key')
-      .eq('user_id', user_id)
-      .eq('source', 'game');
-
-    if (!inviteError) {
-      const completed = doneInvites.map(t => t.task_key);
-      const allInviteCompleted = inviteKeys.every(k => completed.includes(k));
-
-      if (allInviteCompleted) {
-        await supabase
-          .from('referrals')
-          .delete()
-          .eq('user_id', user_id)
-          .eq('source', 'game')
-          .in('task_key', inviteKeys);
-
-        console.log('♻️ Инвайт-задания сброшены для', user_id);
-      }
-    }
-    
     // 1. Получаем количество приглашённых
     const { count, error: countError } = await supabase
       .from('referrals')
