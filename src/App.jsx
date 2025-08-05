@@ -178,6 +178,36 @@ useEffect(() => {
   ensureUserExists();
 }, []);
           
+          // 🔄 Синхронизация completedTasks с Supabase
+useEffect(() => {
+  if (!userId) return;
+
+  const syncCompletedTasks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('referral_tasks')
+        .select('task_key')
+        .eq('user_id', String(userId));
+
+      if (error) {
+        console.error('❌ Ошибка загрузки задач из Supabase:', error);
+        return;
+      }
+
+      const synced = {};
+      data?.forEach(t => synced[t.task_key] = true);
+      setCompletedTasks(synced);
+      localStorage.setItem('completedTasks', JSON.stringify(synced));
+    } catch (e) {
+      console.error('❌ Ошибка синхронизации completedTasks:', e);
+    }
+  };
+
+  syncCompletedTasks();
+}, [userId]);
+
+          
+          
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
