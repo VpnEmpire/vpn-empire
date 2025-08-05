@@ -54,6 +54,35 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
   const [canSpin, setCanSpin] = useState(true);
   const [spinResult, setSpinResult] = useState(null);
   
+useEffect(() => {
+  const syncCoinsFromSupabase = async () => {
+    const storedUserId = localStorage.getItem('user_id');
+    if (!storedUserId) return;
+
+    const { data, error } = await supabase
+      .from('users')
+      .select('coins')
+      .eq('user_id', storedUserId)
+      .single();
+
+    if (error) {
+      console.error('❌ Ошибка получения монет из Supabase:', error.message);
+      return;
+    }
+
+    if (data && typeof data.coins === 'number') {
+      const localCoins = parseInt(localStorage.getItem('coins')) || 0;
+
+      if (data.coins !== localCoins) {
+        localStorage.setItem('coins', data.coins);
+        setCoins(data.coins);
+        console.log('🔄 Синхронизированы монеты из Supabase:', data.coins);
+      }
+    }
+  };
+
+  syncCoinsFromSupabase();
+}, []);
 
 useEffect(() => {
   const initDataUnsafe = window.Telegram?.WebApp?.initDataUnsafe;
