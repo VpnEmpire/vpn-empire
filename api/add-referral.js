@@ -88,6 +88,33 @@ export default async function handler(req, res) {
 
     console.log(`✅ Обновлён счётчик: ${referral_id} → ${newCount}`);
   }
+  
+   // ✅ ДОБАВЛЕНО: проверка и сброс invite1–invite7, если все выполнены
+  const inviteKeys = ['invite1', 'invite2', 'invite3', 'invite4', 'invite5', 'invite6', 'invite7'];
+
+  const { data: allTasks, error: tasksError } = await supabase
+    .from('referrals')
+    .select('task_key')
+    .eq('user_id', referral_id)
+    .eq('source', 'game');
+
+  if (!tasksError) {
+    const completedKeys = allTasks.map(t => t.task_key);
+    const allCompleted = inviteKeys.every(key => completedKeys.includes(key));
+
+    if (allCompleted) {
+      await supabase
+        .from('referrals')
+        .delete()
+        .eq('user_id', referral_id)
+        .eq('source', 'game')
+        .in('task_key', inviteKeys);
+
+      console.log('♻️ Все invite-задания сброшены для', referral_id);
+    }
+  }
+
+  
   console.log(`✅ Добавлен новый реферал: ${referral_id} → ${user_id}`);
   return res.status(200).json({ success: true, message: 'Referral added successfully' });
 } 
