@@ -6,7 +6,7 @@ import Roulette from './components/Roulette.jsx';
 import Hometab from './components/Home.jsx';
 import supabase from './supabaseClient';
 
-function App() {
+function App() { 
   const [activeTab, setActiveTab] = useState('home');
   const [coins, setCoins] = useState(() => Number(localStorage.getItem('coins')) || 0);
   const [rank, setRank] = useState('');
