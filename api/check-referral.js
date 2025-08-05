@@ -96,6 +96,30 @@ export default async function handler(req, res) {
       return res.status(500).json({ success: false, error: 'Не удалось сохранить выполнение' });
     }
 
+// ✅ 5. Проверка: если ВСЕ invite1–invite7 выполнены — сбросим
+    const inviteKeys = ['invite1','invite2','invite3','invite4','invite5','invite6','invite7'];
+    const { data: doneInvites, error: inviteError } = await supabase
+      .from('referrals')
+      .select('task_key')
+      .eq('user_id', user_id)
+      .eq('source', 'game');
+
+    if (!inviteError) {
+      const completedKeys = doneInvites.map(t => t.task_key);
+      const allDone = inviteKeys.every(k => completedKeys.includes(k));
+
+      if (allDone) {
+        await supabase
+          .from('referrals')
+          .delete()
+          .eq('user_id', user_id)
+          .eq('source', 'game')
+          .in('task_key', inviteKeys);
+
+        console.log('♻️ Все инвайты сброшены для', user_id);
+      }
+    }
+
     console.log(`✅ Задание ${task_key} успешно засчитано`);
     return res.status(200).json({ success: true, invited: count });
     
