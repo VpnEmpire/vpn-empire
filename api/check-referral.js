@@ -55,6 +55,31 @@ export default async function handler(req, res) {
       });
     }
 
+// ✅ Проверка и сброс всех invite-заданий, если все 7 выполнены
+    const inviteKeys = ['invite1', 'invite2', 'invite3', 'invite4', 'invite5', 'invite6', 'invite7'];
+
+    const { data: doneInvites, error: inviteError } = await supabase
+      .from('referrals')
+      .select('task_key')
+      .eq('user_id', user_id)
+      .eq('source', 'game');
+
+    if (!inviteError) {
+      const completed = doneInvites.map(t => t.task_key);
+      const allInviteCompleted = inviteKeys.every(k => completed.includes(k));
+
+      if (allInviteCompleted) {
+        await supabase
+          .from('referrals')
+          .delete()
+          .eq('user_id', user_id)
+          .eq('source', 'game')
+          .in('task_key', inviteKeys);
+
+        console.log('♻️ Все invite-задания сброшены для', user_id);
+      }
+    }
+
     // 3. Проверяем, не выполнено ли уже это задание
     const { data: existing, error: existingError } = await supabase
       .from('referrals')
@@ -94,31 +119,6 @@ export default async function handler(req, res) {
     if (insertError) {
       console.error('❌ Ошибка при сохранении выполнения:', insertError.message);
       return res.status(500).json({ success: false, error: 'Не удалось сохранить выполнение' });
-    }
-
-// ✅ Проверка и сброс всех invite-заданий, если все 7 выполнены
-    const inviteKeys = ['invite1', 'invite2', 'invite3', 'invite4', 'invite5', 'invite6', 'invite7'];
-
-    const { data: doneInvites, error: inviteError } = await supabase
-      .from('referrals')
-      .select('task_key')
-      .eq('user_id', user_id)
-      .eq('source', 'game');
-
-    if (!inviteError) {
-      const completed = doneInvites.map(t => t.task_key);
-      const allInviteCompleted = inviteKeys.every(k => completed.includes(k));
-
-      if (allInviteCompleted) {
-        await supabase
-          .from('referrals')
-          .delete()
-          .eq('user_id', user_id)
-          .eq('source', 'game')
-          .in('task_key', inviteKeys);
-
-        console.log('♻️ Все invite-задания сброшены для', user_id);
-      }
     }
 
     console.log(`✅ Задание ${task_key} успешно засчитано`);
