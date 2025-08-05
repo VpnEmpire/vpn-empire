@@ -12,8 +12,7 @@ function App() {
   const [rank, setRank] = useState('');
   const [clicksToday, setClicksToday] = useState(() => Number(localStorage.getItem('clicksToday')) || 0);
   const [hasSubscription, setHasSubscription] = useState(() => localStorage.getItem('hasSubscription') === 'true');
-  const [completedTasks, setCompletedTasks] = useState(() => 
-JSON.parse(localStorage.getItem('completedTasks')) || {});
+  const [completedTasks, setCompletedTasks] = useState({});
   const [flashes, setFlashes] = useState([]);
   const [userId, setUserId] = useState(null);
   const [referrals, setReferrals] = useState(0);
