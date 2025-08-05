@@ -380,6 +380,10 @@ if (task.type === 'referral') {
         setCompletedTasks(updated);
         localStorage.setItem('completedTasks', JSON.stringify(updated));
         alert('🎉 Все реферальные задания выполнены! Они сброшены и доступны снова.');
+        // 🔄 Обновим интерфейс, чтобы сброс отразился
+        setTimeout(() => {
+          window.location.reload();
+        }, 300);
       }
     } else {
       alert(`❌ Недостаточно приглашений: ${invited}/${task.requiresReferralCount}`);
