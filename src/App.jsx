@@ -179,6 +179,37 @@ useEffect(() => {
   ensureUserExists();
 }, []);
           
+          useEffect(() => {
+  if (!userId) return;
+
+  const syncCompletedTasks = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('referral_tasks')
+        .select('task_key')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('❌ Ошибка загрузки выполненных заданий:', error.message);
+        return;
+      }
+
+      const synced = {};
+      data.forEach(t => synced[t.task_key] = true);
+
+      setCompletedTasks(prev => {
+        const merged = { ...prev, ...synced };
+        localStorage.setItem('completedTasks', JSON.stringify(merged));
+        return merged;
+      });
+    } catch (e) {
+      console.error('Ошибка при синхронизации заданий:', e);
+    }
+  };
+
+  syncCompletedTasks();
+}, [userId]);
+          
   const updateRank = (totalCoins) => {
     if (totalCoins >= 5000) setRank('Легенда VPN');
     else if (totalCoins >= 2000) setRank('Эксперт');
