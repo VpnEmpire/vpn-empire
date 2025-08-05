@@ -103,3 +103,4 @@ export default async function handler(req, res) {
     console.error('❌ Внутренняя ошибка:', e);
     return res.status(500).json({ success: false, error: 'Ошибка сервера' });
   } 
+  }
