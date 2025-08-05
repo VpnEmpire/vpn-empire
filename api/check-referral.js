@@ -17,7 +17,7 @@ export const config = {
 
 export default async function handler(req, res) {
   console.log('📥 [check-referral] Запрос получен');
-  
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Метод не поддерживается. Используй POST.' });
   }
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 
   if (!user_id || !task_key || required_count === undefined) {
     return res.status(400).json({ error: 'Не хватает параметров (user_id, task_key, required_count)' });
-      }
+  }
 
   try {
     // 1. Получаем количество приглашённых
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       console.error('❌ Ошибка подсчёта рефералов:', countError.message);
       return res.status(500).json({ success: false, error: 'Ошибка при подсчёте' });
     }
-    
+
     console.log(`👥 Найдено ${count} приглашённых`);
 
     // 2. Проверяем, хватает ли рефералов
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
       .eq('user_id', user_id)
       .eq('task_key', task_key)
       .maybeSingle();
-      
+
     if (existingError) {
       console.error('❌ Ошибка проверки выполнения:', existingError.message);
       return res.status(500).json({ success: false, error: 'Ошибка Supabase' });
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
     }
 
      // 4. Сохраняем выполнение задания
-   const { data: referralData, error: referralFetchError } = await supabase
+    const { data: referralData, error: referralFetchError } = await supabase
       .from('users')
       .select('referrals_by')
       .eq('user_id', user_id)
@@ -98,9 +98,9 @@ export default async function handler(req, res) {
 
     console.log(`✅ Задание ${task_key} успешно засчитано`);
     return res.status(200).json({ success: true, invited: count });
-    
+
   } catch (e) {
     console.error('❌ Внутренняя ошибка:', e);
     return res.status(500).json({ success: false, error: 'Ошибка сервера' });
-  } 
   }
+}
