@@ -84,7 +84,7 @@ export default async function handler(req, res) {
     if (updateError) {
       console.error('❌ Ошибка при обновлении счётчика:', updateError);
       return res.status(500).json({ success: false, error: 'Ошибка обновления счётчика' });
-    }
+    } 
 
     console.log(`✅ Обновлён счётчик: ${referral_id} → ${newCount}`);
   }
