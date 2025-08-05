@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   if (!user_id || !referral_id || user_id === referral_id) {
     return res.status(400).json({ success: false, error: 'Неверные параметры' });
   }
-
+  
   // 1. Проверим, не существует ли уже такая пара
   const { data: existing, error: fetchError } = await supabase
     .from('referrals')
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     console.warn(`⚠️ Реферал уже существует: ${referral_id} → ${user_id}`);
     return res.status(200).json({ success: true, message: 'Реферал уже существует' });
   }
-
+  
   // 2. Добавим новую запись
   const { error: insertError } = await supabase
     .from('referrals')
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
   // 3. Получим текущий счётчик у пригласившего
   const { data: userData, error: fetchUserError } = await supabase
-    .from('users')
+     .from('users')
     .select('referrals_by')
     .eq('user_id', referral_id)
     .maybeSingle();
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
       .insert([{ user_id: referral_id, referrals_by: 1 }]);
 
     if (createError) {
-      console.error('❌ Ошибка при создании пользователя:', createError);
+          console.error('❌ Ошибка при создании пользователя:', createError);
       return res.status(500).json({ success: false, error: 'Ошибка создания пользователя' });
     }
 
@@ -80,14 +80,15 @@ export default async function handler(req, res) {
       .from('users')
       .update({ referrals_by: newCount })
       .eq('user_id', referral_id);
-
+      
     if (updateError) {
       console.error('❌ Ошибка при обновлении счётчика:', updateError);
       return res.status(500).json({ success: false, error: 'Ошибка обновления счётчика' });
-    } 
+    }
 
     console.log(`✅ Обновлён счётчик: ${referral_id} → ${newCount}`);
   }
+
   console.log(`✅ Добавлен новый реферал: ${referral_id} → ${user_id}`);
   return res.status(200).json({ success: true, message: 'Referral added successfully' });
 } 
