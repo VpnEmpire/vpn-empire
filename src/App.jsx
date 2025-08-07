@@ -677,11 +677,15 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
   </div>
 );
  
-  const renderHome = () => (
+ const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
         <div className="coins">💰 Монет: {coins} $RICH</div>
         <div className="rank">🎖 Звание: {rank}</div>
+    {/* 👥 Количество пользователей — ВВЕРХУ */}
+      <div style={{ marginTop: '5px', fontWeight: 'bold', fontSize: '15px', color: '#00c2ff' }}>
+        👥 Количество пользователей: 158 486 
+      </div>
     </div>
 
       <div className="robot-container">
@@ -698,10 +702,6 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
       {flashes.map(f => (
         <div key={f.id} className="flash" style={{ left: f.x, top: f.y }} />
       ))}
-    {/* 👇 Добавленная надпись */}
-    <div style={{ marginTop: '20px', textAlign: 'center', fontWeight: 'bold', fontSize: '16px', color: '#00c2ff' }}>
-      👥 Количество пользователей: 158 486
-    </div>
   </div>
 );
  
