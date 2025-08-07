@@ -680,7 +680,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
  const renderHome = () => (
     <div className="main-content">
       <div className="heander-box">
-        <div className="coins">💰 Монет: {coins}</div>
+        <div className="coins">💰 Монеты: {coins}</div>
         <div className="rank">🎖 Звание: {rank}</div>
     {/* 👥 Количество пользователей — ВВЕРХУ */}
       <div style={{ marginTop: '5px', fontWeight: 'bold', fontSize: '15px', color: '#00c2ff' }}>
