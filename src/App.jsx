@@ -683,8 +683,8 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
         <div className="coins">💰 Монеты: {coins}</div>
         <div className="rank">🎖 Звание: {rank}</div>
     {/* 👥 Количество пользователей — ВВЕРХУ */}
-      <div className="fade-in-users" style={{ marginTop: '5px', fontWeight: 'bold', fontSize: '15px', color: '#00c2ff' }}>
-        👥 Количество пользователей: 158 486 
+      <div style={{ marginTop: '5px', fontWeight: 'bold', fontSize: '15px', color: '#00c2ff' }}>
+  👥 Количество пользователей: <span className="fade-in-users">158 486</span>
       </div>
     </div>
 
