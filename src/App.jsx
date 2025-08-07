@@ -698,8 +698,12 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
       {flashes.map(f => (
         <div key={f.id} className="flash" style={{ left: f.x, top: f.y }} />
       ))}
+    {/* 👇 Добавленная надпись */}
+    <div style={{ marginTop: '20px', textAlign: 'center', fontWeight: 'bold', fontSize: '16px', color: '#00c2ff' }}>
+      👥 Уже 4 581 человек с нами — присоединяйся!
     </div>
-  );
+  </div>
+);
  
   const renderTop = () => <TopTab coins={coins} players={realPlayers} />;
   const renderRoulette = () => <Roulette setCoins={setCoins} />;
