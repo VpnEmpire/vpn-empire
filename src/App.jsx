@@ -700,7 +700,7 @@ if (completedTasks[task.key] && shouldHideAfterComplete) return null;
       ))}
     {/* 👇 Добавленная надпись */}
     <div style={{ marginTop: '20px', textAlign: 'center', fontWeight: 'bold', fontSize: '16px', color: '#00c2ff' }}>
-      👥 Количество пользователей: 158486
+      👥 Количество пользователей: 158 486
     </div>
   </div>
 );
