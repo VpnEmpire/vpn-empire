@@ -45,7 +45,8 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
     { key: 'activateVpn', label: '🚀 Активируй VPN', reward: 2000, type: 'vpn', link: 'https://t.me/OrdoHereticus_bot', bonus: 'x2 кликов', requiresPayment: true },
     { key: 'reactTelegramPost69', label: '💥 Поставь реакцию под новым постом', reward: 200, type: 'action', link: 'https://t.me/OrdoHereticusVPN/69' },
     { key: 'reactTelegramPost68', label: '💥 Поставь реакцию и забери награду', reward: 200, type: 'action', link: 'https://t.me/OrdoHereticusVPN/68' },
-    { key: 'clickRobot', label: '🤖 Ты сегодня уже кликал на робота? Забери монеты!', reward: 100 }
+    { key: 'clickRobot', label: '🤖 Ты сегодня уже кликал на робота? Забери монеты!', reward: 100 },
+    { key: 'reactTelegramPost68', label: '🔎 Изучи новый пост, обнови ссылку на подписку для корректной работы Vpn и забери награду', reward: 500, type: 'action', link: 'https://t.me/OrdoHereticusVPN/77' }
   ]);
 
   const maxClicksPerDay = 1000;
