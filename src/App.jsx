@@ -47,7 +47,8 @@ JSON.parse(localStorage.getItem('completedTasks')) || {});
     { key: 'reactTelegramPost68', label: '💥 Поставь реакцию и забери награду', reward: 200, type: 'action', link: 'https://t.me/OrdoHereticusVPN/68' },
     { key: 'clickRobot', label: '🤖 Ты сегодня уже кликал на робота? Забери монеты!', reward: 100 },
     { key: 'reactTelegramPost77', label: '🔎 Изучи новый пост, обнови ссылку на подписку для корректной работы Vpn и забери награду', reward: 500, type: 'action', link: 'https://t.me/OrdoHereticusVPN/77' },
-  ]);
+    { key: 'topRobot', label: '🔝 Проверь в топе ли ты ? И забери монеты!', reward: 300 }
+    ]);
 
   const maxClicksPerDay = 1000;
   const spinSoundRef = useRef(null);
